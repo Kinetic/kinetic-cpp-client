@@ -1,0 +1,40 @@
+*.swp
+.idea
+.project
+.cproject
+
+# Build output
+*.o
+*.a
+*.lo
+*.la
+*.pc
+.libs
+.deps
+kinetic_client_test
+kinetic_integration_test
+/vendor
+kinetic_cpp_client.build
+kinetic_cpp_client.xcodeproj
+kinetic_client.proto
+
+# gtest report xml
+/gtestresults.xml
+/integrationresults.xml
+test_detail.xml
+
+# CMake artifacts
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+/Makefile
+CMakeScripts
+
+# Doxygen output
+docs
+doxygen_warnings.log
+
+# Compiled protobuf files
+*.pb.cc
+*.pb.h
+tmp

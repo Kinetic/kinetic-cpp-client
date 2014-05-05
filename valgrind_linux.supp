@@ -1,0 +1,9 @@
+{
+   gflags/logtostderr
+   Memcheck:Leak
+   ...
+   fun:_ZNSs4_Rep9_S_create*SaIcE
+   ...
+   fun:_GLOBAL__sub_I__ZN3fLB17FLAGS_logtostderrE
+   ...
+}
