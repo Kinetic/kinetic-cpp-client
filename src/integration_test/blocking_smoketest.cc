@@ -35,6 +35,8 @@ using com::seagate::kinetic::client::proto::Message_Algorithm_SHA1;
 TEST_F(IntegrationTest, BlockingSmoketest) {
     BlockingKineticConnection& blocking = connection_->blocking();
 
+    ASSERT_TRUE(blocking.NoOp().ok());
+
     auto record1 = make_shared<KineticRecord>(make_shared<string>("value1"),
         make_shared<string>("v1"), make_shared<string>("t1"), Message_Algorithm_CRC32);
     KineticStatus kineticStatus = blocking.Put("key1", "", IGNORE_VERSION, *record1);

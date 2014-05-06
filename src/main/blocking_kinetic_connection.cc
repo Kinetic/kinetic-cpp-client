@@ -67,6 +67,24 @@ class BlockingCallbackState {
     }
 };
 
+class BlockingNoOpCallback : public NoOpCallbackInterface, public BlockingCallbackState {
+    public:
+    virtual void Success() {
+        OnSuccess();
+    }
+
+    virtual void Failure(KineticStatus error) {
+        OnError(error);
+    }
+
+    private:
+};
+
+KineticStatus BlockingKineticConnection::NoOp() {
+    auto handler = make_shared<BlockingNoOpCallback>();
+    return RunOperation(handler, nonblocking_connection_->NoOp(handler));
+}
+
 class BlockingGetCallback : public GetCallbackInterface, public BlockingCallbackState {
     public:
     BlockingGetCallback(
