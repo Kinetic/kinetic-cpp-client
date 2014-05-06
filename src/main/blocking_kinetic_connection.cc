@@ -67,8 +67,8 @@ class BlockingCallbackState {
     }
 };
 
-class BlockingNoOpCallback : public NoOpCallbackInterface, public BlockingCallbackState {
-    public:
+class SimpleCallback : public SimpleCallbackInterface, public BlockingCallbackState {
+public:
     virtual void Success() {
         OnSuccess();
     }
@@ -77,11 +77,11 @@ class BlockingNoOpCallback : public NoOpCallbackInterface, public BlockingCallba
         OnError(error);
     }
 
-    private:
+private:
 };
 
 KineticStatus BlockingKineticConnection::NoOp() {
-    auto handler = make_shared<BlockingNoOpCallback>();
+    auto handler = make_shared<SimpleCallback>();
     return RunOperation(handler, nonblocking_connection_->NoOp(handler));
 }
 
@@ -204,19 +204,6 @@ KineticStatus BlockingKineticConnection::Put(const string& key,
     return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode,
         make_shared<KineticRecord>(record));
 }
-
-class SimpleCallback : public SimpleCallbackInterface, public BlockingCallbackState {
-    public:
-    virtual void Success() {
-        OnSuccess();
-    }
-
-    virtual void Failure(KineticStatus error) {
-        OnError(error);
-    }
-
-    private:
-};
 
 KineticStatus BlockingKineticConnection::Delete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode) {

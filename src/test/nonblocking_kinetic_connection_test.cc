@@ -91,7 +91,7 @@ TEST_F(NonblockingKineticConnectionTest, NoOpWorks) {
     Message message;
     EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
             .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
-    shared_ptr<NoOpCallbackInterface> callback;
+    shared_ptr<SimpleCallbackInterface> callback;
     connection_.NoOp(callback);
 
     ASSERT_EQ(Message_MessageType_NOOP, message.command().header().messagetype());

@@ -60,18 +60,6 @@ using std::unique_ptr;
 using std::iterator;
 using std::move;
 
-NoOpHandler::NoOpHandler(const shared_ptr<NoOpCallbackInterface> callback)
-        : callback_(callback) {}
-
-void NoOpHandler::Handle(const Message &response, unique_ptr<const string> value) {
-    callback_->Success();
-}
-
-void NoOpHandler::Error(KineticStatus error) {
-    callback_->Failure(error);
-}
-
-
 GetHandler::GetHandler(const shared_ptr<GetCallbackInterface> callback)
     : callback_(callback) {}
 
@@ -245,8 +233,8 @@ unique_ptr<Message> NonblockingKineticConnection::NewMessage(Message_MessageType
     return move(msg);
 }
 
-HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<NoOpCallbackInterface> callback){
-    unique_ptr<NoOpHandler> handler(new NoOpHandler(callback));
+HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback){
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_NOOP);
     return service_->Submit(move(request), empty_str_, move(handler));
 }
