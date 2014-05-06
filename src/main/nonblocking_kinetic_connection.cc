@@ -233,7 +233,7 @@ unique_ptr<Message> NonblockingKineticConnection::NewMessage(Message_MessageType
     return move(msg);
 }
 
-HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_NOOP);
     return service_->Submit(move(request), empty_str_, move(handler));
