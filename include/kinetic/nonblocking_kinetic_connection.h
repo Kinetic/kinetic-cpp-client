@@ -70,7 +70,6 @@ class SimpleHandler : public HandlerInterface {
     DISALLOW_COPY_AND_ASSIGN(SimpleHandler);
 };
 
-
 class GetCallbackInterface {
     public:
     virtual ~GetCallbackInterface() {}

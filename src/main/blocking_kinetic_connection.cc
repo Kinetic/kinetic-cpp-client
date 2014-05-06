@@ -68,7 +68,7 @@ class BlockingCallbackState {
 };
 
 class SimpleCallback : public SimpleCallbackInterface, public BlockingCallbackState {
-public:
+    public:
     virtual void Success() {
         OnSuccess();
     }
@@ -77,7 +77,7 @@ public:
         OnError(error);
     }
 
-private:
+    private:
 };
 
 KineticStatus BlockingKineticConnection::NoOp() {
