@@ -51,6 +51,7 @@ class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnecti
     /// tells the client the correct cluster version using this method.
     void SetClientClusterVersion(int64_t cluster_version);
 
+    HandlerKey NoOp(const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey Get(const shared_ptr<const string> key,
             const shared_ptr<GetCallbackInterface> callback);
     HandlerKey GetNext(const shared_ptr<const string> key,

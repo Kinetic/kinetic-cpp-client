@@ -43,6 +43,11 @@ void ThreadsafeNonblockingKineticConnection::SetClientClusterVersion(int64_t clu
     return NonblockingKineticConnection::SetClientClusterVersion(cluster_version);
 }
 
+HandlerKey ThreadsafeNonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::mutex> guard(mutex_);
+    return NonblockingKineticConnection::NoOp(callback);
+}
+
 HandlerKey ThreadsafeNonblockingKineticConnection::Get(const shared_ptr<const string> key,
     const shared_ptr<GetCallbackInterface> callback) {
     std::lock_guard<std::mutex> guard(mutex_);
