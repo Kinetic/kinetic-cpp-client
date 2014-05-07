@@ -31,6 +31,7 @@ using com::seagate::kinetic::client::proto::Message_MessageType_GETNEXT;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETPREVIOUS;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETKEYRANGE;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETVERSION;
+using com::seagate::kinetic::client::proto::Message_MessageType_NOOP;
 using com::seagate::kinetic::client::proto::Message_MessageType_PUT;
 using com::seagate::kinetic::client::proto::Message_MessageType_SETUP;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETLOG;
@@ -230,6 +231,12 @@ unique_ptr<Message> NonblockingKineticConnection::NewMessage(Message_MessageType
     msg->mutable_command()->mutable_header()->set_clusterversion(cluster_version_);
 
     return move(msg);
+}
+
+HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    unique_ptr<Message> request = NewMessage(Message_MessageType_NOOP);
+    return service_->Submit(move(request), empty_str_, move(handler));
 }
 
 HandlerKey NonblockingKineticConnection::Get(const shared_ptr<const string> key,

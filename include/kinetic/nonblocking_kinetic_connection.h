@@ -223,6 +223,7 @@ class NonblockingKineticConnection {
     virtual bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds);
     virtual void SetClientClusterVersion(int64_t cluster_version);
 
+    virtual HandlerKey NoOp(const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey Get(const string key, const shared_ptr<GetCallbackInterface> callback);
     virtual HandlerKey Get(const shared_ptr<const string> key,
         const shared_ptr<GetCallbackInterface> callback);

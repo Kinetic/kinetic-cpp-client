@@ -55,6 +55,8 @@ class BlockingKineticConnection {
     /// tells the client the correct cluster version using this method.
     virtual void SetClientClusterVersion(int64_t cluster_version);
 
+    virtual KineticStatus NoOp();
+
     virtual KineticStatus Get(
             const shared_ptr<const string> key,
             unique_ptr<KineticRecord>& record);

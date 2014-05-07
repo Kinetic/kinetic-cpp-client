@@ -34,6 +34,7 @@ using com::seagate::kinetic::client::proto::Message_MessageType_GETNEXT;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETPREVIOUS;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETKEYRANGE;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETVERSION;
+using com::seagate::kinetic::client::proto::Message_MessageType_NOOP;
 using com::seagate::kinetic::client::proto::Message_MessageType_PUT;
 using com::seagate::kinetic::client::proto::Message_MessageType_SETUP;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETLOG;
@@ -85,6 +86,16 @@ class NonblockingKineticConnectionTest : public ::testing::Test {
     MockNonblockingPacketService* packet_service_;
     NonblockingKineticConnection connection_;
 };
+
+TEST_F(NonblockingKineticConnectionTest, NoOpWorks) {
+    Message message;
+    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
+            .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
+    shared_ptr<SimpleCallbackInterface> callback;
+    connection_.NoOp(callback);
+
+    ASSERT_EQ(Message_MessageType_NOOP, message.command().header().messagetype());
+}
 
 TEST_F(NonblockingKineticConnectionTest, GetWorks) {
     Message message;
