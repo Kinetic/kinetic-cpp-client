@@ -22,6 +22,7 @@
 #define KINETIC_CPP_CLIENT_BLOCKING_KINETIC_CONNECTION_H_
 
 #include <memory>
+#include <mutex>
 
 #include "kinetic/nonblocking_kinetic_connection.h"
 #include "kinetic/status.h"
@@ -41,6 +42,9 @@ class KeyRangeIterator;
 class BlockingCallbackState;
 
 class BlockingKineticConnection {
+    private:
+    std::mutex force_single_thread;
+
     public:
     /// Takes ownership of the given NonblockingKineticConnection
     /// @param[in] nonblocking_connection   The underlying connection that will be used

@@ -398,6 +398,7 @@ KineticStatus BlockingKineticConnection::P2PPush(
 KineticStatus BlockingKineticConnection::RunOperation(
         shared_ptr<BlockingCallbackState> callback,
         HandlerKey handler_key) {
+    std::lock_guard<std::mutex> lock(force_single_thread);
     fd_set read_fds, write_fds;
     int nfds;
 
