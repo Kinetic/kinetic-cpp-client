@@ -18,6 +18,7 @@
  *
  */
 
+#include "kinetic/threadsafe_blocking_kinetic_connection.h"
 #include "kinetic/kinetic_connection_factory.h"
 #include "kinetic/threadsafe_nonblocking_connection.h"
 #include "socket_wrapper.h"
@@ -69,17 +70,21 @@ Status KineticConnectionFactory::doNewConnection(ConnectionOptions const &option
 
     NonblockingPacketService *service =
         new NonblockingPacketService(socket_wrapper, move(sender), receiver);
-    NonblockingKineticConnection *nonblocking_connection;
 
     if (threadsafe) {
-        nonblocking_connection = new ThreadsafeNonblockingKineticConnection(service);
+        NonblockingKineticConnection* nonblocking_connection =
+                new ThreadsafeNonblockingKineticConnection(service);
+        ThreadsafeBlockingKineticConnection* blocking_connection =
+                new ThreadsafeBlockingKineticConnection(nonblocking_connection, network_timeout_seconds);
+        connection.reset(new ConnectionHandle(blocking_connection, nonblocking_connection));
     } else {
-        nonblocking_connection = new NonblockingKineticConnection(service);
+        NonblockingKineticConnection* nonblocking_connection =
+                new NonblockingKineticConnection(service);
+        BlockingKineticConnection* blocking_connection =
+                new BlockingKineticConnection(nonblocking_connection, network_timeout_seconds);
+        connection.reset(new ConnectionHandle(blocking_connection, nonblocking_connection));
     }
 
-    BlockingKineticConnection *blocking_connection =
-        new BlockingKineticConnection(nonblocking_connection, network_timeout_seconds);
-    connection.reset(new ConnectionHandle(blocking_connection, nonblocking_connection));
 
     return Status::makeOk();
 }
