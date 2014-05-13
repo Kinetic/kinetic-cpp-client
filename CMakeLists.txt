@@ -51,8 +51,8 @@ set(PREFIX "${CMAKE_BINARY_DIR}/vendor")
 
 include(ExternalProject)
 
-set(PROTOBUFUTIL_VERSION "v0.2.2")
-set(PROTOBUFUTIL_MD5 "e1de2f4b5068b1d6464bacd3b3af3b72")
+set(PROTOBUFUTIL_VERSION "0.2.3")
+set(PROTOBUFUTIL_MD5 "b60a0ff47222ab70e0ddb7a8e6ef6900")
 
 ExternalProject_add(
     protobufutil
