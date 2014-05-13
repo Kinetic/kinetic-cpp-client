@@ -24,10 +24,9 @@
 #include "protobufutil/message_stream.h"
 
 #include "kinetic/connection_options.h"
-#include "kinetic/connection_handle.h"
 #include "kinetic/hmac_provider.h"
 #include "kinetic/nonblocking_kinetic_connection.h"
-#include "kinetic/blocking_kinetic_connection.h"
+#include "kinetic/threadsafe_nonblocking_connection.h"
 #include "kinetic/status.h"
 
 namespace kinetic {
@@ -50,24 +49,23 @@ class KineticConnectionFactory {
     /// @param[in] options                  Specifies host, port, user id, etc
     /// @param[in] network_timeout_seconds  If an operation goes more than this many seconds without
     ///                                     data the operation fails
-    /// @param[out] connection              Populated with a ConnectionHandle if the request
+    /// @param[out] connection              Populated with a NonblockingKineticConnection if the request
     ///                                     succeeds
-    virtual Status NewConnection(
-        const ConnectionOptions &options,
-        unsigned int network_timeout_seconds,
-        unique_ptr<ConnectionHandle>& connection);
+    virtual Status NewNonblockingConnection(
+            const ConnectionOptions& options,
+            unique_ptr <NonblockingKineticConnection>& connection);
 
-    /// Like NewConnection, except the connections available via the ConnectionHandle are safe for
-    /// use by multiple threads.
-    virtual Status NewThreadsafeConnection(const ConnectionOptions &options,
-            unsigned int network_timeout_seconds,
-            unique_ptr<ConnectionHandle>& connection);
+    /// Like NewConnection, except the connection is safe for use by multiple threads.
+    virtual Status NewThreadsafeNonblockingConnection(
+            const ConnectionOptions& options,
+            unique_ptr <NonblockingKineticConnection>& connection);
 
     private:
     HmacProvider hmac_provider_;
-    Status doNewConnection(ConnectionOptions const &options,
-            unsigned int network_timeout_seconds,
-            unique_ptr<ConnectionHandle>& connection, bool threadsafe);
+    Status doNewConnection(
+            ConnectionOptions const& options,
+            unique_ptr <NonblockingKineticConnection>& connection,
+            bool threadsafe);
 };
 
 /// Helper method that creates a new KineticConnectionFactory with

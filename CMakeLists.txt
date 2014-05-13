@@ -134,7 +134,7 @@ add_library(kinetic_client
     src/main/socket_wrapper.cc
     src/main/blocking_kinetic_connection.cc
     src/main/threadsafe_blocking_kinetic_connection.cc
-    src/main/connection_handle.cc
+
     src/main/key_range_iterator.cc
 )
 add_dependencies(kinetic_client

@@ -49,7 +49,7 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnection {
     /// @param[in] network_timeout_seconds  If an operation goes more than network_timeout_seconds
     ///                                     seconds without receiving data the operation will fail
     explicit ThreadsafeBlockingKineticConnection(
-        NonblockingKineticConnection* nonblocking_connection,
+        shared_ptr<ThreadsafeNonblockingKineticConnection> nonblocking_connection,
         unsigned int network_timeout_seconds);
     ~ThreadsafeBlockingKineticConnection();
 

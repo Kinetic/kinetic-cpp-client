@@ -44,7 +44,7 @@ class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnecti
     /// @param[out] write_fds
     /// @param[out] nfds
     /// @return true if everything went well; false otherwise. If this method returns false
-    /// the connection is broken and the ConnectionHandle needs to be discarded
+    /// the connection is broken and needs to be discarded
     bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds);
 
     /// If the drive has a non-zero cluster version, requests will fail unless the developer

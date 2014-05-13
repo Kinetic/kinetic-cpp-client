@@ -36,9 +36,9 @@ TEST_F(IntegrationTest, Write) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put("key", "", REQUIRE_SAME_VERSION, record, put_callback);
+    nonblocking_connection_->Put("key", "", REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Get("key", get_callback);
+    nonblocking_connection_->Get("key", get_callback);
     EXPECT_CALL(*get_callback, Success_("key",
             KineticRecordEq("value", "version", "tag", Message_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
@@ -49,10 +49,10 @@ TEST_F(IntegrationTest, Write_NoTag) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Get("key", get_callback);
+    nonblocking_connection_->Get("key", get_callback);
     EXPECT_CALL(*get_callback, Success_("key",
             KineticRecordEq("value", "version", "", Message_Algorithm_SHA1)))
             .WillOnce(Assign(&done_, true));
@@ -64,7 +64,7 @@ TEST_F(IntegrationTest, WriteWithWrongVersion) {
     // current version of "v2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>("v2"),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>("v2"),
         REQUIRE_SAME_VERSION, record, put_callback);
     EXPECT_CALL(*put_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_VERSION_MISMATCH, "Version mismatch")))
@@ -77,7 +77,7 @@ TEST_F(IntegrationTest, Update) {
     auto write_callback = make_shared<StrictMock<MockPutCallback>>();
     auto initial_record = make_shared<KineticRecord>("initial value", "v1", "initial tag",
         Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, initial_record,
         write_callback);
     WaitForSuccessSharedPtr(write_callback);
@@ -86,13 +86,13 @@ TEST_F(IntegrationTest, Update) {
     auto update_callback = make_shared<StrictMock<MockPutCallback>>();
     auto new_record = make_shared<KineticRecord>("new value", "v2", "new tag",
         Message_Algorithm_CRC64);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>("v1"),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>("v1"),
         REQUIRE_SAME_VERSION, new_record, update_callback);
     WaitForSuccessSharedPtr(update_callback);
 
     // Verify that the update is now visible
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().Get("key", get_callback);
+    nonblocking_connection_->Get("key", get_callback);
     EXPECT_CALL(*get_callback, Success_("key",
             KineticRecordEq("new value", "v2", "new tag", Message_Algorithm_CRC64)))
             .WillOnce(Assign(&done_, true));
@@ -104,7 +104,7 @@ TEST_F(IntegrationTest, UpdateWithWrongVersion) {
     auto write_callback = make_shared<StrictMock<MockPutCallback>>();
     auto initial_record = make_shared<KineticRecord>("initial value", "v1", "initial tag",
         Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, initial_record, write_callback);
     WaitForSuccessSharedPtr(write_callback);
 
@@ -112,7 +112,7 @@ TEST_F(IntegrationTest, UpdateWithWrongVersion) {
     auto update_callback = make_shared<StrictMock<MockPutCallback>>();
     auto new_record = make_shared<KineticRecord>("new value", "v2", "new tag",
         Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>("wrong version"),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>("wrong version"),
         REQUIRE_SAME_VERSION, new_record, update_callback);
     EXPECT_CALL(*update_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_VERSION_MISMATCH, "Version mismatch")))
@@ -128,12 +128,12 @@ TEST_F(IntegrationTest, InsertWithNullVersion) {
 
     auto initial_record = make_shared<KineticRecord>(make_shared<string>("value"),
         version, make_shared<string>("tag"), Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, initial_record, write_callback);
     WaitForSuccessSharedPtr(write_callback);
 
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().Get("key", get_callback);
+    nonblocking_connection_->Get("key", get_callback);
     // TODO(marshall) should the version really be empty string here? Should we express null?
     EXPECT_CALL(*get_callback, Success_("key",
         KineticRecordEq("value", "", "tag", Message_Algorithm_SHA1)))
@@ -146,7 +146,7 @@ TEST_F(IntegrationTest, ForcedWrite) {
     // "v1" provided that we set the force flag
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "v2", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>("v1"),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>("v1"),
         IGNORE_VERSION, record, put_callback);
     EXPECT_CALL(*put_callback, Success()).WillOnce(Assign(&done_, true));
     RunSelectLoop();
@@ -157,7 +157,7 @@ TEST_F(IntegrationTest, ForcedUpdate) {
     auto write_callback = make_shared<StrictMock<MockPutCallback>>();
     auto initial_record = make_shared<KineticRecord>("initial value", "v1", "initial tag",
         Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, initial_record, write_callback);
     WaitForSuccessSharedPtr(write_callback);
 
@@ -166,7 +166,7 @@ TEST_F(IntegrationTest, ForcedUpdate) {
     auto update_callback = make_shared<StrictMock<MockPutCallback>>();
     auto new_record = make_shared<KineticRecord>("new value", "", "new tag",
         Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>("wrong version"),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>("wrong version"),
         IGNORE_VERSION, new_record, update_callback);
     EXPECT_CALL(*update_callback, Success()).WillOnce(Assign(&done_, true));
 

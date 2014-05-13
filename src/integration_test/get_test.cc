@@ -38,7 +38,7 @@ using std::string;
 
 TEST_F(IntegrationTest, GetNonexistent) {
     auto callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().Get("nonexistent key", callback);
+    nonblocking_connection_->Get("nonexistent key", callback);
     EXPECT_CALL(*callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND, "Key not found")))
         .WillOnce(Assign(&done_, true)); RunSelectLoop();
@@ -47,12 +47,12 @@ TEST_F(IntegrationTest, GetNonexistent) {
 TEST_F(IntegrationTest, GetOk) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
             REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     auto callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().Get("key1", callback);
+    nonblocking_connection_->Get("key1", callback);
     EXPECT_CALL(*callback,
         Success_("key1", KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
@@ -64,16 +64,16 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
     auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Put(make_shared<string>("key2"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record2, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "key2" and its value
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetNext("key1", get_callback);
+    nonblocking_connection_->GetNext("key1", get_callback);
     EXPECT_CALL(*get_callback, Success_("key2",
             KineticRecordEq("value2", "v2", "tag2", Message_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
@@ -84,7 +84,7 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
 TEST_F(IntegrationTest, GetManyOutstandingRequests) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_CRC64);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
@@ -98,7 +98,7 @@ TEST_F(IntegrationTest, GetManyOutstandingRequests) {
         auto get_callback = make_shared<StrictMock<MockGetCallback>>();
         callbacks.push_back(get_callback);
 
-        connection_->nonblocking().Get("key1", get_callback);
+        nonblocking_connection_->Get("key1", get_callback);
         EXPECT_CALL(*get_callback, Success_("key1",
                 KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_CRC64)))
             .WillOnce(InvokeWithoutArgs(incr));
@@ -111,13 +111,13 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndDoesNotHaveSuccessor) {
     // Write "key1"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "not found"
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetNext("key1", get_callback);
+    nonblocking_connection_->GetNext("key1", get_callback);
     WaitForFailure(get_callback, StatusCode::REMOTE_NOT_FOUND, "Key not found");
 }
 
@@ -125,13 +125,13 @@ TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndHasSuccessor) {
     // Write "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_CRC64);
-    connection_->nonblocking().Put(make_shared<string>("key2"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "key2" and its value
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetNext("key1", get_callback);
+    nonblocking_connection_->GetNext("key1", get_callback);
     EXPECT_CALL(*get_callback, Success_("key2",
             KineticRecordEq("value", "version", "tag", Message_Algorithm_CRC64)))
         .WillOnce(Assign(&done_, true));
@@ -142,7 +142,7 @@ TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndHasSuccessor) {
 TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndDoesNotHaveSuccessor) {
     // Call GetNext on "key1" and verify that we get "not found"
     auto callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetNext("key1", callback);
+    nonblocking_connection_->GetNext("key1", callback);
     EXPECT_CALL(*callback, Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND, "Key not found")))
         .WillOnce(Assign(&done_, true));
 
@@ -154,16 +154,16 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndHasPredecessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
     auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Put(make_shared<string>("key2"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record2, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "key1" and its value
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetPrevious("key2", get_callback);
+    nonblocking_connection_->GetPrevious("key2", get_callback);
     EXPECT_CALL(*get_callback, Success_("key1",
         KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
@@ -175,13 +175,13 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndDoesNotHavePredecessor) {
     // Write "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key2"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "not found"
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetPrevious("key2", get_callback);
+    nonblocking_connection_->GetPrevious("key2", get_callback);
     EXPECT_CALL(*get_callback, Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND,
         "Key not found"))) .WillOnce(Assign(&done_, true));
 
@@ -192,13 +192,13 @@ TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndHasPredecessor) {
     // Write "key1"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "key1" and its value
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetPrevious("key2", get_callback);
+    nonblocking_connection_->GetPrevious("key2", get_callback);
     EXPECT_CALL(*get_callback, Success_("key1",
             KineticRecordEq("value", "version", "tag", Message_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
@@ -209,7 +209,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndHasPredecessor) {
 TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndDoesNotHavePredecessor) {
     // Call GetPrevious on "key2" and verify that we get "not found"
     auto callback = make_shared<StrictMock<MockGetCallback>>();
-    connection_->nonblocking().GetPrevious("key2", callback);
+    nonblocking_connection_->GetPrevious("key2", callback);
     EXPECT_CALL(*callback, Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND, "Key not found")))
         .WillOnce(Assign(&done_, true));
 
@@ -218,7 +218,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndDoesNotHavePredecessor) {
 
 TEST_F(IntegrationTest, GetVersionNonexistent) {
     auto get_version_callback = make_shared<StrictMock<MockGetVersionCallback>>();
-    connection_->nonblocking().GetVersion("key", get_version_callback);
+    nonblocking_connection_->GetVersion("key", get_version_callback);
     EXPECT_CALL(*get_version_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND, "Key not found")))
         .WillOnce(Assign(&done_, true));
@@ -229,11 +229,11 @@ TEST_F(IntegrationTest, GetVersion) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto get_version_callback = make_shared<StrictMock<MockGetVersionCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("key"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
-    connection_->nonblocking().GetVersion("key", get_version_callback);
+    nonblocking_connection_->GetVersion("key", get_version_callback);
     EXPECT_CALL(*get_version_callback, Success("version")).WillOnce(Assign(&done_, true));
     RunSelectLoop();
 }
@@ -242,16 +242,16 @@ TEST_F(IntegrationTest, GetKeyRange) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     // TODO(marshall) fails on java simulator with empty value
     auto record = make_shared<KineticRecord>("v", "", "", Message_Algorithm_SHA1);
-    connection_->nonblocking().Put(make_shared<string>("k0"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("k0"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Put(make_shared<string>("k1"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("k1"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Put(make_shared<string>("k2"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("k2"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
-    connection_->nonblocking().Put(make_shared<string>("k3"), make_shared<string>(""),
+    nonblocking_connection_->Put(make_shared<string>("k3"), make_shared<string>(""),
         REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
@@ -262,7 +262,7 @@ TEST_F(IntegrationTest, GetKeyRange) {
 
     EXPECT_CALL(*getkeyrange_callback, Success_(VectorStringPtrEq(expected_keys)))
         .WillOnce(Assign(&done_, true));
-    connection_->nonblocking().GetKeyRange("k1", true, "k3", true, false, 2, getkeyrange_callback);
+    nonblocking_connection_->GetKeyRange("k1", true, "k3", true, false, 2, getkeyrange_callback);
     RunSelectLoop();
 }
 
