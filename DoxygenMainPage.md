@@ -24,14 +24,15 @@ Next, create a connection options object to indicate the IP, port, user identity
 
 Finally, open the connection:
 
-    std::unique_ptr<kinetic::ConnectionHandle> connection;
-    kinetic::KineticStatus status = kinetic_connection_factory.NewConnection(options, timeout_in_seconds, connection);
+    std::unique_ptr<kinetic::NonblockingKineticConnection> connection;
+    kinetic::KineticStatus status = kinetic_connection_factory.NewNonblockingConnection(options, timeout_in_seconds, connection);
 
-*Note*: If the connection needs to be shared between threads, call `NewThreadsafeConnection` instead.
+*Note*: If the connection needs to be shared between threads, call `NewThreadsafeNonblockingConnection` instead.
 
 To check whether the connection succeeded, check the value of `status.ok()`. If it's false, additional error information is available by calling `status.statusCode()` and `status.message()`.
 
-The underlying connection can be accessed by calling `connection.blocking()` or `connection.nonblocking()`. The interface returned by `blocking()` and `nonblocking()` both access the same underlying TCP connection.
+The factory can create threadasafe and non-threadsafe variants of blocking and nonblocking clients. Blocking clients can also be created from an existing nonblocking client using the `BlockingKineticClient` constructor which takes a `NonblockingKineticConnection`.
+The benefit of this approach is that both clients will use the same underyling connection. This is not necessarily threadsafe. If you use a nonblocking and blocking client which use the same underlying connection, then there are no guarantees about which thread is will process callbacks.
 
 Performing blocking GET/PUT operations
 --------------------------------------
@@ -39,7 +40,7 @@ PUT and GET calls make use of the `kientic::KineticRecord` class, which bundles 
 
 To PUT a key:
     
-    connection->blocking().Put(
+    blocking_connection->Put(
         key,
         version,
         kinetic::IGNORE_VERSION,
@@ -52,7 +53,7 @@ Like most operations in the Kinetic C++ client, `Put` returns a `KineticStatus` 
 GETting a key works similarly:
 
     std::unique_ptr<KineticRecord> record;
-    connection->blocking().Get(key, record);
+    blocking_connection->Get(key, record);
 
 Performing non-blocking GET/PUT operations
 ------------------------------------------
@@ -80,20 +81,20 @@ class to receive success and failure messages:
 Then enqueue a series of operations:
 
     auto record = make_shared<KineticRecord>(value, version, tag, Message_Algorithm_SHA1);
-        connection->nonblocking().Put(key1, version, kinetic::IGNORE_VERSION, record, callback);
+        nonblocking_connection->Put(key1, version, kinetic::IGNORE_VERSION, record, callback);
     Message_Algorithm_SHA1);
-        connection->nonblocking().Put(key2, version, kinetic::IGNORE_VERSION, record, callback);
+        nonblocking_connection->Put(key2, version, kinetic::IGNORE_VERSION, record, callback);
     Message_Algorithm_SHA1);
-        connection->nonblocking().Put(key3, version, kinetic::IGNORE_VERSION, record, callback);
+        nonblocking_connection->Put(key3, version, kinetic::IGNORE_VERSION, record, callback);
 
 Finally, call `Run` repeatedly to actually execute the operations:
     
     fd_set read_fds, write_fds;
     int nfd = 0;
-    connection->nonblocking().Run(&read_fds, &write_fds, &nfd);
+    nonblocking_connection->Run(&read_fds, &write_fds, &nfd);
     while (there_is_work_to_do) {
         while (select(nfd + 1, &read_fds, &write_fds, NULL, NULL) <= 0);
-        connection->nonblocking().Run(&read_fds, &write_fds, &num_fds);
+        nonblocking_connection->.Run(&read_fds, &write_fds, &num_fds);
     }
 
 If desired, other fds can be added to the `fd_set`s so that the `select` call can wait for IO to be ready on fds controlled by the Kinetic API or other parts of the application.
@@ -117,9 +118,9 @@ GETs work very similarly. First, a callback implementation:
 
 Next, enqueue some operations:
 
-        connection->nonblocking().Get(key_1, callback);
-        connection->nonblocking().Get(key_2, callback);
-        connection->nonblocking().Get(key_3, callback);
+        nonblocking_connection->Get(key_1, callback);
+        nonblocking_connection->Get(key_2, callback);
+        nonblocking_connection->Get(key_3, callback);
 
 The `Run` loop works exactly the same way as it does for the PUT case. Multiple GET/PUT/management operations can all be enqueued and they will be executed one at a time in order by repeated `Run` calls.
 
