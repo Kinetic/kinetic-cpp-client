@@ -42,10 +42,76 @@ Status KineticConnectionFactory::NewNonblockingConnection(
     return doNewConnection(options, connection, false);
 }
 
+Status KineticConnectionFactory::NewNonblockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<NonblockingKineticConnection>& connection) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, false);
+    if (status.ok()) {
+        connection.reset(nbc.release());
+    }
+    return status;
+}
+
 Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
         const ConnectionOptions& options,
         unique_ptr<NonblockingKineticConnection>& connection) {
     return doNewConnection(options, connection, true);
+}
+
+Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<NonblockingKineticConnection>& connection) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, true);
+    if (status.ok()) {
+        connection.reset(nbc.release());
+    }
+    return status;
+}
+
+Status KineticConnectionFactory::NewBlockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, false);
+    connection.reset(new BlockingKineticConnection(move(nbc), network_timeout_seconds));
+    return status;
+}
+
+Status KineticConnectionFactory::NewBlockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
+    if (status.ok()) {
+        connection.reset(bc.release());
+    }
+    return status;
+}
+
+Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, true);
+    connection.reset(new BlockingKineticConnection(move(nbc), network_timeout_seconds));
+    return status;
+}
+
+Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    Status status = NewThreadsafeBlockingConnection(options, bc, network_timeout_seconds);
+    if (status.ok()) {
+        connection.reset(bc.release());
+    }
+    return status;
 }
 
 Status KineticConnectionFactory::doNewConnection(

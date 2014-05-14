@@ -89,10 +89,8 @@ class IntegrationTest : public ::testing::Test {
 
         for (size_t i = 0; i < kMaxRetries; ++i) {
             ASSERT_EQ(0, nanosleep(&sleep_time, NULL));
-            unique_ptr<NonblockingKineticConnection> nonblocking_connection(nullptr);
-            if (connection_factory.NewNonblockingConnection(options, nonblocking_connection).ok()) {
+            if (connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok()) {
                 connected = true;
-                nonblocking_connection_ = shared_ptr<NonblockingKineticConnection>(nonblocking_connection.release());
                 blocking_connection_.reset(new BlockingKineticConnection(nonblocking_connection_, 10));
                 break;
             }
