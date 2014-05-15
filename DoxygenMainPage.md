@@ -123,7 +123,3 @@ Next, enqueue some operations:
         nonblocking_connection->Get(key_3, callback);
 
 The `Run` loop works exactly the same way as it does for the PUT case. Multiple GET/PUT/management operations can all be enqueued and they will be executed one at a time in order by repeated `Run` calls.
-
-Closing a connection
---------------------
-The `ConnectionHandle` destructor closes the connection. This means that the he connection remains open until the `unique_ptr` goes out of scope or the `ConnectionHandle` is manually freed.
