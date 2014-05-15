@@ -35,8 +35,13 @@ using std::make_shared;
 using std::move;
 
 BlockingKineticConnection::BlockingKineticConnection(
-        NonblockingKineticConnection* nonblocking_connection, unsigned int network_timeout_seconds)
+        shared_ptr<NonblockingKineticConnection> nonblocking_connection, unsigned int network_timeout_seconds)
     : nonblocking_connection_(nonblocking_connection),
+    network_timeout_seconds_(network_timeout_seconds) {}
+
+BlockingKineticConnection::BlockingKineticConnection(
+        unique_ptr<NonblockingKineticConnection> nonblocking_connection, unsigned int network_timeout_seconds)
+    : nonblocking_connection_(shared_ptr<NonblockingKineticConnection>(nonblocking_connection.release())),
     network_timeout_seconds_(network_timeout_seconds) {}
 
 BlockingKineticConnection::~BlockingKineticConnection() {}

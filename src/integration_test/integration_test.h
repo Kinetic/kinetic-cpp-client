@@ -55,7 +55,10 @@ using std::string;
  */
 class IntegrationTest : public ::testing::Test {
     protected:
-    IntegrationTest() : use_external_(false), pid_(0), done_(false), connection_(nullptr) {}
+    IntegrationTest() : use_external_(false),
+                        pid_(0), done_(false),
+                        nonblocking_connection_(nullptr),
+                        blocking_connection_(nullptr) {}
 
     void SetUp() {
         const char *kinetic_path = getenv("KINETIC_PATH");
@@ -86,15 +89,16 @@ class IntegrationTest : public ::testing::Test {
 
         for (size_t i = 0; i < kMaxRetries; ++i) {
             ASSERT_EQ(0, nanosleep(&sleep_time, NULL));
-            if (connection_factory.NewConnection(options, 10, connection_).ok()) {
+            if (connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok()) {
                 connected = true;
+                blocking_connection_.reset(new BlockingKineticConnection(nonblocking_connection_, 10));
                 break;
             }
         }
         ASSERT_TRUE(connected);
 
         shared_ptr<string> null_ptr(nullptr);
-        connection_->blocking().InstantSecureErase(null_ptr);
+        blocking_connection_->InstantSecureErase(null_ptr);
     }
 
     void TearDown() {
@@ -141,17 +145,18 @@ class IntegrationTest : public ::testing::Test {
         timeout.tv_sec = 10;
         timeout.tv_usec = 0;
 
-        ASSERT_TRUE(connection_->nonblocking().Run(&read_fds, &write_fds, &nfds));
+        ASSERT_TRUE(nonblocking_connection_->Run(&read_fds, &write_fds, &nfds));
         while (!done_) {
             ASSERT_GT(select(nfds, &read_fds, &write_fds, NULL, &timeout), 0);
-            ASSERT_TRUE(connection_->nonblocking().Run(&read_fds, &write_fds, &nfds));
+            ASSERT_TRUE(nonblocking_connection_->Run(&read_fds, &write_fds, &nfds));
         }
     }
 
     bool use_external_;
     pid_t pid_;
     bool done_;
-    unique_ptr<kinetic::ConnectionHandle> connection_;
+    shared_ptr<kinetic::NonblockingKineticConnection> nonblocking_connection_;
+    unique_ptr<kinetic::BlockingKineticConnection> blocking_connection_;
 };
 
 // when the cap is reached, set the flag bool to true

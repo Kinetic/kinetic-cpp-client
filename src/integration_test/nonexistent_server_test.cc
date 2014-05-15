@@ -38,8 +38,8 @@ TEST(NonexistentServerTest, NonexistentServer) {
     options.user_id = 1;
     options.hmac_key = "asdfasdf";
 
-    unique_ptr<ConnectionHandle> connection;
-    ASSERT_FALSE(kinetic_connection_factory.NewConnection(options, 5, connection).ok());
+    unique_ptr<NonblockingKineticConnection> connection;
+    ASSERT_FALSE(kinetic_connection_factory.NewNonblockingConnection(options, connection).ok());
     ASSERT_FALSE(connection);
 }
 

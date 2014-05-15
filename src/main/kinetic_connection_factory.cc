@@ -19,7 +19,6 @@
  */
 
 #include "kinetic/kinetic_connection_factory.h"
-#include "kinetic/threadsafe_nonblocking_connection.h"
 #include "socket_wrapper.h"
 #include "nonblocking_packet_service.h"
 
@@ -37,23 +36,87 @@ KineticConnectionFactory::KineticConnectionFactory(
     : hmac_provider_(hmac_provider) {}
 
 
-Status KineticConnectionFactory::NewConnection(
-        const ConnectionOptions &options,
-        unsigned int network_timeout_seconds,
-        unique_ptr<ConnectionHandle>& connection) {
-    return doNewConnection(options, network_timeout_seconds, connection, false);
+Status KineticConnectionFactory::NewNonblockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<NonblockingKineticConnection>& connection) {
+    return doNewConnection(options, connection, false);
 }
 
-Status KineticConnectionFactory::NewThreadsafeConnection(
-        const ConnectionOptions &options,
-        unsigned int network_timeout_seconds,
-        unique_ptr<ConnectionHandle>& connection) {
-    return doNewConnection(options, network_timeout_seconds, connection, true);
+Status KineticConnectionFactory::NewNonblockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<NonblockingKineticConnection>& connection) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, false);
+    if (status.ok()) {
+        connection.reset(nbc.release());
+    }
+    return status;
 }
 
-Status KineticConnectionFactory::doNewConnection(ConnectionOptions const &options,
-        unsigned int network_timeout_seconds,
-        unique_ptr<ConnectionHandle>& connection, bool threadsafe) {
+Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<NonblockingKineticConnection>& connection) {
+    return doNewConnection(options, connection, true);
+}
+
+Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<NonblockingKineticConnection>& connection) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, true);
+    if (status.ok()) {
+        connection.reset(nbc.release());
+    }
+    return status;
+}
+
+Status KineticConnectionFactory::NewBlockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, false);
+    connection.reset(new BlockingKineticConnection(move(nbc), network_timeout_seconds));
+    return status;
+}
+
+Status KineticConnectionFactory::NewBlockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
+    if (status.ok()) {
+        connection.reset(bc.release());
+    }
+    return status;
+}
+
+Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
+        const ConnectionOptions& options,
+        unique_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    Status status = doNewConnection(options, nbc, true);
+    connection.reset(new BlockingKineticConnection(move(nbc), network_timeout_seconds));
+    return status;
+}
+
+Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
+        const ConnectionOptions& options,
+        shared_ptr<BlockingKineticConnection>& connection,
+        unsigned int network_timeout_seconds) {
+    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    Status status = NewThreadsafeBlockingConnection(options, bc, network_timeout_seconds);
+    if (status.ok()) {
+        connection.reset(bc.release());
+    }
+    return status;
+}
+
+Status KineticConnectionFactory::doNewConnection(
+        ConnectionOptions const& options,
+        unique_ptr <NonblockingKineticConnection>& connection, bool threadsafe) {
     auto socket_wrapper = make_shared<SocketWrapper>(options.host, options.port, true);
 
     if (!socket_wrapper->Connect()) {
@@ -67,19 +130,13 @@ Status KineticConnectionFactory::doNewConnection(ConnectionOptions const &option
     auto sender = unique_ptr<NonblockingSenderInterface>(new NonblockingSender(socket_wrapper,
         receiver, move(writer_factory), hmac_provider_, options));
 
-    NonblockingPacketService *service =
-        new NonblockingPacketService(socket_wrapper, move(sender), receiver);
-    NonblockingKineticConnection *nonblocking_connection;
+    NonblockingPacketService *service = new NonblockingPacketService(socket_wrapper, move(sender), receiver);
 
     if (threadsafe) {
-        nonblocking_connection = new ThreadsafeNonblockingKineticConnection(service);
+        connection.reset(new ThreadsafeNonblockingKineticConnection(service));
     } else {
-        nonblocking_connection = new NonblockingKineticConnection(service);
+        connection.reset(new NonblockingKineticConnection(service));
     }
-
-    BlockingKineticConnection *blocking_connection =
-        new BlockingKineticConnection(nonblocking_connection, network_timeout_seconds);
-    connection.reset(new ConnectionHandle(blocking_connection, nonblocking_connection));
 
     return Status::makeOk();
 }

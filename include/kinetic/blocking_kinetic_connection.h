@@ -47,8 +47,13 @@ class BlockingKineticConnection {
     /// @param[in] network_timeout_seconds  If an operation goes more than network_timeout_seconds
     ///                                     seconds without receiving data the operation will fail
     explicit BlockingKineticConnection(
-        NonblockingKineticConnection* nonblocking_connection,
+            shared_ptr<NonblockingKineticConnection> nonblocking_connection,
         unsigned int network_timeout_seconds);
+
+    explicit BlockingKineticConnection(
+            unique_ptr<NonblockingKineticConnection> nonblocking_connection,
+            unsigned int network_timeout_seconds);
+
     virtual ~BlockingKineticConnection();
 
     /// If the drive has a non-zero cluster version, requests will fail unless the developer
@@ -157,7 +162,7 @@ class BlockingKineticConnection {
     /// Helper method for translating a StatusCode from the drive into an API client KineticStatus
     /// object
     KineticStatus GetKineticStatus(StatusCode code);
-    NonblockingKineticConnection* nonblocking_connection_;
+    shared_ptr<NonblockingKineticConnection> nonblocking_connection_;
     const unsigned int network_timeout_seconds_;
     DISALLOW_COPY_AND_ASSIGN(BlockingKineticConnection);
     };
