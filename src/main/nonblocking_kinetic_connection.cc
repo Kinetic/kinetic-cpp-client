@@ -148,8 +148,8 @@ void GetLogHandler::Handle(const Message& response, unique_ptr<const string> val
     drive_log->configuration.tls_port = configuration.tlsport();
 
     auto capacity = getlog.capacity();
-    drive_log->capacity.remaining_bytes = capacity.remaining();
-    drive_log->capacity.total_bytes = capacity.total();
+    drive_log->capacity.nominal_capacity_in_bytes = capacity.nominalcapacityinbytes();
+    drive_log->capacity.portion_full = capacity.portionfull();
 
     auto limits = getlog.limits();
     drive_log->limits.max_key_size = limits.maxkeysize();

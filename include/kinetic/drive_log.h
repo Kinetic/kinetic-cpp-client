@@ -26,8 +26,8 @@
 namespace kinetic {
 
 typedef struct {
-    uint64_t remaining_bytes;
-    uint64_t total_bytes;
+    uint64_t nominal_capacity_in_bytes;
+    float portion_full;
 } Capacity;
 
 typedef struct {

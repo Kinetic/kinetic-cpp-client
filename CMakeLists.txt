@@ -65,8 +65,8 @@ ExternalProject_add(
     INSTALL_COMMAND ""
 )
 
-set(KINETIC_PROTO_VERSION "6dcceb871d03ae8b727d48ddcc88053d9e9d6874")
-set(KINETIC_PROTO_MD5 "de61424f3340a6216a3576c1997f2f2c")
+set(KINETIC_PROTO_VERSION "2.0.1")
+set(KINETIC_PROTO_MD5 "1505fab102afc04994932c7c1406a697")
 
 ExternalProject_add(
     kinetic-proto

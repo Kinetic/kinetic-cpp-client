@@ -48,6 +48,7 @@ using com::seagate::kinetic::client::proto::Message_GetLog_Type_CAPACITIES;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_CONFIGURATION;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_STATISTICS;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_MESSAGES;
+using com::seagate::kinetic::client::proto::Message_GetLog_Type_LIMITS;
 using com::seagate::kinetic::client::proto::Message_Security;
 using com::seagate::kinetic::client::proto::Message_Security_ACL;
 using com::seagate::kinetic::client::proto::Message_Security_ACL_Scope;
@@ -274,21 +275,22 @@ TEST_F(NonblockingKineticConnectionTest, GetLogBuildsCorrectMessage) {
     connection_.GetLog(NULL);
 
     EXPECT_EQ(Message_MessageType_GETLOG, message.command().header().messagetype());
-    EXPECT_EQ(6, message.command().body().getlog().type_size());
+    EXPECT_EQ(7, message.command().body().getlog().type_size());
     EXPECT_EQ(Message_GetLog_Type_UTILIZATIONS, message.command().body().getlog().type(0));
     EXPECT_EQ(Message_GetLog_Type_TEMPERATURES, message.command().body().getlog().type(1));
     EXPECT_EQ(Message_GetLog_Type_CAPACITIES, message.command().body().getlog().type(2));
     EXPECT_EQ(Message_GetLog_Type_CONFIGURATION, message.command().body().getlog().type(3));
     EXPECT_EQ(Message_GetLog_Type_STATISTICS, message.command().body().getlog().type(4));
     EXPECT_EQ(Message_GetLog_Type_MESSAGES, message.command().body().getlog().type(5));
+    EXPECT_EQ(Message_GetLog_Type_LIMITS, message.command().body().getlog().type(6));
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetLogParsesMessageCorrectly) {
     Message response;
     response.mutable_command()->mutable_body()->mutable_getlog()
-            ->mutable_capacity()->set_remaining(123);
+            ->mutable_capacity()->set_nominalcapacityinbytes(123);
     response.mutable_command()->mutable_body()->mutable_getlog()
-            ->mutable_capacity()->set_total(456);
+            ->mutable_capacity()->set_portionfull(0.5);
 
     response.mutable_command()->mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_vendor("vendor");
@@ -337,8 +339,8 @@ TEST_F(NonblockingKineticConnectionTest, GetLogParsesMessageCorrectly) {
     unique_ptr<const string> empty_str(new string(""));
     handler.Handle(response, move(empty_str));
 
-    EXPECT_EQ((uint64_t) 123, drive_log.capacity.remaining_bytes);
-    EXPECT_EQ((uint64_t) 456, drive_log.capacity.total_bytes);
+    EXPECT_EQ((uint64_t) 123, drive_log.capacity.nominal_capacity_in_bytes);
+    EXPECT_EQ((float) 0.5, drive_log.capacity.portion_full);
 
     EXPECT_EQ("vendor", drive_log.configuration.vendor);
     EXPECT_EQ("model", drive_log.configuration.model);
