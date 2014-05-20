@@ -26,8 +26,8 @@
 namespace kinetic {
 
 typedef struct {
-    uint64_t remaining_bytes;
-    uint64_t total_bytes;
+    uint64_t nominal_capacity_in_bytes;
+    float portion_full;
 } Capacity;
 
 typedef struct {
@@ -61,11 +61,24 @@ typedef struct {
 } Configuration;
 
 typedef struct {
+    uint32_t max_key_size;
+    uint32_t max_value_size;
+    uint32_t max_version_size;
+    uint32_t max_tag_size;
+    uint32_t max_connections;
+    uint32_t max_outstanding_read_requests;
+    uint32_t max_outstanding_write_requests;
+    uint32_t max_message_size;
+} Limits;
+
+
+typedef struct {
     Configuration configuration;
     Capacity capacity;
     std::list<OperationStatistic> operation_statistics;
     std::list<Utilization> utilizations;
     std::list<Temperature> temperatures;
+    Limits limits;
     std::string messages;
 } DriveLog;
 

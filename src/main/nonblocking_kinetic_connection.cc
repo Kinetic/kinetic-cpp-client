@@ -46,6 +46,7 @@ using com::seagate::kinetic::client::proto::Message_GetLog_Type_CAPACITIES;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_CONFIGURATION;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_STATISTICS;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_MESSAGES;
+using com::seagate::kinetic::client::proto::Message_GetLog_Type_LIMITS;
 using com::seagate::kinetic::client::proto::Message_Security_ACL;
 using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission;
 using com::seagate::kinetic::client::proto::Message_Security_ACL_Scope;
@@ -147,8 +148,18 @@ void GetLogHandler::Handle(const Message& response, unique_ptr<const string> val
     drive_log->configuration.tls_port = configuration.tlsport();
 
     auto capacity = getlog.capacity();
-    drive_log->capacity.remaining_bytes = capacity.remaining();
-    drive_log->capacity.total_bytes = capacity.total();
+    drive_log->capacity.nominal_capacity_in_bytes = capacity.nominalcapacityinbytes();
+    drive_log->capacity.portion_full = capacity.portionfull();
+
+    auto limits = getlog.limits();
+    drive_log->limits.max_key_size = limits.maxkeysize();
+    drive_log->limits.max_value_size = limits.maxvaluesize();
+    drive_log->limits.max_version_size = limits.maxversionsize();
+    drive_log->limits.max_tag_size = limits.maxtagsize();
+    drive_log->limits.max_connections = limits.maxconnections();
+    drive_log->limits.max_outstanding_read_requests = limits.maxoutstandingreadrequests();
+    drive_log->limits.max_outstanding_write_requests = limits.maxoutstandingwriterequests();
+    drive_log->limits.max_message_size = limits.maxmessagesize();
 
     for (int i = 0; i < getlog.statistics_size(); i++) {
         OperationStatistic statistic;
@@ -410,6 +421,7 @@ HandlerKey NonblockingKineticConnection::GetLog(
     mutable_getlog->add_type(Message_GetLog_Type_CONFIGURATION);
     mutable_getlog->add_type(Message_GetLog_Type_STATISTICS);
     mutable_getlog->add_type(Message_GetLog_Type_MESSAGES);
+    mutable_getlog->add_type(Message_GetLog_Type_LIMITS);
 
     unique_ptr<GetLogHandler> handler(new GetLogHandler(callback));
     return service_->Submit(move(request), empty_str_, move(handler));
