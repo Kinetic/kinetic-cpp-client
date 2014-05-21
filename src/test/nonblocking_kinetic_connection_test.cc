@@ -64,9 +64,9 @@ using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_H
 using com::seagate::kinetic::client::proto::Message_Status;
 using com::seagate::kinetic::client::proto::Message_P2POperation;
 using com::seagate::kinetic::client::proto::Message_Synchronization;
-using Message_Synchronization::Message_Synchronization_FLUSH;
-using Message_Synchronization::Message_Synchronization_WRITEBACK;
-using Message_Synchronization::Message_Synchronization_WRITETHROUGH;
+using com::seagate::kinetic::client::proto::Message_Synchronization_FLUSH;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITEBACK;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITETHROUGH;
 
 using ::testing::_;
 using ::testing::DoAll;
