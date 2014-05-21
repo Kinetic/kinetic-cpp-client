@@ -37,7 +37,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
 
     auto record1 = make_shared<KineticRecord>(make_shared<string>("value1"),
         make_shared<string>("v1"), make_shared<string>("t1"), Message_Algorithm_CRC32);
-    KineticStatus kineticStatus = blocking_connection_->Put("key1", "",WriteMode::IGNORE_VERSION, *record1);
+    KineticStatus kineticStatus = blocking_connection_->Put("key1", "", WriteMode::IGNORE_VERSION, *record1);
     ASSERT_TRUE(kineticStatus.ok());
 
     auto record2 = make_shared<KineticRecord>(make_shared<string>("value2"),
@@ -91,7 +91,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     ASSERT_TRUE(status.ok());
     EXPECT_EQ(expected_keys, *actual_keys);
 
-    ASSERT_TRUE(blocking_connection_->Delete("key1", "",WriteMode::IGNORE_VERSION).ok());
+    ASSERT_TRUE(blocking_connection_->Delete("key1", "", WriteMode::IGNORE_VERSION).ok());
 
     ASSERT_EQ(blocking_connection_->Get("key1", result_record).statusCode(), StatusCode::REMOTE_NOT_FOUND);
 
