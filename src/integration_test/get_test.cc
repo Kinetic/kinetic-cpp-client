@@ -48,7 +48,7 @@ TEST_F(IntegrationTest, GetOk) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-            REQUIRE_SAME_VERSION, record1, put_callback);
+            WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     auto callback = make_shared<StrictMock<MockGetCallback>>();
@@ -65,10 +65,10 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
     auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record1, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record2, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record2, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "key2" and its value
@@ -85,7 +85,7 @@ TEST_F(IntegrationTest, GetManyOutstandingRequests) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_CRC64);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record1, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     uint32_t num_reqs = 2000;
@@ -112,7 +112,7 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndDoesNotHaveSuccessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "not found"
@@ -126,7 +126,7 @@ TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndHasSuccessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_CRC64);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetNext on "key1" and verify that we get "key2" and its value
@@ -155,10 +155,10 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndHasPredecessor) {
     auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
     auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record1, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record2, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record2, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "key1" and its value
@@ -176,7 +176,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndDoesNotHavePredecessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "not found"
@@ -193,7 +193,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndHasPredecessor) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Call GetPrevious on "key2" and verify that we get "key1" and its value
@@ -230,7 +230,7 @@ TEST_F(IntegrationTest, GetVersion) {
     auto get_version_callback = make_shared<StrictMock<MockGetVersionCallback>>();
     auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     nonblocking_connection_->GetVersion("key", get_version_callback);
@@ -243,16 +243,16 @@ TEST_F(IntegrationTest, GetKeyRange) {
     // TODO(marshall) fails on java simulator with empty value
     auto record = make_shared<KineticRecord>("v", "", "", Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("k0"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
     nonblocking_connection_->Put(make_shared<string>("k1"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
     nonblocking_connection_->Put(make_shared<string>("k2"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
     nonblocking_connection_->Put(make_shared<string>("k3"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     auto getkeyrange_callback = make_shared<StrictMock<MockGetKeyRangeCallback>>();

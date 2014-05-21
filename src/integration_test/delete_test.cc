@@ -33,7 +33,7 @@ using std::shared_ptr;
 
 TEST_F(IntegrationTest, DeleteNonexistent) {
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("nonexistent key", "", REQUIRE_SAME_VERSION, delete_callback);
+    nonblocking_connection_->Delete("nonexistent key", "", WriteMode::REQUIRE_SAME_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_NOT_FOUND, "Key not found")))
         .WillOnce(Assign(&done_, true));
@@ -46,12 +46,12 @@ TEST_F(IntegrationTest, DeleteWithWrongVersion) {
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
         make_shared<string>("v1"), make_shared<string>("tag"), Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"),  make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Attempt to delete version "v2"
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("key", "v2", REQUIRE_SAME_VERSION, delete_callback);
+    nonblocking_connection_->Delete("key", "v2", WriteMode::REQUIRE_SAME_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_VERSION_MISMATCH, "Version mismatch")))
         .WillOnce(Assign(&done_, true));
@@ -65,12 +65,12 @@ TEST_F(IntegrationTest, DeleteWithMissingVersion) {
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
         make_shared<string>("v1"), make_shared<string>("tag"), Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"),  make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Attempt to delete version "" (empty)
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("key", "", REQUIRE_SAME_VERSION, delete_callback);
+    nonblocking_connection_->Delete("key", "", WriteMode::REQUIRE_SAME_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_VERSION_MISMATCH, "Version mismatch")))
         .WillOnce(Assign(&done_, true));
@@ -84,12 +84,12 @@ TEST_F(IntegrationTest, SuccessfulDelete) {
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
         make_shared<string>("v1"), make_shared<string>("tag"), Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Delete it
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("key", "v1", REQUIRE_SAME_VERSION, delete_callback);
+    nonblocking_connection_->Delete("key", "v1", WriteMode::REQUIRE_SAME_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback, Success()).WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -101,12 +101,12 @@ TEST_F(IntegrationTest, ForcedDelete) {
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
         make_shared<string>("v1"), make_shared<string>("tag"), Message_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
-        REQUIRE_SAME_VERSION, record, put_callback);
+        WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
 
     // Delete with wrong version should succeed if we set the force flag
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("key", "", IGNORE_VERSION, delete_callback);
+    nonblocking_connection_->Delete("key", "", WriteMode::IGNORE_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback, Success()).WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -115,7 +115,7 @@ TEST_F(IntegrationTest, ForcedDelete) {
 TEST_F(IntegrationTest, ForcedDeleteNonexistent) {
     // Delete of a nonexistent key should succeed if we set the force flag
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
-    nonblocking_connection_->Delete("key", "", IGNORE_VERSION, delete_callback);
+    nonblocking_connection_->Delete("key", "", WriteMode::IGNORE_VERSION, delete_callback);
     EXPECT_CALL(*delete_callback, Success()).WillOnce(Assign(&done_, true));
     RunSelectLoop();
 }

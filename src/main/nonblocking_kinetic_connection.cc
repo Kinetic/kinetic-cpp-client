@@ -333,7 +333,7 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     unique_ptr<PutHandler> handler(new PutHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_PUT);
 
-    bool force = mode == IGNORE_VERSION;
+    bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_key(*key);
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_dbversion(
             *current_version);
@@ -364,7 +364,7 @@ HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> k
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_DELETE);
 
-    bool force = mode == IGNORE_VERSION;
+    bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_key(*key);
     // TODO(marshall) handle null version
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_dbversion(*version);

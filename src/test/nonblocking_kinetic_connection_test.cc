@@ -158,7 +158,7 @@ TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
     Message message;
     EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<0>(&message), Return(0)));
-    connection_.Delete("key", "version", IGNORE_VERSION, NULL);
+    connection_.Delete("key", "version", WriteMode::IGNORE_VERSION, NULL);
 
     ASSERT_EQ(Message_MessageType_DELETE, message.command().header().messagetype());
     ASSERT_EQ("key", message.command().body().keyvalue().key());
@@ -172,7 +172,7 @@ TEST_F(NonblockingKineticConnectionTest, PutWorks) {
             DoAll(SaveArg<0>(&message), Return(0)));
     auto record = make_shared<KineticRecord>("value", "new_version", "tag", Message_Algorithm_SHA1);
     shared_ptr<PutCallbackInterface> callback;
-    connection_.Put(make_shared<string>("key"), make_shared<string>("old_version"), IGNORE_VERSION,
+    connection_.Put(make_shared<string>("key"), make_shared<string>("old_version"), WriteMode::IGNORE_VERSION,
             record, callback);
 
     ASSERT_EQ(Message_MessageType_PUT, message.command().header().messagetype());
