@@ -53,6 +53,10 @@ using com::seagate::kinetic::client::proto::Message_Security_ACL_Scope;
 using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_HmacSHA1;
 using com::seagate::kinetic::client::proto::Message_Status;
 using com::seagate::kinetic::client::proto::Message_P2POperation;
+using com::seagate::kinetic::client::proto::Message_Synchronization;
+using Message_Synchronization::Message_Synchronization_FLUSH;
+using Message_Synchronization::Message_Synchronization_WRITEBACK;
+using Message_Synchronization::Message_Synchronization_WRITETHROUGH;
 
 using std::shared_ptr;
 using std::string;
@@ -329,7 +333,8 @@ HandlerKey NonblockingKineticConnection::GetKeyRange(const string start_key,
 HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     const shared_ptr<const string> current_version, WriteMode mode,
     const shared_ptr<const KineticRecord> record,
-    const shared_ptr<PutCallbackInterface> callback) {
+    const shared_ptr<PutCallbackInterface> callback,
+    PersistMode persistMode) {
     unique_ptr<PutHandler> handler(new PutHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_PUT);
 
@@ -347,7 +352,42 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_tag(*(record->tag()));
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_algorithm(
             record->algorithm());
+
+
+    Message_Synchronization sync_option;
+    switch (persistMode) {
+        case PersistMode::WRITE_BACK:
+            sync_option = Message_Synchronization_WRITEBACK;
+            break;
+        case PersistMode::WRITE_THROUGH:
+            sync_option = Message_Synchronization_WRITETHROUGH;
+            break;
+        case PersistMode::FLUSH:
+            sync_option = Message_Synchronization_FLUSH;
+            break;
+    }
+    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(sync_option);
+
     return service_->Submit(move(request), record->value(), move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::Put(const string key,
+    const string current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record,
+    const shared_ptr<PutCallbackInterface> callback,
+    PersistMode persistMode) {
+    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record,
+        callback);
+}
+
+
+HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback) {
+    // Default to the WRITE_BACK case, which performs better but does
+    // not guarantee immediate persistence
+    return this->Put(key, current_version, mode, record, callback, PersistMode::WRITE_BACK);
 }
 
 HandlerKey NonblockingKineticConnection::Put(const string key,

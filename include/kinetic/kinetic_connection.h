@@ -33,6 +33,16 @@ enum class WriteMode {
     REQUIRE_SAME_VERSION
 };
 
+enum class PersistMode {
+    /// This request is made persistent before returning
+    WRITE_THROUGH,
+    /// This request can be made persistent when the device chooses, or when a subsequent
+    /// request with PersistMode FLUSH is issued on this connection
+    WRITE_BACK,
+    /// All pending information that has not been persisted will be before returning
+    FLUSH
+};
+
 } // namespace kinetic
 
 #endif  // KINETIC_CPP_CLIENT_KINETIC_CONNECTION_H_

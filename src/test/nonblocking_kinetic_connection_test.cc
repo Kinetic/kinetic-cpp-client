@@ -63,6 +63,10 @@ using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_SECU
 using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_HmacSHA1;
 using com::seagate::kinetic::client::proto::Message_Status;
 using com::seagate::kinetic::client::proto::Message_P2POperation;
+using com::seagate::kinetic::client::proto::Message_Synchronization;
+using Message_Synchronization::Message_Synchronization_FLUSH;
+using Message_Synchronization::Message_Synchronization_WRITEBACK;
+using Message_Synchronization::Message_Synchronization_WRITETHROUGH;
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -182,6 +186,7 @@ TEST_F(NonblockingKineticConnectionTest, PutWorks) {
     ASSERT_EQ("new_version", message.command().body().keyvalue().newversion());
     ASSERT_EQ("tag", message.command().body().keyvalue().tag());
     ASSERT_EQ(Message_Algorithm_SHA1, message.command().body().keyvalue().algorithm());
+    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetKeyRangeWorks) {

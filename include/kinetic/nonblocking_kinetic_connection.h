@@ -261,6 +261,16 @@ class NonblockingKineticConnection {
         const string current_version, WriteMode mode,
         const shared_ptr<const KineticRecord> record,
         const shared_ptr<PutCallbackInterface> callback);
+    virtual HandlerKey Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback,
+        PersistMode persistMode);
+    virtual HandlerKey Put(const string key,
+        const string current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback,
+        PersistMode persistMode);
     virtual HandlerKey Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode,
             const shared_ptr<SimpleCallbackInterface> callback);
