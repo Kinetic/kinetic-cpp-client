@@ -56,9 +56,10 @@ KineticStatus ThreadsafeBlockingKineticConnection::Get(const shared_ptr<const st
 
 KineticStatus ThreadsafeBlockingKineticConnection::Put(const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record) {
+        const shared_ptr<const KineticRecord> record,
+        PersistMode persistMode) {
     std::lock_guard<std::mutex> guard(mutex_);
-    return BlockingKineticConnection::Put(key, current_version, mode, record);
+    return BlockingKineticConnection::Put(key, current_version, mode, record, persistMode);
 }
 
 KineticStatus ThreadsafeBlockingKineticConnection::Delete(const shared_ptr<const string> key,

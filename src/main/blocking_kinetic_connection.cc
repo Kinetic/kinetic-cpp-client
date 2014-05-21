@@ -196,9 +196,28 @@ class BlockingPutCallback : public PutCallbackInterface, public BlockingCallback
 
 KineticStatus BlockingKineticConnection::Put(const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        PersistMode persistMode) {
+    auto handler = make_shared<BlockingPutCallback>();
+
+    return RunOperation(handler,
+            nonblocking_connection_->Put(key, current_version, mode, record, handler, persistMode));
+}
+
+KineticStatus BlockingKineticConnection::Put(const string& key,
+        const string& current_version, WriteMode mode,
+        const KineticRecord& record,
+        PersistMode persistMode) {
+    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode,
+        make_shared<KineticRecord>(record), persistMode);
+}
+
+KineticStatus BlockingKineticConnection::Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
         const shared_ptr<const KineticRecord> record) {
     auto handler = make_shared<BlockingPutCallback>();
 
+    // Rely on nonblocking_connection to handle the default PersistMode case
     return RunOperation(handler,
             nonblocking_connection_->Put(key, current_version, mode, record, handler));
 }

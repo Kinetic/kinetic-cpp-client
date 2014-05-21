@@ -92,7 +92,8 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnection {
 
     KineticStatus Put(const shared_ptr<const string> key,
             const shared_ptr<const string> current_version, WriteMode mode,
-            const shared_ptr<const KineticRecord> record);
+            const shared_ptr<const KineticRecord> record,
+            PersistMode persistMode);
 
     KineticStatus Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode);
