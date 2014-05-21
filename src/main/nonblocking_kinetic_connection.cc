@@ -365,7 +365,7 @@ HandlerKey NonblockingKineticConnection::Put(const string key,
     const shared_ptr<PutCallbackInterface> callback,
     PersistMode persistMode) {
     return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record,
-        callback);
+        callback, persistMode);
 }
 
 
