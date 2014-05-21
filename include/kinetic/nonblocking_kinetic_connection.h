@@ -43,6 +43,8 @@ using com::seagate::kinetic::client::proto::Message_MessageType;
 
 using com::seagate::kinetic::client::proto::Message_P2POperation;
 
+using com::seagate::kinetic::client::proto::Message_Synchronization;
+
 using std::shared_ptr;
 using std::unique_ptr;
 using std::string;
@@ -273,6 +275,11 @@ class NonblockingKineticConnection {
         PersistMode persistMode);
     virtual HandlerKey Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode,
+            const shared_ptr<SimpleCallbackInterface> callback, PersistMode persistMode);
+    virtual HandlerKey Delete(const string key, const string version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback, PersistMode persistMode);
+    virtual HandlerKey Delete(const shared_ptr<const string> key,
+            const shared_ptr<const string> version, WriteMode mode,
             const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey Delete(const string key, const string version, WriteMode mode,
         const shared_ptr<SimpleCallbackInterface> callback);
@@ -305,9 +312,11 @@ class NonblockingKineticConnection {
     void PopulateP2PMessage(Message_P2POperation *mutable_p2pop,
         const shared_ptr<const P2PPushRequest> push_request);
     unique_ptr<Message> NewMessage(Message_MessageType message_type);
+    Message_Synchronization GetSynchronizationForPersistMode(PersistMode persistMode);
 
     NonblockingPacketServiceInterface *service_;
     const shared_ptr<const string> empty_str_;
+
     int64_t cluster_version_;
 
     DISALLOW_COPY_AND_ASSIGN(NonblockingKineticConnection);

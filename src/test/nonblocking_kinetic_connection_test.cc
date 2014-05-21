@@ -168,6 +168,7 @@ TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
     ASSERT_EQ("key", message.command().body().keyvalue().key());
     ASSERT_EQ("version", message.command().body().keyvalue().dbversion());
     ASSERT_TRUE(message.command().body().keyvalue().force());
+    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, PutWorks) {

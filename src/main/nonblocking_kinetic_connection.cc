@@ -353,20 +353,8 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_algorithm(
             record->algorithm());
 
-
-    Message_Synchronization sync_option;
-    switch (persistMode) {
-        case PersistMode::WRITE_BACK:
-            sync_option = Message_Synchronization_WRITEBACK;
-            break;
-        case PersistMode::WRITE_THROUGH:
-            sync_option = Message_Synchronization_WRITETHROUGH;
-            break;
-        case PersistMode::FLUSH:
-            sync_option = Message_Synchronization_FLUSH;
-            break;
-    }
-    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(sync_option);
+    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(
+            this->GetSynchronizationForPersistMode(persistMode));
 
     return service_->Submit(move(request), record->value(), move(handler));
 }
@@ -400,7 +388,8 @@ HandlerKey NonblockingKineticConnection::Put(const string key,
 
 HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+    const shared_ptr<SimpleCallbackInterface> callback,
+    PersistMode persistMode) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_DELETE);
 
@@ -409,7 +398,25 @@ HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> k
     // TODO(marshall) handle null version
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_dbversion(*version);
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_force(force);
+    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(
+            this->GetSynchronizationForPersistMode(persistMode));
+
     return service_->Submit(move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
+        WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
+    return this->Delete(make_shared<string>(key), make_shared<string>(version),
+            mode, callback, persistMode);
+}
+
+HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback) {
+    // Default to the WRITE_BACK case, which performs better but does
+    // not guarantee immediate persistence
+    return this->Delete(key, version, mode, callback, PersistMode::WRITE_BACK);
 }
 
 HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
@@ -597,5 +604,20 @@ bool NonblockingKineticConnection::RemoveHandler(HandlerKey handler_key) {
     return service_->Remove(handler_key);
 }
 
+Message_Synchronization NonblockingKineticConnection::GetSynchronizationForPersistMode(PersistMode persistMode) {
+    Message_Synchronization sync_option;
+    switch (persistMode) {
+        case PersistMode::WRITE_BACK:
+            sync_option = Message_Synchronization_WRITEBACK;
+            break;
+        case PersistMode::WRITE_THROUGH:
+            sync_option = Message_Synchronization_WRITETHROUGH;
+            break;
+        case PersistMode::FLUSH:
+            sync_option = Message_Synchronization_FLUSH;
+            break;
+    }
+    return sync_option;
+}
 
 } // namespace kinetic
