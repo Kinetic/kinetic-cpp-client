@@ -230,8 +230,22 @@ KineticStatus BlockingKineticConnection::Put(const string& key,
 }
 
 KineticStatus BlockingKineticConnection::Delete(const shared_ptr<const string> key,
+    const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode) {
+    auto callback = make_shared<SimpleCallback>();
+    return RunOperation(callback, nonblocking_connection_->Delete(key, version, mode,
+            callback, persistMode));
+}
+
+KineticStatus BlockingKineticConnection::Delete(const string& key, const string& version,
+    WriteMode mode, PersistMode persistMode) {
+    return this->Delete(make_shared<string>(key),
+            make_shared<string>(version), mode, persistMode);
+}
+
+KineticStatus BlockingKineticConnection::Delete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode) {
     auto callback = make_shared<SimpleCallback>();
+    // Let the nonblocking_connection handle the default persistOption
     return RunOperation(callback, nonblocking_connection_->Delete(key, version, mode, callback));
 }
 

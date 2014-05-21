@@ -139,6 +139,12 @@ class BlockingKineticConnection {
             const KineticRecord& record);
 
     virtual KineticStatus Delete(const shared_ptr<const string> key,
+            const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode);
+
+    virtual KineticStatus Delete(const string& key, const string& version,
+            WriteMode mode, PersistMode persistMode);
+
+    virtual KineticStatus Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode);
 
     virtual KineticStatus Delete(const string& key, const string& version, WriteMode mode);

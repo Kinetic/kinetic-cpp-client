@@ -96,9 +96,10 @@ HandlerKey ThreadsafeNonblockingKineticConnection::Put(const shared_ptr<const st
 
 HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+    const shared_ptr<SimpleCallbackInterface> callback,
+    PersistMode persistMode) {
     std::lock_guard<std::mutex> guard(mutex_);
-    return NonblockingKineticConnection::Delete(key, version, mode, callback);
+    return NonblockingKineticConnection::Delete(key, version, mode, callback, persistMode);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin,
