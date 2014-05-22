@@ -53,6 +53,10 @@ using com::seagate::kinetic::client::proto::Message_Security_ACL_Scope;
 using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_HmacSHA1;
 using com::seagate::kinetic::client::proto::Message_Status;
 using com::seagate::kinetic::client::proto::Message_P2POperation;
+using com::seagate::kinetic::client::proto::Message_Synchronization;
+using com::seagate::kinetic::client::proto::Message_Synchronization_FLUSH;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITEBACK;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITETHROUGH;
 
 using std::shared_ptr;
 using std::string;
@@ -329,11 +333,12 @@ HandlerKey NonblockingKineticConnection::GetKeyRange(const string start_key,
 HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     const shared_ptr<const string> current_version, WriteMode mode,
     const shared_ptr<const KineticRecord> record,
-    const shared_ptr<PutCallbackInterface> callback) {
+    const shared_ptr<PutCallbackInterface> callback,
+    PersistMode persistMode) {
     unique_ptr<PutHandler> handler(new PutHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_PUT);
 
-    bool force = mode == IGNORE_VERSION;
+    bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_key(*key);
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_dbversion(
             *current_version);
@@ -347,7 +352,30 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_tag(*(record->tag()));
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_algorithm(
             record->algorithm());
+
+    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(
+            this->GetSynchronizationForPersistMode(persistMode));
+
     return service_->Submit(move(request), record->value(), move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::Put(const string key,
+    const string current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record,
+    const shared_ptr<PutCallbackInterface> callback,
+    PersistMode persistMode) {
+    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record,
+        callback, persistMode);
+}
+
+
+HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback) {
+    // Default to the WRITE_BACK case, which performs better but does
+    // not guarantee immediate persistence
+    return this->Put(key, current_version, mode, record, callback, PersistMode::WRITE_BACK);
 }
 
 HandlerKey NonblockingKineticConnection::Put(const string key,
@@ -360,16 +388,35 @@ HandlerKey NonblockingKineticConnection::Put(const string key,
 
 HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+    const shared_ptr<SimpleCallbackInterface> callback,
+    PersistMode persistMode) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     unique_ptr<Message> request = NewMessage(Message_MessageType_DELETE);
 
-    bool force = mode == IGNORE_VERSION;
+    bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_key(*key);
     // TODO(marshall) handle null version
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_dbversion(*version);
     request->mutable_command()->mutable_body()->mutable_keyvalue()->set_force(force);
+    request->mutable_command()->mutable_body()->mutable_keyvalue()->set_synchronization(
+            this->GetSynchronizationForPersistMode(persistMode));
+
     return service_->Submit(move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
+        WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
+    return this->Delete(make_shared<string>(key), make_shared<string>(version),
+            mode, callback, persistMode);
+}
+
+HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback) {
+    // Default to the WRITE_BACK case, which performs better but does
+    // not guarantee immediate persistence
+    return this->Delete(key, version, mode, callback, PersistMode::WRITE_BACK);
 }
 
 HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
@@ -557,5 +604,20 @@ bool NonblockingKineticConnection::RemoveHandler(HandlerKey handler_key) {
     return service_->Remove(handler_key);
 }
 
+Message_Synchronization NonblockingKineticConnection::GetSynchronizationForPersistMode(PersistMode persistMode) {
+    Message_Synchronization sync_option;
+    switch (persistMode) {
+        case PersistMode::WRITE_BACK:
+            sync_option = Message_Synchronization_WRITEBACK;
+            break;
+        case PersistMode::WRITE_THROUGH:
+            sync_option = Message_Synchronization_WRITETHROUGH;
+            break;
+        case PersistMode::FLUSH:
+            sync_option = Message_Synchronization_FLUSH;
+            break;
+    }
+    return sync_option;
+}
 
 } // namespace kinetic

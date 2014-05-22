@@ -122,11 +122,27 @@ class BlockingKineticConnection {
 
     virtual KineticStatus Put(const shared_ptr<const string> key,
             const shared_ptr<const string> current_version, WriteMode mode,
+            const shared_ptr<const KineticRecord> record,
+            PersistMode persistMode);
+
+    virtual KineticStatus Put(const string& key,
+            const string& current_version, WriteMode mode,
+            const KineticRecord& record,
+            PersistMode persistMode);
+
+    virtual KineticStatus Put(const shared_ptr<const string> key,
+            const shared_ptr<const string> current_version, WriteMode mode,
             const shared_ptr<const KineticRecord> record);
 
     virtual KineticStatus Put(const string& key,
             const string& current_version, WriteMode mode,
             const KineticRecord& record);
+
+    virtual KineticStatus Delete(const shared_ptr<const string> key,
+            const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode);
+
+    virtual KineticStatus Delete(const string& key, const string& version,
+            WriteMode mode, PersistMode persistMode);
 
     virtual KineticStatus Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode);

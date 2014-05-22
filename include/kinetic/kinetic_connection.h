@@ -23,7 +23,7 @@
 
 namespace kinetic {
 
-typedef enum {
+enum class WriteMode {
     /// If specified, PUTs will succeed even if the key already exists and has a different
     /// version
     IGNORE_VERSION,
@@ -31,7 +31,17 @@ typedef enum {
     /// Requires the existing version match the given expected value. This can be used to
     /// implement compare-and-swap type operations
     REQUIRE_SAME_VERSION
-} WriteMode;
+};
+
+enum class PersistMode {
+    /// This request is made persistent before returning
+    WRITE_THROUGH,
+    /// This request can be made persistent when the device chooses, or when a subsequent
+    /// request with PersistMode FLUSH is issued on this connection
+    WRITE_BACK,
+    /// All pending information that has not been persisted will be before returning
+    FLUSH
+};
 
 } // namespace kinetic
 

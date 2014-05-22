@@ -70,9 +70,14 @@ class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnecti
     HandlerKey Put(const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode,
         const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback);
-    HandlerKey Delete(const shared_ptr<const string> key, const shared_ptr<const string> version,
-        WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback);
+        const shared_ptr<PutCallbackInterface> callback,
+        PersistMode persistMode);
+    HandlerKey Delete(
+            const shared_ptr<const string> key,
+            const shared_ptr<const string> version,
+            WriteMode mode,
+            const shared_ptr<SimpleCallbackInterface> callback,
+            PersistMode persistMode);
     HandlerKey InstantSecureErase(const shared_ptr<string> pin,
         const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey SetClusterVersion(int64_t new_cluster_version,

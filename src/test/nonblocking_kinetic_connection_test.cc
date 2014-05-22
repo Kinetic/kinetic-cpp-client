@@ -63,6 +63,10 @@ using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_SECU
 using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_HmacSHA1;
 using com::seagate::kinetic::client::proto::Message_Status;
 using com::seagate::kinetic::client::proto::Message_P2POperation;
+using com::seagate::kinetic::client::proto::Message_Synchronization;
+using com::seagate::kinetic::client::proto::Message_Synchronization_FLUSH;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITEBACK;
+using com::seagate::kinetic::client::proto::Message_Synchronization_WRITETHROUGH;
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -158,12 +162,13 @@ TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
     Message message;
     EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<0>(&message), Return(0)));
-    connection_.Delete("key", "version", IGNORE_VERSION, NULL);
+    connection_.Delete("key", "version", WriteMode::IGNORE_VERSION, NULL);
 
     ASSERT_EQ(Message_MessageType_DELETE, message.command().header().messagetype());
     ASSERT_EQ("key", message.command().body().keyvalue().key());
     ASSERT_EQ("version", message.command().body().keyvalue().dbversion());
     ASSERT_TRUE(message.command().body().keyvalue().force());
+    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, PutWorks) {
@@ -172,7 +177,7 @@ TEST_F(NonblockingKineticConnectionTest, PutWorks) {
             DoAll(SaveArg<0>(&message), Return(0)));
     auto record = make_shared<KineticRecord>("value", "new_version", "tag", Message_Algorithm_SHA1);
     shared_ptr<PutCallbackInterface> callback;
-    connection_.Put(make_shared<string>("key"), make_shared<string>("old_version"), IGNORE_VERSION,
+    connection_.Put(make_shared<string>("key"), make_shared<string>("old_version"), WriteMode::IGNORE_VERSION,
             record, callback);
 
     ASSERT_EQ(Message_MessageType_PUT, message.command().header().messagetype());
@@ -182,6 +187,7 @@ TEST_F(NonblockingKineticConnectionTest, PutWorks) {
     ASSERT_EQ("new_version", message.command().body().keyvalue().newversion());
     ASSERT_EQ("tag", message.command().body().keyvalue().tag());
     ASSERT_EQ(Message_Algorithm_SHA1, message.command().body().keyvalue().algorithm());
+    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetKeyRangeWorks) {
