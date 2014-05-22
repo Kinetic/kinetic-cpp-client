@@ -149,6 +149,8 @@ class BlockingKineticConnection {
 
     virtual KineticStatus Delete(const string& key, const string& version, WriteMode mode);
 
+    virtual KineticStatus Flush();
+
     virtual KineticStatus InstantSecureErase(const shared_ptr<string> pin);
 
     virtual KineticStatus InstantSecureErase(const string& pin);

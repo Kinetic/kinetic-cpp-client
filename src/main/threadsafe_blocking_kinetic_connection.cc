@@ -68,6 +68,11 @@ KineticStatus ThreadsafeBlockingKineticConnection::Delete(const shared_ptr<const
         return BlockingKineticConnection::Delete(key, version, mode, persistMode);
 }
 
+KineticStatus ThreadsafeBlockingKineticConnection::Flush() {
+    std::lock_guard<std::mutex> guard(mutex_);
+    return BlockingKineticConnection::Flush();
+}
+
 KineticStatus ThreadsafeBlockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin) {
     std::lock_guard<std::mutex> guard(mutex_);
     return BlockingKineticConnection::InstantSecureErase(pin);

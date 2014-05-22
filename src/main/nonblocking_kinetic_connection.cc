@@ -37,6 +37,7 @@ using com::seagate::kinetic::client::proto::Message_MessageType_SETUP;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETLOG;
 using com::seagate::kinetic::client::proto::Message_MessageType_SECURITY;
 using com::seagate::kinetic::client::proto::Message_MessageType_PEER2PEERPUSH;
+using com::seagate::kinetic::client::proto::Message_MessageType_FLUSHALLDATA;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NOT_AUTHORIZED;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NOT_FOUND;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
@@ -422,6 +423,12 @@ HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> k
 HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
         WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
     return this->Delete(make_shared<string>(key), make_shared<string>(version), mode, callback);
+}
+
+HandlerKey NonblockingKineticConnection::Flush(const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    unique_ptr<Message> request = NewMessage(Message_MessageType_FLUSHALLDATA);
+    return service_->Submit(move(request), empty_str_, move(handler));
 }
 
 HandlerKey NonblockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin,
