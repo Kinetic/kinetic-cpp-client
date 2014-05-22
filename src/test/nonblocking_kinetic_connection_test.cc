@@ -40,6 +40,7 @@ using com::seagate::kinetic::client::proto::Message_MessageType_SETUP;
 using com::seagate::kinetic::client::proto::Message_MessageType_GETLOG;
 using com::seagate::kinetic::client::proto::Message_MessageType_SECURITY;
 using com::seagate::kinetic::client::proto::Message_MessageType_PEER2PEERPUSH;
+using com::seagate::kinetic::client::proto::Message_MessageType_FLUSHALLDATA;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_INTERNAL_ERROR;
 using com::seagate::kinetic::client::proto::Message_GetLog_Type_UTILIZATIONS;
@@ -169,6 +170,17 @@ TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
     ASSERT_EQ("version", message.command().body().keyvalue().dbversion());
     ASSERT_TRUE(message.command().body().keyvalue().force());
     ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
+}
+
+TEST_F(NonblockingKineticConnectionTest, FlushWorks) {
+    Message message;
+    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
+                .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
+
+    shared_ptr<SimpleCallbackInterface> callback;
+    connection_.Flush(callback);
+
+    ASSERT_EQ(Message_MessageType_FLUSHALLDATA, message.command().header().messagetype());
 }
 
 TEST_F(NonblockingKineticConnectionTest, PutWorks) {

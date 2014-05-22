@@ -98,6 +98,8 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnection {
     KineticStatus Delete(const shared_ptr<const string> key,
             const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode);
 
+    KineticStatus Flush();
+
     KineticStatus InstantSecureErase(const shared_ptr<string> pin);
 
     KineticStatus SetClusterVersion(int64_t cluster_version);

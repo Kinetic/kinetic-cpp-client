@@ -283,6 +283,7 @@ class NonblockingKineticConnection {
             const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey Delete(const string key, const string version, WriteMode mode,
         const shared_ptr<SimpleCallbackInterface> callback);
+    virtual HandlerKey Flush(const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey InstantSecureErase(const shared_ptr<string> pin,
         const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey InstantSecureErase(const string pin,

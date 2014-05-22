@@ -78,6 +78,7 @@ class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnecti
             WriteMode mode,
             const shared_ptr<SimpleCallbackInterface> callback,
             PersistMode persistMode);
+    HandlerKey Flush(const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey InstantSecureErase(const shared_ptr<string> pin,
         const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey SetClusterVersion(int64_t new_cluster_version,

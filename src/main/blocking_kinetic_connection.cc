@@ -254,6 +254,10 @@ KineticStatus BlockingKineticConnection::Delete(const string& key, const string&
     return this->Delete(make_shared<string>(key), make_shared<string>(version), mode);
 }
 
+KineticStatus BlockingKineticConnection::Flush() {
+    auto handler = make_shared<SimpleCallback>();
+    return RunOperation(handler, nonblocking_connection_->Flush(handler));
+}
 
 KineticStatus BlockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
