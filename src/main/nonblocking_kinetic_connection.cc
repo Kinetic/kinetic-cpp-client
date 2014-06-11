@@ -214,7 +214,7 @@ void P2PPushHandler::Handle(const Message& response, unique_ptr<const string> va
         Message_Status const &status = p2pop.operation(i).status();
 
         statuses->push_back(
-                KineticStatus(ConvertProtoStatus(status.code()), status.statusmessage()));
+                KineticStatus(ConvertFromProtoStatus(status.code()), status.statusmessage()));
     }
 
     callback_->Success(move(statuses));

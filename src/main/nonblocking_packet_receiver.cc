@@ -22,72 +22,13 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_INVALID_STATUS_CODE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_HMAC_FAILURE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NOT_AUTHORIZED;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NOT_FOUND;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_INTERNAL_ERROR;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_HEADER_REQUIRED;
 using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_VERSION_FAILURE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_VERSION_MISMATCH;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SERVICE_BUSY;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_EXPIRED;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_DATA_ERROR;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_PERM_DATA_ERROR;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_REMOTE_CONNECTION_ERROR;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NO_SPACE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_NO_SUCH_HMAC_ALGORITHM;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_INVALID_REQUEST;
-
 using std::string;
 using std::shared_ptr;
 using std::unique_ptr;
 using std::move;
 using std::make_pair;
 
-
-StatusCode ConvertProtoStatus(Message_Status_StatusCode status) {
-    switch (status) {
-        case Message_Status_StatusCode_SUCCESS:
-            return StatusCode::OK;
-        case Message_Status_StatusCode_HMAC_FAILURE:
-            return StatusCode::REMOTE_HMAC_ERROR;
-        case Message_Status_StatusCode_NOT_AUTHORIZED:
-            return StatusCode::REMOTE_NOT_AUTHORIZED;
-        case Message_Status_StatusCode_VERSION_FAILURE:
-            return StatusCode::REMOTE_CLUSTER_VERSION_MISMATCH;
-        case Message_Status_StatusCode_INTERNAL_ERROR:
-            return StatusCode::REMOTE_INTERNAL_ERROR;
-        case Message_Status_StatusCode_HEADER_REQUIRED:
-            return StatusCode::REMOTE_HEADER_REQUIRED;
-        case Message_Status_StatusCode_NOT_FOUND:
-            return StatusCode::REMOTE_NOT_FOUND;
-        case Message_Status_StatusCode_VERSION_MISMATCH:
-            return StatusCode::REMOTE_VERSION_MISMATCH;
-        case Message_Status_StatusCode_SERVICE_BUSY:
-            return StatusCode::REMOTE_SERVICE_BUSY;
-        case Message_Status_StatusCode_EXPIRED:
-            return StatusCode::REMOTE_EXPIRED;
-        case Message_Status_StatusCode_DATA_ERROR:
-            return StatusCode::REMOTE_DATA_ERROR;
-        case Message_Status_StatusCode_PERM_DATA_ERROR:
-            return StatusCode::REMOTE_PERM_DATA_ERROR;
-        case Message_Status_StatusCode_REMOTE_CONNECTION_ERROR:
-            return StatusCode::REMOTE_REMOTE_CONNECTION_ERROR;
-        case Message_Status_StatusCode_NO_SPACE:
-            return StatusCode::REMOTE_NO_SPACE;
-        case Message_Status_StatusCode_NO_SUCH_HMAC_ALGORITHM:
-            return StatusCode::REMOTE_NO_SUCH_HMAC_ALGORITHM;
-        case Message_Status_StatusCode_INVALID_REQUEST:
-            return StatusCode::REMOTE_INVALID_REQUEST;
-        case Message_Status_StatusCode_INVALID_STATUS_CODE:
-            return StatusCode::CLIENT_INTERNAL_ERROR;
-        default:
-            return StatusCode::REMOTE_OTHER_ERROR;
-    }
-}
 
 KineticStatus GetKineticStatus(StatusCode code) {
     switch (code) {
@@ -228,7 +169,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
         if (response_.command().status().code() == Message_Status_StatusCode_SUCCESS) {
             handler_->Handle(response_, move(value_));
         } else {
-            handler_->Error(GetKineticStatus(ConvertProtoStatus(
+            handler_->Error(GetKineticStatus(ConvertFromProtoStatus(
                     response_.command().status().code())));
         }
 

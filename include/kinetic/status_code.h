@@ -21,8 +21,11 @@
 #ifndef KINETIC_CPP_CLIENT_STATUS_CODE_H_
 #define KINETIC_CPP_CLIENT_STATUS_CODE_H_
 
+#include "kinetic_client.pb.h"
+
 namespace kinetic {
 
+using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
 using std::string;
 
 enum class StatusCode {
@@ -49,6 +52,9 @@ enum class StatusCode {
     REMOTE_OTHER_ERROR,
     PROTOCOL_ERROR_RESPONSE_NO_ACKSEQUENCE
 };
+
+StatusCode ConvertFromProtoStatus(Message_Status_StatusCode status);
+Message_Status_StatusCode ConvertToProtoStatus(StatusCode status);
 
 } // namespace kinetic
 
