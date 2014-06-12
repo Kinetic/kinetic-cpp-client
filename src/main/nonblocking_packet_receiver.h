@@ -46,8 +46,6 @@ using std::deque;
 using std::pair;
 using std::unordered_map;
 
-StatusCode ConvertProtoStatus(Message_Status_StatusCode status);
-
 enum NonblockingPacketServiceStatus {
     kIdle,      // nothing to do
     kIoWait,    // waiting for I/O to become possible
