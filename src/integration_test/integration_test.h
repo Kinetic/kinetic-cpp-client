@@ -1,7 +1,7 @@
 /*
  * kinetic-cpp-client
  * Copyright (C) 2014 Seagate Technology.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -67,7 +67,7 @@ class IntegrationTest : public ::testing::Test {
             pid_ = fork();
             ASSERT_NE(-1, pid_);
             if (pid_ == 0) {
-                execl(kinetic_path, kinetic_path, NULL);
+                execl(kinetic_path, kinetic_path, "--clear_database", NULL);
             }
         }
         ConnectionOptions options;
