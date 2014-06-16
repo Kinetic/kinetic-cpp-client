@@ -139,7 +139,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
             LOG(INFO) << "Response HMAC mismatch";
             CallAllErrorHandlers(KineticStatus(StatusCode::CLIENT_RESPONSE_HMAC_VERIFICATION_ERROR,
                 "Response HMAC mismatch"));
-            return kError;
+            return kIdle;
         }
         if (response_.command().header().has_connectionid()) {
             connection_id_ = response_.command().header().connectionid();
@@ -148,7 +148,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
             LOG(INFO) << "Got response without an acksequence";
             CallAllErrorHandlers(KineticStatus(StatusCode::PROTOCOL_ERROR_RESPONSE_NO_ACKSEQUENCE,
                 "Response had no acksequence"));
-            return kError;
+            return kIdle;
         }
 
         auto find_result = map_.find(response_.command().header().acksequence());
