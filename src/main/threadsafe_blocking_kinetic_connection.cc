@@ -33,7 +33,7 @@ using std::make_shared;
 using std::move;
 
 ThreadsafeBlockingKineticConnection::ThreadsafeBlockingKineticConnection(
-        shared_ptr<ThreadsafeNonblockingKineticConnection> nonblocking_connection, unsigned int network_timeout_seconds)
+        shared_ptr<NonblockingKineticConnection> nonblocking_connection, unsigned int network_timeout_seconds)
     : BlockingKineticConnection(nonblocking_connection, network_timeout_seconds) {}
 
 ThreadsafeBlockingKineticConnection::~ThreadsafeBlockingKineticConnection() {}

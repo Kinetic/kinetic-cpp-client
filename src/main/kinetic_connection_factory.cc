@@ -98,7 +98,7 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
         unsigned int network_timeout_seconds) {
     unique_ptr<NonblockingKineticConnection> nbc(nullptr);
     Status status = doNewConnection(options, nbc, true);
-    connection.reset(new BlockingKineticConnection(move(nbc), network_timeout_seconds));
+    connection.reset(new ThreadsafeBlockingKineticConnection(move(nbc), network_timeout_seconds));
     return status;
 }
 
