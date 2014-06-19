@@ -3,7 +3,7 @@ project(kinetic_cpp_client CXX C)
 
 find_package (Threads)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON) 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 option(BUILD_FOR_ARM "Build for ARM instead of x86" off)
 option(BUILD_PIC "Build static PIC" off)
@@ -169,7 +169,7 @@ add_dependencies(${INTEGRATION_TEST_BINARY} ${TEST_LIBRARIES})
 target_link_libraries(${INTEGRATION_TEST_BINARY} ${LIBRARY_DEPENDENCIES})
 
 # Rule for running unit tests
-add_custom_target(test
+add_custom_target(check
     COMMAND ${TEST_BINARY_PATH} --gtest_output=xml:gtestresults.xml
     DEPENDS ${TEST_BINARY_PATH}
 )
