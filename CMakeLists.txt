@@ -138,11 +138,6 @@ add_library(kinetic_client
 
     src/main/key_range_iterator.cc
 )
-add_dependencies(kinetic_client
-    glog
-    openssl
-    protobuf
-)
 
 add_executable(${TEST_BINARY}
     src/test/kinetic_cpp_client_test.cc
@@ -154,7 +149,6 @@ add_executable(${TEST_BINARY}
     src/test/nonblocking_string_test.cc
     src/test/hmac_provider_test.cc
 )
-add_dependencies(${TEST_BINARY} ${TEST_LIBRARIES})
 target_link_libraries(${TEST_BINARY} ${LIBRARY_DEPENDENCIES})
 
 add_executable(${INTEGRATION_TEST_BINARY}
@@ -165,7 +159,6 @@ add_executable(${INTEGRATION_TEST_BINARY}
     src/integration_test/blocking_smoketest.cc
     src/test/kinetic_cpp_client_test.cc
 )
-add_dependencies(${INTEGRATION_TEST_BINARY} ${TEST_LIBRARIES})
 target_link_libraries(${INTEGRATION_TEST_BINARY} ${LIBRARY_DEPENDENCIES})
 
 # Rule for running unit tests
