@@ -22,7 +22,7 @@
 #define KINETIC_CPP_CLIENT_KINETIC_RECORD_H_
 
 #include <memory>
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 #include "kinetic_client.pb.h"
 
 namespace kinetic {

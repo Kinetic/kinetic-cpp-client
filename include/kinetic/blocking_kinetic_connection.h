@@ -27,7 +27,7 @@
 #include "kinetic/status.h"
 #include "kinetic/kinetic_connection.h"
 #include "kinetic/key_range_iterator.h"
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 
 
 namespace kinetic {

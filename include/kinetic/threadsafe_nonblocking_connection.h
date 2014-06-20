@@ -24,7 +24,7 @@
 #include <mutex>
 
 #include "kinetic/nonblocking_kinetic_connection.h"
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 
 namespace kinetic {
 
