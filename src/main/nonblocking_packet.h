@@ -23,7 +23,7 @@
 
 #include <memory>
 
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 
 #include "kinetic_client.pb.h"
 #include "nonblocking_string.h"

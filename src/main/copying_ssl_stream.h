@@ -23,7 +23,7 @@
 
 #include "google/protobuf/io/zero_copy_stream_impl_lite.h"
 #include "openssl/ssl.h"
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 
 namespace kinetic {
 

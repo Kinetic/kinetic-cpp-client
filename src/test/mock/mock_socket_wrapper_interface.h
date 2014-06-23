@@ -21,7 +21,7 @@
 #ifndef KINETIC_CPP_CLIENT_MOCK_SOCKET_WRAPPER_INTERFACE_H_
 #define KINETIC_CPP_CLIENT_MOCK_SOCKET_WRAPPER_INTERFACE_H_
 
-#include "protobufutil/message_stream.h"
+#include "kinetic/message_stream.h"
 
 #include "socket_wrapper_interface.h"
 

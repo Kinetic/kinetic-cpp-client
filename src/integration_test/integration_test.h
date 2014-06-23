@@ -41,7 +41,6 @@ using ::testing::StrictMock;
 using ::testing::Assign;
 using ::testing::Matcher;
 using ::testing::MatcherInterface;
-using palominolabs::protobufutil::MessageStreamFactory;
 
 using std::shared_ptr;
 using std::unique_ptr;

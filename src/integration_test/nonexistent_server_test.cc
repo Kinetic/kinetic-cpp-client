@@ -1,7 +1,7 @@
 /*
  * kinetic-cpp-client
  * Copyright (C) 2014 Seagate Technology.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -19,14 +19,13 @@
  */
 
 #include "gtest/gtest.h"
-#include "protobufutil/message_stream.h"
+#include "kinetic/message_stream.h"
 
 #include "kinetic/kinetic.h"
 #include "gtest/gtest.h"
 
 namespace kinetic {
 
-using palominolabs::protobufutil::MessageStreamFactory;
 using std::unique_ptr;
 
 TEST(NonexistentServerTest, NonexistentServer) {

@@ -24,7 +24,7 @@
 #include <string>
 #include <memory>
 
-#include "protobufutil/common.h"
+#include "kinetic/common.h"
 
 namespace kinetic {
 

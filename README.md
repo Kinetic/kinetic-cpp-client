@@ -25,7 +25,7 @@ Common Developer Tasks
 
 **Building the lib**: `make`. It will be in `libkinetic_client.a`
 
-**Running tests**: To run the unit test suite, run `make test`. Tests results
+**Running tests**: To run the unit test suite, run `make check`. Tests results
 will appear on stdout and a JUnit report be written to `gtestresults.xml`
 
 There is also an integration test suite. This suite reads the environment

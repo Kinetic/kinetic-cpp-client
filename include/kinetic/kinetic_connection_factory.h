@@ -1,7 +1,7 @@
 /*
  * kinetic-cpp-client
  * Copyright (C) 2014 Seagate Technology.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -21,8 +21,7 @@
 #ifndef KINETIC_CPP_CLIENT_KINETIC_CONNECTION_FACTORY_H_
 #define KINETIC_CPP_CLIENT_KINETIC_CONNECTION_FACTORY_H_
 
-#include "protobufutil/message_stream.h"
-
+#include "kinetic/message_stream.h"
 #include "kinetic/connection_options.h"
 #include "kinetic/hmac_provider.h"
 #include "kinetic/blocking_kinetic_connection.h"
@@ -33,7 +32,6 @@
 
 namespace kinetic {
 
-using palominolabs::protobufutil::MessageStreamFactoryInterface;
 using std::unique_ptr;
 
 /// Factory class that builds KineticConnection instances. Rather than use the constructor
