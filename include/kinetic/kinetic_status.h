@@ -1,7 +1,7 @@
 /*
  * kinetic-cpp-client
  * Copyright (C) 2014 Seagate Technology.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -32,11 +32,17 @@ using std::string;
 /// from a version or an HMAC error
 class KineticStatus {
     public:
-    KineticStatus(const StatusCode code, const string& message) : code_(code), message_(message) {
-    }
+    KineticStatus(const StatusCode code,
+      const string& message,
+      const int64_t expected_cluster_version = 0) :
+        code_(code),
+        message_(message),
+        expected_cluster_version_(expected_cluster_version) {}
 
-    KineticStatus(const KineticStatus& status) : code_(status.code_), message_(status.message_) {
-    }
+    KineticStatus(const KineticStatus& status) :
+      code_(status.code_),
+      message_(status.message_),
+      expected_cluster_version_(status.expected_cluster_version_) {}
 
     bool ok() const {
         return code_ == StatusCode::OK;
@@ -50,17 +56,22 @@ class KineticStatus {
         return message_;
     }
 
+    int64_t expected_cluster_version() const {
+      return expected_cluster_version_;
+    }
+
     void operator=(const KineticStatus& other) {
         code_ = other.code_;
         message_ = other.message_;
+        expected_cluster_version_ = other.expected_cluster_version_;
     }
 
     private:
     StatusCode code_;
     string message_;
+    int64_t expected_cluster_version_;
 };
 
 } // namespace kinetic
 
 #endif  // KINETIC_CPP_CLIENT_KINETIC_STATUS_H_
-
