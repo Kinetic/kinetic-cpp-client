@@ -1,7 +1,7 @@
 /*
  * kinetic-cpp-client
  * Copyright (C) 2014 Seagate Technology.
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -30,7 +30,7 @@ using std::move;
 using std::make_pair;
 
 
-KineticStatus GetKineticStatus(StatusCode code) {
+KineticStatus GetKineticStatus(StatusCode code, int64_t expected_cluster_version) {
     switch (code) {
         case StatusCode::CLIENT_IO_ERROR:
             return KineticStatus(code, "IO error");
@@ -45,7 +45,7 @@ KineticStatus GetKineticStatus(StatusCode code) {
         case StatusCode::REMOTE_NOT_AUTHORIZED:
             return KineticStatus(code, "Not authorized");
         case StatusCode::REMOTE_CLUSTER_VERSION_MISMATCH:
-            return KineticStatus(code, "Cluster version mismatch");
+            return KineticStatus(code, "Cluster version mismatch", expected_cluster_version);
         case StatusCode::REMOTE_INTERNAL_ERROR:
             return KineticStatus(code, "Remote internal error");
         case StatusCode::REMOTE_HEADER_REQUIRED:
@@ -170,7 +170,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
             handler_->Handle(response_, move(value_));
         } else {
             handler_->Error(GetKineticStatus(ConvertFromProtoStatus(
-                    response_.command().status().code())));
+                    response_.command().status().code()), response_.command().header().clusterversion()));
         }
 
         handler_.reset();
