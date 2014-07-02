@@ -584,7 +584,7 @@ TEST_F(NonblockingKineticConnectionTest, P2PHandlerInterpretsStatusCorrectly) {
 
     vector<KineticStatus> statuses;
 
-    EXPECT_CALL(*callback, Success_(_)).WillOnce(SaveArg<0>(&statuses));
+    EXPECT_CALL(*callback, Success_(_, _)).WillOnce(SaveArg<0>(&statuses));
 
     unique_ptr<const string> empty_str(new string(""));
     handler.Handle(response, move(empty_str));

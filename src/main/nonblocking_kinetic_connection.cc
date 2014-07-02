@@ -217,7 +217,7 @@ void P2PPushHandler::Handle(const Message& response, unique_ptr<const string> va
                 KineticStatus(ConvertFromProtoStatus(status.code()), status.statusmessage()));
     }
 
-    callback_->Success(move(statuses));
+    callback_->Success(move(statuses), response);
 }
 
 void P2PPushHandler::Error(KineticStatus error, Message const * const response) {

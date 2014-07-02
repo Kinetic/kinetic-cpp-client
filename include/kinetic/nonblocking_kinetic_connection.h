@@ -166,7 +166,7 @@ class GetLogHandler : public HandlerInterface {
 class P2PPushCallbackInterface {
     public:
     virtual ~P2PPushCallbackInterface() {}
-    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses) = 0;
+    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses, const Message& response) = 0;
     virtual void Failure(KineticStatus error, Message const * const response) = 0;
 };
 
