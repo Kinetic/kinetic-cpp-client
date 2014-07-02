@@ -417,7 +417,7 @@ class BlockingP2PPushCallback : public P2PPushCallbackInterface, public Blocking
         OnSuccess();
         statuses_ = std::move(statuses);
     }
-    virtual void Failure(KineticStatus error) {
+    virtual void Failure(KineticStatus error, Message const * const response) {
         OnError(error);
     }
 

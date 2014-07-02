@@ -144,7 +144,7 @@ TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
 
     auto handler = make_shared<MockHandler>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::PROTOCOL_ERROR_RESPONSE_NO_ACKSEQUENCE,
-        "Response had no acksequence")));
+        "Response had no acksequence"), nullptr));
     ASSERT_TRUE(receiver.Enqueue(handler, 33, 0));
     ASSERT_EQ(kIdle, receiver.Receive());
 }
@@ -180,7 +180,8 @@ TEST_F(NonblockingReceiverTest, HandlesReadError) {
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<MockHandler>();
-    EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error")));
+    EXPECT_CALL(*handler, Error(
+            KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
     ASSERT_TRUE(receiver.Enqueue(handler, 0, 0));
     ASSERT_EQ(kError, receiver.Receive());
 }
@@ -198,7 +199,7 @@ TEST_F(NonblockingReceiverTest, HandlesHmacError) {
 
     auto handler = make_shared<MockHandler>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_RESPONSE_HMAC_VERIFICATION_ERROR,
-        "Response HMAC mismatch")));
+        "Response HMAC mismatch"), nullptr));
     ASSERT_TRUE(receiver.Enqueue(handler, 0, 0));
     ASSERT_EQ(kIdle, receiver.Receive());
 }
@@ -218,8 +219,10 @@ TEST_F(NonblockingReceiverTest, ErrorCausesAllEnqueuedRequestsToFail) {
 
     auto handler1 = make_shared<MockHandler>();
     auto handler2 = make_shared<MockHandler>();
-    EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error")));
-    EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error")));
+    EXPECT_CALL(*handler1, Error(KineticStatusEq(
+            StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
+    EXPECT_CALL(*handler2, Error(KineticStatusEq(
+            StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
     ASSERT_TRUE(receiver.Enqueue(handler1, 0, 0));
     ASSERT_TRUE(receiver.Enqueue(handler2, 1, 1));
     ASSERT_EQ(kError, receiver.Receive());
@@ -238,9 +241,9 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
     auto handler1 = make_shared<MockHandler>();
     auto handler2 = make_shared<MockHandler>();
     EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Receiver shutdown")));
+        "Receiver shutdown"), nullptr));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Receiver shutdown")));
+        "Receiver shutdown"), nullptr));
     ASSERT_TRUE(receiver->Enqueue(handler1, 0, 0));
     ASSERT_TRUE(receiver->Enqueue(handler2, 1, 1));
     delete receiver;

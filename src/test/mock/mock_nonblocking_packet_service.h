@@ -35,7 +35,8 @@ class MockHandler : public HandlerInterface {
         Handle_(response, *value);
     }
     MOCK_METHOD2(Handle_, void(const Message &response, const string& value));
-    MOCK_METHOD1(Error, void(KineticStatus error));
+    MOCK_METHOD2
+    (Error, void(KineticStatus error, Message const * const response));
 };
 
 class MockNonblockingReceiver : public NonblockingReceiverInterface {

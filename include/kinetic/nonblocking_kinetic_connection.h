@@ -65,7 +65,7 @@ class SimpleHandler : public HandlerInterface {
     public:
     explicit SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<SimpleCallbackInterface> callback_;
@@ -83,7 +83,7 @@ class GetHandler : public HandlerInterface {
     public:
     explicit GetHandler(const shared_ptr<GetCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<GetCallbackInterface> callback_;
@@ -101,7 +101,7 @@ class GetVersionHandler : public HandlerInterface {
     public:
     explicit GetVersionHandler(const shared_ptr<GetVersionCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<GetVersionCallbackInterface> callback_;
@@ -119,7 +119,7 @@ class GetKeyRangeHandler : public HandlerInterface {
     public:
     explicit GetKeyRangeHandler(const shared_ptr<GetKeyRangeCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<GetKeyRangeCallbackInterface>  callback_;
@@ -138,7 +138,7 @@ class PutHandler : public HandlerInterface {
     public:
     explicit PutHandler(const shared_ptr<PutCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<PutCallbackInterface> callback_;
@@ -156,7 +156,7 @@ class GetLogHandler : public HandlerInterface {
     public:
     explicit GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback);
     void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<GetLogCallbackInterface> callback_;
@@ -167,14 +167,14 @@ class P2PPushCallbackInterface {
     public:
     virtual ~P2PPushCallbackInterface() {}
     virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses) = 0;
-    virtual void Failure(KineticStatus error) = 0;
+    virtual void Failure(KineticStatus error, Message const * const response) = 0;
 };
 
 class P2PPushHandler : public HandlerInterface {
     public:
     explicit P2PPushHandler(const shared_ptr<P2PPushCallbackInterface> callback);
     void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response = nullptr);
 
     private:
     const shared_ptr<P2PPushCallbackInterface> callback_;

@@ -95,7 +95,7 @@ class MockP2PPushCallback : public P2PPushCallbackInterface {
     }
 
     MOCK_METHOD1(Success_, void(vector<KineticStatus> statuses));
-    MOCK_METHOD1(Failure, void(KineticStatus error));
+    MOCK_METHOD2(Failure, void(KineticStatus error, Message const * const response));
 };
 
 

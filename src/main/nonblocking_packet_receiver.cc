@@ -170,7 +170,8 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
             handler_->Handle(response_, move(value_));
         } else {
             handler_->Error(GetKineticStatus(ConvertFromProtoStatus(
-                    response_.command().status().code()), response_.command().header().clusterversion()));
+                    response_.command().status().code()), response_.command().header().clusterversion()),
+                    &response_);
         }
 
         handler_.reset();
