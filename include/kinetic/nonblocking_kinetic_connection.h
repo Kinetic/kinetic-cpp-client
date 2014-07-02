@@ -198,6 +198,12 @@ struct P2PPushOperation {
 
     /// Ignore version on the remote drive. The same as specifying force with a regular put.
     bool force;
+
+    /// P2P operations to execute on the drive specified in the request.
+    /// This lets you set up a pipeline of P2P push. For example, a client can push
+    /// a set of keys to A, and in the same request instruct A to push
+    /// keys to B, and so on.
+    shared_ptr<P2PPushRequest> request;
 };
 
 /// Represents a collection of P2P operations
@@ -210,12 +216,6 @@ struct P2PPushRequest {
 
     /// Operations to perform against the drive specified above
     vector<P2PPushOperation> operations;
-
-    /// P2P operations to execute on the drive specified above. This lets
-    /// you set up a pipeline of P2P push. For example, a client can push
-    /// a set of keys to A, and in the same request instruct A to push
-    /// keys to B, and so on.
-    vector<P2PPushRequest> requests;
 };
 
 class NonblockingKineticConnection {
