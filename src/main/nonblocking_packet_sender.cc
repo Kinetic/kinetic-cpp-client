@@ -61,7 +61,8 @@ NonblockingSender::~NonblockingSender() {
         unique_ptr<Request> request = move(request_queue_.front());
         request_queue_.pop_front();
         request->handler->Error(
-            KineticStatus(StatusCode::CLIENT_SHUTDOWN, "Sender shutdown"));
+            KineticStatus(StatusCode::CLIENT_SHUTDOWN, "Sender shutdown"),
+            nullptr);
     }
 }
 
@@ -90,14 +91,15 @@ NonblockingPacketServiceStatus NonblockingSender::Send() {
 
             CHECK_EQ(kFailed, status);
 
-            handler_->Error(KineticStatus(StatusCode::CLIENT_IO_ERROR, "I/O write error"));
+            handler_->Error(
+                    KineticStatus(StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr);
             handler_.reset();
 
             while (!request_queue_.empty()) {
                 unique_ptr<Request> request = move(request_queue_.front());
                 request_queue_.pop_front();
                 request->handler->Error(KineticStatus(StatusCode::CLIENT_IO_ERROR,
-                    "I/O write error"));
+                    "I/O write error"), nullptr);
             }
             return kError;
         }
@@ -109,7 +111,7 @@ NonblockingPacketServiceStatus NonblockingSender::Send() {
             LOG(WARNING) << "Could not enqueue handler; already had a handler for sequence " <<
                 message_sequence_ << " and handler key " << handler_key_;
             handler_->Error(KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR,
-                "Could not enqueue handler"));
+                "Could not enqueue handler"), nullptr);
         }
         handler_.reset();
     }

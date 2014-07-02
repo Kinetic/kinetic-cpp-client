@@ -44,7 +44,7 @@ class HandlerInterface {
 
     // response is re-used, so make sure to copy everything you need out of it
     virtual void Handle(const Message &response, unique_ptr<const string> value) = 0;
-    virtual void Error(KineticStatus error) = 0;
+    virtual void Error(KineticStatus error, Message const * const response) = 0;
 };
 
 class NonblockingPacketServiceInterface {

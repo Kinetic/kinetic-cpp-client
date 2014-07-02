@@ -76,7 +76,7 @@ void GetHandler::Handle(const Message &response, unique_ptr<const string> value)
     callback_->Success(response.command().body().keyvalue().key(), move(record));
 }
 
-void GetHandler::Error(KineticStatus error) {
+void GetHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -87,7 +87,7 @@ void GetVersionHandler::Handle(const Message &response, unique_ptr<const string>
     callback_->Success(response.command().body().keyvalue().dbversion());
 }
 
-void GetVersionHandler::Error(KineticStatus error) {
+void GetVersionHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -109,7 +109,7 @@ void GetKeyRangeHandler::Handle(const Message &response, unique_ptr<const string
     callback_->Success(move(keys));
 }
 
-void GetKeyRangeHandler::Error(KineticStatus error) {
+void GetKeyRangeHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -120,7 +120,7 @@ void PutHandler::Handle(const Message &response, unique_ptr<const string> value)
     callback_->Success();
 }
 
-void PutHandler::Error(KineticStatus error) {
+void PutHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -131,7 +131,7 @@ void SimpleHandler::Handle(const Message &response, unique_ptr<const string> val
     callback_->Success();
 }
 
-void SimpleHandler::Error(KineticStatus error) {
+void SimpleHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -197,7 +197,7 @@ void GetLogHandler::Handle(const Message& response, unique_ptr<const string> val
     callback_->Success(move(drive_log));
 }
 
-void GetLogHandler::Error(KineticStatus error) {
+void GetLogHandler::Error(KineticStatus error, Message const * const response) {
     callback_->Failure(error);
 }
 
@@ -217,11 +217,11 @@ void P2PPushHandler::Handle(const Message& response, unique_ptr<const string> va
                 KineticStatus(ConvertFromProtoStatus(status.code()), status.statusmessage()));
     }
 
-    callback_->Success(move(statuses));
+    callback_->Success(move(statuses), response);
 }
 
-void P2PPushHandler::Error(KineticStatus error) {
-    callback_->Failure(error);
+void P2PPushHandler::Error(KineticStatus error, Message const * const response) {
+    callback_->Failure(error, response);
 }
 
 NonblockingKineticConnection::NonblockingKineticConnection(

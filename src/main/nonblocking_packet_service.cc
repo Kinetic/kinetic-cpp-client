@@ -44,7 +44,8 @@ HandlerKey NonblockingPacketService::Submit(unique_ptr<Message> message,
     HandlerKey key = next_key_++;
 
     if (failed_) {
-        handler->Error(KineticStatus(StatusCode::CLIENT_SHUTDOWN, "Client already shut down"));
+        handler->Error(
+                KineticStatus(StatusCode::CLIENT_SHUTDOWN, "Client already shut down"), nullptr);
     } else {
         sender_->Enqueue(move(message), value, move(handler), key);
     }
