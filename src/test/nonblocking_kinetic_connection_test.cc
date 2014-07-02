@@ -493,12 +493,31 @@ TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
     EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<0>(&message), Return(0)));
 
+
+    auto double_nested_request = make_shared<P2PPushRequest>();
+    double_nested_request->host = "baz.tld";
+    double_nested_request->port = 1236;
+
+    P2PPushOperation double_nested_op;
+    double_nested_op.key = "double_nested_key1";
+    double_nested_request->operations.push_back(double_nested_op);
+
+    auto nested_request = make_shared<P2PPushRequest>();
+    nested_request->host = "bar.tld";
+    nested_request->port = 1235;
+
+    P2PPushOperation nested_op;
+    nested_op.key = "nested_key1";
+    nested_op.request = double_nested_request;
+    nested_request->operations.push_back(nested_op);
+
     P2PPushRequest request;
     request.host = "foo.tld";
     request.port = 1234;
 
     P2PPushOperation op1;
     op1.key = "key1";
+    op1.request = nested_request;
     request.operations.push_back(op1);
 
     P2PPushOperation op2;
@@ -519,9 +538,24 @@ TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
     EXPECT_EQ(1234, message.command().body().p2poperation().peer().port());
     EXPECT_FALSE(message.command().body().p2poperation().peer().tls());
 
+    auto operation0 = message.command().body().p2poperation().operation(0);
     ASSERT_EQ(3, message.command().body().p2poperation().operation_size());
-    EXPECT_EQ("key1", message.command().body().p2poperation().operation(0).key());
-    EXPECT_FALSE(message.command().body().p2poperation().operation(0).has_newkey());
+    EXPECT_EQ("key1", operation0.key());
+    EXPECT_FALSE(operation0.has_newkey());
+
+    EXPECT_EQ("bar.tld", operation0.p2pop().peer().hostname());
+    EXPECT_EQ(1235, operation0.p2pop().peer().port());
+    ASSERT_EQ(1, operation0.p2pop().operation_size());
+
+    auto operation0_nested = operation0.p2pop().operation(0);
+    EXPECT_EQ("nested_key1", operation0_nested.key());
+
+    EXPECT_EQ("baz.tld", operation0_nested.p2pop().peer().hostname());
+    EXPECT_EQ(1236, operation0_nested.p2pop().peer().port());
+    ASSERT_EQ(1, operation0_nested.p2pop().operation_size());
+
+    auto operation0_double_nested = operation0_nested.p2pop().operation(0);
+    EXPECT_EQ("double_nested_key1", operation0_double_nested.key());
 
     EXPECT_EQ("key2", message.command().body().p2poperation().operation(1).key());
     EXPECT_FALSE(message.command().body().p2poperation().operation(1).has_newkey());

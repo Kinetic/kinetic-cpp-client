@@ -578,12 +578,11 @@ void NonblockingKineticConnection::PopulateP2PMessage(
             op->set_newkey(it->newKey);
         }
         op->set_force(it->force);
-    }
 
-    for (auto it = push_request->requests.begin(); it != push_request->requests.end(); ++it) {
-        auto req = mutable_p2pop->add_operation()->mutable_p2pop();
-
-        PopulateP2PMessage(req, make_shared<P2PPushRequest>(*it));
+        if (it->request != nullptr) {
+            auto req = op->mutable_p2pop();
+            PopulateP2PMessage(req, it->request);
+        }
     }
 }
 
