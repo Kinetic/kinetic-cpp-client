@@ -65,7 +65,7 @@ class SimpleHandler : public HandlerInterface {
     public:
     explicit SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<SimpleCallbackInterface> callback_;
@@ -83,7 +83,7 @@ class GetHandler : public HandlerInterface {
     public:
     explicit GetHandler(const shared_ptr<GetCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<GetCallbackInterface> callback_;
@@ -101,7 +101,7 @@ class GetVersionHandler : public HandlerInterface {
     public:
     explicit GetVersionHandler(const shared_ptr<GetVersionCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<GetVersionCallbackInterface> callback_;
@@ -119,7 +119,7 @@ class GetKeyRangeHandler : public HandlerInterface {
     public:
     explicit GetKeyRangeHandler(const shared_ptr<GetKeyRangeCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<GetKeyRangeCallbackInterface>  callback_;
@@ -138,7 +138,7 @@ class PutHandler : public HandlerInterface {
     public:
     explicit PutHandler(const shared_ptr<PutCallbackInterface> callback);
     void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<PutCallbackInterface> callback_;
@@ -156,7 +156,7 @@ class GetLogHandler : public HandlerInterface {
     public:
     explicit GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback);
     void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<GetLogCallbackInterface> callback_;
@@ -166,15 +166,15 @@ class GetLogHandler : public HandlerInterface {
 class P2PPushCallbackInterface {
     public:
     virtual ~P2PPushCallbackInterface() {}
-    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses) = 0;
-    virtual void Failure(KineticStatus error) = 0;
+    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses, const Message& response) = 0;
+    virtual void Failure(KineticStatus error, Message const * const response) = 0;
 };
 
 class P2PPushHandler : public HandlerInterface {
     public:
     explicit P2PPushHandler(const shared_ptr<P2PPushCallbackInterface> callback);
     void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error);
+    void Error(KineticStatus error, Message const * const response);
 
     private:
     const shared_ptr<P2PPushCallbackInterface> callback_;
@@ -198,6 +198,12 @@ struct P2PPushOperation {
 
     /// Ignore version on the remote drive. The same as specifying force with a regular put.
     bool force;
+
+    /// P2P operations to execute on the drive specified in the request.
+    /// This lets you set up a pipeline of P2P push. For example, a client can push
+    /// a set of keys to A, and in the same request instruct A to push
+    /// keys to B, and so on.
+    shared_ptr<P2PPushRequest> request;
 };
 
 /// Represents a collection of P2P operations
@@ -210,12 +216,6 @@ struct P2PPushRequest {
 
     /// Operations to perform against the drive specified above
     vector<P2PPushOperation> operations;
-
-    /// P2P operations to execute on the drive specified above. This lets
-    /// you set up a pipeline of P2P push. For example, a client can push
-    /// a set of keys to A, and in the same request instruct A to push
-    /// keys to B, and so on.
-    vector<P2PPushRequest> requests;
 };
 
 class NonblockingKineticConnection {

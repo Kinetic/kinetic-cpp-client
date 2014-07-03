@@ -78,7 +78,7 @@ TEST(NonblockingPacketServiceTest, SubmitAfterFailureInvokesErrorOnCallback) {
     auto handler = new MockHandler();
 
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Client already shut down")));
+        "Client already shut down"), nullptr));
 
     service.Submit(unique_ptr<Message>(nullptr), make_shared<string>("zomg"),
         unique_ptr<HandlerInterface>(handler));

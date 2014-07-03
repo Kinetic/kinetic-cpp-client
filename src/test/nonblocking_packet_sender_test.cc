@@ -122,7 +122,7 @@ TEST_F(NonblockingSenderTest, CallsErrorWhenCannotEnqueueHandler) {
     unique_ptr<MockHandler> handler(new MockHandler());
     auto receiver = make_shared<MockNonblockingReceiver>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_INTERNAL_ERROR,
-        "Could not enqueue handler")));
+        "Could not enqueue handler"), nullptr));
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(false));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
@@ -188,7 +188,8 @@ TEST_F(NonblockingSenderTest, HandlesWriteError) {
         options);
 
     unique_ptr<MockHandler> handler(new MockHandler());
-    EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O write error")));
+    EXPECT_CALL(*handler, Error(KineticStatusEq(
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
     unique_ptr<Message> message(new Message());
     sender.Enqueue(move(message), make_shared<string>(""), move(handler), 0);
     ASSERT_EQ(kError, sender.Send());
@@ -266,8 +267,10 @@ TEST_F(NonblockingSenderTest, ErrorCausesAllEnqueuedRequestsToFail) {
 
     unique_ptr<MockHandler> handler1(new MockHandler());
     unique_ptr<MockHandler> handler2(new MockHandler());
-    EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O write error")));
-    EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O write error")));
+    EXPECT_CALL(*handler1, Error(KineticStatusEq(
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
+    EXPECT_CALL(*handler2, Error(KineticStatusEq(
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
     unique_ptr<Message> message(new Message());
     sender.Enqueue(move(message), make_shared<string>(""), move(handler1), 0);
     message.reset(new Message());
@@ -288,9 +291,9 @@ TEST_F(NonblockingSenderTest, DestructorDeletesOutstandingRequests) {
     unique_ptr<MockHandler> handler1(new MockHandler());
     unique_ptr<MockHandler> handler2(new MockHandler());
     EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Sender shutdown")));
+        "Sender shutdown"), nullptr));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Sender shutdown")));
+        "Sender shutdown"), nullptr));
     unique_ptr<Message> message(new Message());
     sender->Enqueue(move(message), make_shared<string>(""), move(handler1), 0);
     message.reset(new Message());
