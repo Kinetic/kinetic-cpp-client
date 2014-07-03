@@ -68,6 +68,8 @@ KineticStatus GetKineticStatus(StatusCode code, int64_t expected_cluster_version
             return KineticStatus(code, "No space left");
         case StatusCode::REMOTE_NO_SUCH_HMAC_ALGORITHM:
             return KineticStatus(code, "Unknown HMAC algorithm");
+        case StatusCode::REMOTE_NESTED_OPERATION_ERRORS:
+            return KineticStatus(code, "Operation completed but has nested errors");
         default:
             return KineticStatus(code, "Internal Error");
     }
