@@ -5,7 +5,7 @@ This repo contains code for producing C and C++ kinetic clients.
 
 Protocol Version
 =================
-The client is using version `2.0.1` of the [Kinetic-Protocol](https://github.com/Seagate/kinetic-protocol/releases/tag/2.0.1).
+The client is using version `2.0.4` of the [Kinetic-Protocol](https://github.com/Seagate/kinetic-protocol/releases/tag/2.0.4).
 
 
 Dependencies
