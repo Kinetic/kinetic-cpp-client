@@ -33,7 +33,6 @@ class OutgoingValueInterface {
     virtual size_t size() const = 0;
     virtual bool TransferToSocket(int fd, int* err) const = 0;
     virtual bool ToString(std::string *result, int* err) const = 0;
-    virtual int fd() {return -1;}
 };
 
 class OutgoingStringValue : public OutgoingValueInterface {
