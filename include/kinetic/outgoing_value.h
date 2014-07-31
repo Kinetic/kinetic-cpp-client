@@ -31,16 +31,17 @@ class OutgoingValueInterface {
     public:
     virtual ~OutgoingValueInterface() {}
     virtual size_t size() const = 0;
-    virtual bool TransferToSocket(int fd) const = 0;
-    virtual bool ToString(std::string *result) const = 0;
+    virtual bool TransferToSocket(int fd, int* err) const = 0;
+    virtual bool ToString(std::string *result, int* err) const = 0;
+    virtual int fd() {return -1;}
 };
 
 class OutgoingStringValue : public OutgoingValueInterface {
     public:
     explicit OutgoingStringValue(const std::string &s);
     size_t size() const;
-    bool TransferToSocket(int fd) const;
-    bool ToString(std::string *result) const;
+    bool TransferToSocket(int fd, int* err) const;
+    bool ToString(std::string *result, int* err) const;
 
     private:
     const std::string s_;

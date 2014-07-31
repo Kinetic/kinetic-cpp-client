@@ -30,7 +30,7 @@ namespace kinetic {
 class ReaderWriter {
     public:
     explicit ReaderWriter(int fd);
-    bool Read(void *buf, size_t n);
+    bool Read(void *buf, size_t n, int* err);
     bool Write(const void *buf, size_t n);
 
     private:
