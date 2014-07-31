@@ -77,32 +77,32 @@ MessageStream::MessageStreamReadStatus MessageStream::ReadMessage(
     return MessageStreamReadStatus_SUCCESS;
 }
 
-bool MessageStream::WriteMessage(const ::google::protobuf::Message &message,
-        const OutgoingValueInterface& value) {
+int MessageStream::WriteMessage(const ::google::protobuf::Message &message,
+        const OutgoingValueInterface& value, int* err) {
     // First the header
     if (!WriteHeader(message.ByteSize(), value.size())) {
         LOG(WARNING) << "Failed to write header";
-        return false;
+        return 1;
     }
 
     // Now the message
     std::string message_string;
     if (!message.SerializeToString(&message_string)) {
         LOG(WARNING) << "Failed to serialize protocol buffer";
-        return false;
+        return 2;
     }
     if (!byte_stream_->Write(message_string.data(), message_string.size())) {
         LOG(WARNING) << "Failed to write message";
-        return false;
+        return 3;
     }
 
     // And finally the value if any
-    if (!byte_stream_->WriteValue(value)) {
+    if (!byte_stream_->WriteValue(value, err)) {
         LOG(WARNING) << "Failed to write value";
-        return false;
+        return 4;
     }
 
-    return true;
+    return 0;
 }
 
 MessageStreamFactory::MessageStreamFactory(SSL_CTX *ssl_context,
