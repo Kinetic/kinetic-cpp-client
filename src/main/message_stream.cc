@@ -109,9 +109,9 @@ MessageStreamFactory::MessageStreamFactory(SSL_CTX *ssl_context,
         IncomingValueFactoryInterface &value_factory)
     : ssl_context_(ssl_context), value_factory_(value_factory) {}
 
-bool MessageStreamFactory::NewMessageStream(int fd, bool use_ssl, uint32_t max_message_size_bytes,
+bool MessageStreamFactory::NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
         MessageStreamInterface **message_stream) {
-    if (use_ssl) {
+    if ( (ssl == NULL) && use_ssl) {
         SSL *ssl = SSL_new(ssl_context_);
         // We want to automatically retry reads and writes when a renegotiation
         // takes place. This way the only errors we have to handle are real,
