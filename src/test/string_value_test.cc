@@ -90,8 +90,9 @@ TEST(OutgoingStringValueTest, TransferToSocketWorks) {
     // Write OutgoingStringValue into a pipe
     OutgoingStringValue value("a");
     int output_pipe[2];
+    int err;
     ASSERT_EQ(0, pipe(output_pipe));
-    ASSERT_TRUE(value.TransferToSocket(output_pipe[1]));
+    ASSERT_TRUE(value.TransferToSocket(output_pipe[1], &err));
 
     // Check that the pipe contains the right value
     char result;
@@ -105,7 +106,8 @@ TEST(OutgoingStringValueTest, TransferToSocketWorks) {
 TEST(OutgoingStringValueTest, ToStringWorks) {
     OutgoingStringValue value("abc");
     std::string s;
-    ASSERT_TRUE(value.ToString(&s));
+    int err;
+    ASSERT_TRUE(value.ToString(&s, &err));
     ASSERT_EQ("abc", s);
 }
 

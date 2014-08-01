@@ -35,7 +35,7 @@ class ByteStreamInterface {
     virtual bool Read(void *buf, size_t n) = 0;
     virtual bool Write(const void *buf, size_t n) = 0;
     virtual IncomingValueInterface *ReadValue(size_t n) = 0;
-    virtual bool WriteValue(const OutgoingValueInterface &value) = 0;
+    virtual bool WriteValue(const OutgoingValueInterface &value, int* err) = 0;
 };
 
 class PlainByteStream : public ByteStreamInterface {
@@ -44,7 +44,7 @@ class PlainByteStream : public ByteStreamInterface {
     bool Read(void *buf, size_t n);
     bool Write(const void *buf, size_t n);
     IncomingValueInterface *ReadValue(size_t n);
-    bool WriteValue(const OutgoingValueInterface &value);
+    bool WriteValue(const OutgoingValueInterface &value, int* err);
 
     private:
     int fd_;
@@ -59,7 +59,7 @@ class SslByteStream : public ByteStreamInterface {
     bool Read(void *buf, size_t n);
     bool Write(const void *buf, size_t n);
     IncomingValueInterface *ReadValue(size_t n);
-    bool WriteValue(const OutgoingValueInterface &value);
+    bool WriteValue(const OutgoingValueInterface &value, int* err);
 
     private:
     SSL *ssl_;

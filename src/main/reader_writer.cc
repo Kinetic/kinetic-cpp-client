@@ -29,7 +29,7 @@ namespace kinetic {
 
 ReaderWriter::ReaderWriter(int fd) : fd_(fd) {}
 
-bool ReaderWriter::Read(void *buf, size_t n) {
+bool ReaderWriter::Read(void *buf, size_t n, int* err) {
     size_t bytes_read = 0;
     while (bytes_read < n) {
         int status = read(fd_, reinterpret_cast<char *>(buf) + bytes_read, n - bytes_read);
@@ -37,6 +37,7 @@ bool ReaderWriter::Read(void *buf, size_t n) {
             continue;
         }
         if (status < 0) {
+            *err = errno;
             PLOG(WARNING) << "Failed to read from socket";
             return false;
         }
