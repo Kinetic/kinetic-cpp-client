@@ -64,7 +64,7 @@ class MessageStream : public MessageStreamInterface {
 
 class MessageStreamFactoryInterface {
     public:
-    virtual bool NewMessageStream(int fd, bool use_ssl, uint32_t max_message_size_bytes,
+    virtual bool NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
         MessageStreamInterface **message_stream) = 0;
     virtual ~MessageStreamFactoryInterface() {}
 };
@@ -72,7 +72,7 @@ class MessageStreamFactoryInterface {
 class MessageStreamFactory : public MessageStreamFactoryInterface {
     public:
     MessageStreamFactory(SSL_CTX *ssl_context, IncomingValueFactoryInterface &value_factory);
-    bool NewMessageStream(int fd, bool use_ssl, uint32_t max_message_size_bytes,
+    bool NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
         MessageStreamInterface **message_stream);
     virtual ~MessageStreamFactory() {}
 
