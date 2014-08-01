@@ -55,7 +55,6 @@ bool PlainByteStream::WriteValue(const OutgoingValueInterface &value) {
 SslByteStream::SslByteStream(SSL *ssl) : ssl_(ssl) {}
 
 SslByteStream::~SslByteStream() {
-    SSL_free(ssl_);
 }
 
 bool SslByteStream::Read(void *buf, size_t n) {
