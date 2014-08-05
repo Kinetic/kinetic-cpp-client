@@ -41,8 +41,8 @@ class MessageStreamInterface {
     virtual ~MessageStreamInterface() {}
     virtual MessageStreamReadStatus ReadMessage(::google::protobuf::Message *message,
         IncomingValueInterface** value) = 0;
-    virtual bool WriteMessage(const ::google::protobuf::Message &message,
-        const OutgoingValueInterface& value) = 0;
+    virtual int WriteMessage(const ::google::protobuf::Message &message,
+        const OutgoingValueInterface& value, int* err) = 0;
 };
 
 class MessageStream : public MessageStreamInterface {
@@ -51,8 +51,8 @@ class MessageStream : public MessageStreamInterface {
     ~MessageStream();
     MessageStreamReadStatus ReadMessage(::google::protobuf::Message *message,
         IncomingValueInterface** value);
-    bool WriteMessage(const ::google::protobuf::Message &message,
-        const OutgoingValueInterface& value);
+    int WriteMessage(const ::google::protobuf::Message &message,
+        const OutgoingValueInterface& value, int* err);
 
     private:
     bool ReadHeader(uint32_t *message_size, uint32_t *value_size);

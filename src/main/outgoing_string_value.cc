@@ -38,12 +38,12 @@ size_t OutgoingStringValue::size() const {
     return s_.size();
 }
 
-bool OutgoingStringValue::TransferToSocket(int fd) const {
+bool OutgoingStringValue::TransferToSocket(int fd, int* err) const {
     ReaderWriter reader_writer(fd);
     return reader_writer.Write(s_.data(), s_.size());
 }
 
-bool OutgoingStringValue::ToString(std::string *result) const {
+bool OutgoingStringValue::ToString(std::string *result, int* err) const {
     *result = s_;
     return true;
 }

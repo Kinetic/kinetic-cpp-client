@@ -36,7 +36,8 @@ PlainByteStream::PlainByteStream(int fd, IncomingValueFactoryInterface &value_fa
 
 bool PlainByteStream::Read(void *buf, size_t n) {
     ReaderWriter reader_writer(fd_);
-    return reader_writer.Read(buf, n);
+    int err;
+    return reader_writer.Read(buf, n, &err);
 }
 
 bool PlainByteStream::Write(const void *buf, size_t n) {
@@ -48,8 +49,8 @@ IncomingValueInterface *PlainByteStream::ReadValue(size_t n) {
     return value_factory_.NewValue(fd_, n);
 }
 
-bool PlainByteStream::WriteValue(const OutgoingValueInterface &value) {
-    return value.TransferToSocket(fd_);
+bool PlainByteStream::WriteValue(const OutgoingValueInterface &value, int* err) {
+    return value.TransferToSocket(fd_, err);
 }
 
 SslByteStream::SslByteStream(SSL *ssl) : ssl_(ssl) {}
@@ -124,9 +125,9 @@ IncomingValueInterface *SslByteStream::ReadValue(size_t n) {
     return new IncomingStringValue(value);
 }
 
-bool SslByteStream::WriteValue(const OutgoingValueInterface &value) {
+bool SslByteStream::WriteValue(const OutgoingValueInterface &value, int* err) {
     std::string s;
-    if (!value.ToString(&s)) {
+    if (!value.ToString(&s, err)) {
         return false;
     }
     return Write(s.data(), s.size());
