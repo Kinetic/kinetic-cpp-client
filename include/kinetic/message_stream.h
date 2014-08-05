@@ -74,10 +74,12 @@ class MessageStreamFactory : public MessageStreamFactoryInterface {
     MessageStreamFactory(SSL_CTX *ssl_context, IncomingValueFactoryInterface &value_factory);
     bool NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
         MessageStreamInterface **message_stream);
-    virtual ~MessageStreamFactory() {}
+    ~MessageStreamFactory();
 
     private:
     SSL_CTX *ssl_context_;
+    SSL *ssl_;
+    bool ssl_created_;
     IncomingValueFactoryInterface &value_factory_;
     DISALLOW_COPY_AND_ASSIGN(MessageStreamFactory);
 };

@@ -45,9 +45,9 @@ class MockMessageStream : public MessageStreamInterface {
 class MockMessageStreamFactory : public MessageStreamFactoryInterface {
     public:
     MockMessageStreamFactory() {}
-    virtual ~MockMessageStreamFactory() {}
+    ~MockMessageStreamFactory() {}
     MOCK_METHOD4(NewMessageStream,
-        bool(int fd, bool use_ssl, uint32_t max_message_size_bytes,
+        bool(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
             MessageStreamInterface **message_stream));
 };
 

@@ -19,8 +19,12 @@
  */
 
 #include "nonblocking_packet.h"
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include "glog/logging.h"
 
@@ -41,6 +45,16 @@ NonblockingPacketWriter::~NonblockingPacketWriter() {
 }
 
 NonblockingStringStatus NonblockingPacketWriter::Write() {
+    struct stat statbuf;
+    if (fstat(fd_, &statbuf)) {
+        PLOG(ERROR) << "Unable to fstat socket";
+        return kFailed;
+    }
+    if (S_ISSOCK(statbuf.st_mode)) {
+        int optval = 1;
+        setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+    }
+
     while (true) {
         NonblockingStringStatus status = writer_->Write();
         if (status != kDone) {
@@ -67,6 +81,16 @@ NonblockingStringStatus NonblockingPacketWriter::Write() {
                 TransitionFromValue();
                 break;
             case kFinished:
+                if (fstat(fd_, &statbuf)) {
+                    PLOG(ERROR) << "Unable to fstat socket";
+                    return kFailed;
+                }
+                if (S_ISSOCK(statbuf.st_mode)) {
+                    int optval = 0;
+                    setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+                    optval = 1;
+                    setsockopt(fd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+                }
                 return kDone;
             default:
                 CHECK(false);

@@ -107,21 +107,33 @@ bool MessageStream::WriteMessage(const ::google::protobuf::Message &message,
 
 MessageStreamFactory::MessageStreamFactory(SSL_CTX *ssl_context,
         IncomingValueFactoryInterface &value_factory)
-    : ssl_context_(ssl_context), value_factory_(value_factory) {}
+    : ssl_context_(ssl_context), value_factory_(value_factory) {
+    ssl_created_ = false;
+    }
+
+
+MessageStreamFactory::~MessageStreamFactory() {
+    if (ssl_created_) {
+        SSL_free(ssl_);
+    }
+}
 
 bool MessageStreamFactory::NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint32_t max_message_size_bytes,
         MessageStreamInterface **message_stream) {
     if (use_ssl) {
         if (ssl == NULL) {
-            SSL *ssl = SSL_new(ssl_context_);
+            ssl_ = SSL_new(ssl_context_);
             // We want to automatically retry reads and writes when a renegotiation
             // takes place. This way the only errors we have to handle are real,
             // permanent ones.
-            SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
+
             if (ssl == NULL) {
                 LOG(ERROR) << "Failed to create new SSL object";
                 return false;
             }
+            SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
+            ssl_created_ = true;
+            ssl = ssl_;
             if (SSL_set_fd(ssl, fd) != 1) {
                 LOG(ERROR) << "Failed to associate SSL object with file descriptor";
                 SSL_free(ssl);
