@@ -127,22 +127,22 @@ bool MessageStreamFactory::NewMessageStream(int fd, bool use_ssl, SSL *ssl, uint
             // takes place. This way the only errors we have to handle are real,
             // permanent ones.
 
-            if (ssl == NULL) {
+            if (ssl_ == NULL) {
                 LOG(ERROR) << "Failed to create new SSL object";
                 return false;
             }
-            SSL_set_mode(ssl, SSL_MODE_AUTO_RETRY);
+            SSL_set_mode(ssl_, SSL_MODE_AUTO_RETRY);
             ssl_created_ = true;
             ssl = ssl_;
-            if (SSL_set_fd(ssl, fd) != 1) {
+            if (SSL_set_fd(ssl_, fd) != 1) {
                 LOG(ERROR) << "Failed to associate SSL object with file descriptor";
-                SSL_free(ssl);
+                SSL_free(ssl_);
                 return false;
             }
-            if (SSL_accept(ssl) != 1) {
+            if (SSL_accept(ssl_) != 1) {
                 LOG(ERROR) << "Failed to perform SSL handshake";
                 LOG(ERROR) << "The client may have attempted to use an SSL/TLS version below TLSv1.1";
-                SSL_free(ssl);
+                SSL_free(ssl_);
                 return false;
             }
         }
