@@ -30,8 +30,8 @@ using ::testing::SaveArg;
 using ::testing::StrictMock;
 using ::testing::MatcherInterface;
 using ::testing::Matcher;
-using com::seagate::kinetic::client::proto::Message_Algorithm_SHA1;
-using com::seagate::kinetic::client::proto::Message_Algorithm_CRC64;
+using com::seagate::kinetic::client::proto::Command_Algorithm_SHA1;
+using com::seagate::kinetic::client::proto::Command_Algorithm_CRC64;
 
 using std::make_shared;
 using std::string;
@@ -46,7 +46,7 @@ TEST_F(IntegrationTest, GetNonexistent) {
 
 TEST_F(IntegrationTest, GetOk) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
+    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
             WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -54,7 +54,7 @@ TEST_F(IntegrationTest, GetOk) {
     auto callback = make_shared<StrictMock<MockGetCallback>>();
     nonblocking_connection_->Get("key1", callback);
     EXPECT_CALL(*callback,
-        Success_("key1", KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_SHA1)))
+        Success_("key1", KineticRecordEq("value1", "v1", "tag1", Command_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
     RunSelectLoop();
 }
@@ -62,8 +62,8 @@ TEST_F(IntegrationTest, GetOk) {
 TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
     // Write keys "key1" and "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
-    auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
+    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Command_Algorithm_SHA1);
+    auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -75,7 +75,7 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     nonblocking_connection_->GetNext("key1", get_callback);
     EXPECT_CALL(*get_callback, Success_("key2",
-            KineticRecordEq("value2", "v2", "tag2", Message_Algorithm_SHA1)))
+            KineticRecordEq("value2", "v2", "tag2", Command_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -83,7 +83,7 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndHasSuccessor) {
 
 TEST_F(IntegrationTest, GetManyOutstandingRequests) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_CRC64);
+    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Command_Algorithm_CRC64);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -100,7 +100,7 @@ TEST_F(IntegrationTest, GetManyOutstandingRequests) {
 
         nonblocking_connection_->Get("key1", get_callback);
         EXPECT_CALL(*get_callback, Success_("key1",
-                KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_CRC64)))
+                KineticRecordEq("value1", "v1", "tag1", Command_Algorithm_CRC64)))
             .WillOnce(InvokeWithoutArgs(incr));
     }
 
@@ -110,7 +110,7 @@ TEST_F(IntegrationTest, GetManyOutstandingRequests) {
 TEST_F(IntegrationTest, GetNext_KeyExistsAndDoesNotHaveSuccessor) {
     // Write "key1"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
+    auto record = make_shared<KineticRecord>("value", "version", "tag", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -124,7 +124,7 @@ TEST_F(IntegrationTest, GetNext_KeyExistsAndDoesNotHaveSuccessor) {
 TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndHasSuccessor) {
     // Write "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_CRC64);
+    auto record = make_shared<KineticRecord>("value", "version", "tag", Command_Algorithm_CRC64);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -133,7 +133,7 @@ TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndHasSuccessor) {
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     nonblocking_connection_->GetNext("key1", get_callback);
     EXPECT_CALL(*get_callback, Success_("key2",
-            KineticRecordEq("value", "version", "tag", Message_Algorithm_CRC64)))
+            KineticRecordEq("value", "version", "tag", Command_Algorithm_CRC64)))
         .WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -152,8 +152,8 @@ TEST_F(IntegrationTest, GetNext_KeyDoesNotExistAndDoesNotHaveSuccessor) {
 TEST_F(IntegrationTest, GetPrevious_KeyExistsAndHasPredecessor) {
     // Write keys "key1" and "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Message_Algorithm_SHA1);
-    auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Message_Algorithm_SHA1);
+    auto record1 = make_shared<KineticRecord>("value1", "v1", "tag1", Command_Algorithm_SHA1);
+    auto record2 = make_shared<KineticRecord>("value2", "v2", "tag2", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record1, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -165,7 +165,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndHasPredecessor) {
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     nonblocking_connection_->GetPrevious("key2", get_callback);
     EXPECT_CALL(*get_callback, Success_("key1",
-        KineticRecordEq("value1", "v1", "tag1", Message_Algorithm_SHA1)))
+        KineticRecordEq("value1", "v1", "tag1", Command_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -174,7 +174,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndHasPredecessor) {
 TEST_F(IntegrationTest, GetPrevious_KeyExistsAndDoesNotHavePredecessor) {
     // Write "key2"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
+    auto record = make_shared<KineticRecord>("value", "version", "tag", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -191,7 +191,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyExistsAndDoesNotHavePredecessor) {
 TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndHasPredecessor) {
     // Write "key1"
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
+    auto record = make_shared<KineticRecord>("value", "version", "tag", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key1"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -200,7 +200,7 @@ TEST_F(IntegrationTest, GetPrevious_KeyDoesNotExistAndHasPredecessor) {
     auto get_callback = make_shared<StrictMock<MockGetCallback>>();
     nonblocking_connection_->GetPrevious("key2", get_callback);
     EXPECT_CALL(*get_callback, Success_("key1",
-            KineticRecordEq("value", "version", "tag", Message_Algorithm_SHA1)))
+            KineticRecordEq("value", "version", "tag", Command_Algorithm_SHA1)))
         .WillOnce(Assign(&done_, true));
 
     RunSelectLoop();
@@ -228,7 +228,7 @@ TEST_F(IntegrationTest, GetVersionNonexistent) {
 TEST_F(IntegrationTest, GetVersion) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     auto get_version_callback = make_shared<StrictMock<MockGetVersionCallback>>();
-    auto record = make_shared<KineticRecord>("value", "version", "tag", Message_Algorithm_SHA1);
+    auto record = make_shared<KineticRecord>("value", "version", "tag", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);
@@ -241,7 +241,7 @@ TEST_F(IntegrationTest, GetVersion) {
 TEST_F(IntegrationTest, GetKeyRange) {
     auto put_callback = make_shared<StrictMock<MockPutCallback>>();
     // TODO(marshall) fails on java simulator with empty value
-    auto record = make_shared<KineticRecord>("v", "", "", Message_Algorithm_SHA1);
+    auto record = make_shared<KineticRecord>("v", "", "", Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("k0"), make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
     WaitForSuccessSharedPtr(put_callback);

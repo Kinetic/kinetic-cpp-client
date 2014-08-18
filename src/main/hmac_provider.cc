@@ -35,18 +35,16 @@ HmacProvider::HmacProvider() {}
 
 std::string HmacProvider::ComputeHmac(const Message& message,
         const std::string& key) const {
-    std::string input(message.command().SerializeAsString());
-
     HMAC_CTX ctx;
     HMAC_CTX_init(&ctx);
     HMAC_Init_ex(&ctx, key.c_str(), key.length(), EVP_sha1(), NULL);
 
-    if (input.length() != 0) {
-        uint32_t message_length_bigendian = htonl(input.length());
+    if (message.commandbytes().length() != 0) {
+        uint32_t message_length_bigendian = htonl(message.commandbytes().length());
         HMAC_Update(&ctx, reinterpret_cast<unsigned char *>(&message_length_bigendian),
             sizeof(uint32_t));
-        HMAC_Update(&ctx, reinterpret_cast<const unsigned char *>(input.c_str()),
-            input.length());
+        HMAC_Update(&ctx, reinterpret_cast<const unsigned char *>(message.commandbytes().c_str()),
+            message.commandbytes().length());
     }
 
     unsigned char result[SHA_DIGEST_LENGTH];
@@ -57,15 +55,14 @@ std::string HmacProvider::ComputeHmac(const Message& message,
     return std::string(reinterpret_cast<char *>(result), result_length);
 }
 
-bool HmacProvider::ValidateHmac(const Message& message,
-        const std::string& key) const {
+bool HmacProvider::ValidateHmac(const Message& message, const std::string& key) const {
     std::string correct_hmac(ComputeHmac(message, key));
 
-    if (!message.has_hmac()) {
+    if (!message.has_hmacauth()) {
         return false;
     }
 
-    const std::string &provided_hmac = message.hmac();
+    const std::string &provided_hmac = message.hmacauth().hmac();
 
     if (provided_hmac.length() != correct_hmac.length()) {
         return false;

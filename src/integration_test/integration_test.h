@@ -182,7 +182,7 @@ class KineticRecordMatcher : public MatcherInterface<KineticRecord*> {
     KineticRecordMatcher(const std::string& value,
             const std::string& version,
             const std::string& tag,
-            Message_Algorithm algorithm)
+            Command_Algorithm algorithm)
     : value_(value), version_(version), tag_(tag), algorithm_(algorithm) {}
 
     virtual bool MatchAndExplain(KineticRecord* other,
@@ -208,7 +208,7 @@ class KineticRecordMatcher : public MatcherInterface<KineticRecord*> {
     const std::string value_;
     const std::string version_;
     const std::string tag_;
-    Message_Algorithm algorithm_;
+    Command_Algorithm algorithm_;
 };
 
 
@@ -216,7 +216,7 @@ inline Matcher<KineticRecord*> KineticRecordEq(
         const std::string& value,
         const std::string& version,
         const std::string& tag,
-        Message_Algorithm algorithm) {
+        Command_Algorithm algorithm) {
     return MakeMatcher(new KineticRecordMatcher(value, version, tag, algorithm));
 }
 

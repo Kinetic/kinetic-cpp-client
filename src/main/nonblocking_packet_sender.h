@@ -41,7 +41,8 @@
 namespace kinetic {
 
 using com::seagate::kinetic::client::proto::Message;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
+using com::seagate::kinetic::client::proto::Command;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode;
 
 using std::string;
 using std::unique_ptr;
@@ -53,7 +54,7 @@ class NonblockingSenderInterface {
     public:
     virtual ~NonblockingSenderInterface() {}
     // The HandlerKey returned will be unique for the lifespan of the Sender instance.
-    virtual void Enqueue(unique_ptr<Message> message, const shared_ptr<const string> value,
+    virtual void Enqueue(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
             unique_ptr<HandlerInterface> handler, HandlerKey handler_key) = 0;
     virtual NonblockingPacketServiceStatus Send() = 0;
     // remove the handler if it hasn't already started being processed. Returns true if a handler
@@ -68,7 +69,7 @@ class NonblockingSender : public NonblockingSenderInterface {
         shared_ptr<NonblockingPacketWriterFactoryInterface> packet_writer_factory,
         HmacProvider hmac_provider, const ConnectionOptions &connection_options);
     ~NonblockingSender();
-    void Enqueue(unique_ptr<Message> message, const shared_ptr<const string> value,
+    void Enqueue(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
             unique_ptr<HandlerInterface> handler, HandlerKey handler_key);
     NonblockingPacketServiceStatus Send();
     bool Remove(HandlerKey key);
@@ -76,6 +77,7 @@ class NonblockingSender : public NonblockingSenderInterface {
     private:
     struct Request {
         unique_ptr<const Message> message;
+        unique_ptr<const Command> command;
         shared_ptr<const string> value;
         unique_ptr<HandlerInterface> handler;
         HandlerKey handler_key;

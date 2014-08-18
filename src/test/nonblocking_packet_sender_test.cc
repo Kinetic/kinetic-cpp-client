@@ -35,8 +35,8 @@ using ::testing::_;
 using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::StrictMock;
-using com::seagate::kinetic::client::proto::Message_MessageType_GET_RESPONSE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Command_MessageType_GET_RESPONSE;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
 
 using std::string;
 using std::make_shared;
@@ -82,7 +82,8 @@ TEST_F(NonblockingSenderTest, SimpleMessageAndValue) {
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
-    sender.Enqueue(move(message), make_shared<string>("value"), move(handler), 0);
+    unique_ptr<Command> command(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>("value"), move(handler), 0);
     ASSERT_EQ(kIdle, sender.Send());
 
     // Check that the pipe now contains what it's supposed to
@@ -128,8 +129,10 @@ TEST_F(NonblockingSenderTest, CallsErrorWhenCannotEnqueueHandler) {
 
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
+
     unique_ptr<Message> message(new Message());
-    sender.Enqueue(move(message), make_shared<string>("value"), move(handler), 0);
+    unique_ptr<Command> command(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>("value"), move(handler), 0);
     ASSERT_EQ(kIdle, sender.Send());
 }
 
@@ -147,7 +150,8 @@ TEST_F(NonblockingSenderTest, UsesCorrectConnectionId) {
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
-    sender.Enqueue(move(message), make_shared<string>(""), move(handler), 0);
+    unique_ptr<Command> command(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler), 0);
     ASSERT_EQ(kIdle, sender.Send());
 
     // Check that the resulting message has the right connection id
@@ -168,7 +172,9 @@ TEST_F(NonblockingSenderTest, UsesCorrectConnectionId) {
         read(fds_[0], serialized_message, message_length));
     Message message_parsed;
     ASSERT_TRUE(message_parsed.ParseFromArray(serialized_message, message_length));
-    ASSERT_EQ(42, message_parsed.command().header().connectionid());
+    Command command_parsed;
+    command_parsed.ParseFromString(message_parsed.commandbytes());
+    ASSERT_EQ(42, command_parsed.header().connectionid());
     delete[] serialized_message;
 }
 
@@ -191,7 +197,8 @@ TEST_F(NonblockingSenderTest, HandlesWriteError) {
     EXPECT_CALL(*handler, Error(KineticStatusEq(
             StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
     unique_ptr<Message> message(new Message());
-    sender.Enqueue(move(message), make_shared<string>(""), move(handler), 0);
+    unique_ptr<Command> command(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler), 0);
     ASSERT_EQ(kError, sender.Send());
 }
 
@@ -239,11 +246,11 @@ TEST_F(NonblockingSenderTest, MaintainsCorrectHandlerKeyWhenWriteDoesntCompleteO
     NonblockingSender sender(socket_wrapper, receiver,
         unique_ptr<NonblockingPacketWriterFactoryInterface>(mock_factory), hmac_provider_,
         options);
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), value, move(handler1), 0);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler1), 0);
     ASSERT_EQ(kIoWait, sender.Send());
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), value, move(handler2), 1);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler2), 1);
     ASSERT_EQ(kIoWait, sender.Send());
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), value, move(handler3), 2);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler3), 2);
     ASSERT_EQ(kIoWait, sender.Send());
     ASSERT_EQ(kIoWait, sender.Send());
     ASSERT_EQ(kIoWait, sender.Send());
@@ -272,9 +279,11 @@ TEST_F(NonblockingSenderTest, ErrorCausesAllEnqueuedRequestsToFail) {
     EXPECT_CALL(*handler2, Error(KineticStatusEq(
             StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
     unique_ptr<Message> message(new Message());
-    sender.Enqueue(move(message), make_shared<string>(""), move(handler1), 0);
+    unique_ptr<Command> command(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler1), 0);
     message.reset(new Message());
-    sender.Enqueue(move(message), make_shared<string>(""), move(handler2), 1);
+    command.reset(new Command());
+    sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler2), 1);
     ASSERT_EQ(kError, sender.Send());
 }
 
@@ -295,9 +304,11 @@ TEST_F(NonblockingSenderTest, DestructorDeletesOutstandingRequests) {
     EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
         "Sender shutdown"), nullptr));
     unique_ptr<Message> message(new Message());
-    sender->Enqueue(move(message), make_shared<string>(""), move(handler1), 0);
+    unique_ptr<Command> command(new Command());
+    sender->Enqueue(move(message), move(command), make_shared<string>(""), move(handler1), 0);
     message.reset(new Message());
-    sender->Enqueue(move(message), make_shared<string>(""), move(handler2), 1);
+    command.reset(new Command());
+    sender->Enqueue(move(message), move(command), make_shared<string>(""), move(handler2), 1);
 
     delete sender;
 }
@@ -318,15 +329,16 @@ TEST_F(NonblockingSenderTest, EnqueueAndRemoveDoesntInvoke) {
     unique_ptr<MockHandler> handler2(new StrictMock<MockHandler>());
     unique_ptr<Message> message1(new Message());
     unique_ptr<Message> message2(new Message());
+    unique_ptr<Command> command1(new Command());
+    unique_ptr<Command> command2(new Command());
 
     // message sequence 1 means 2nd handler
     EXPECT_CALL(*receiver, Enqueue_(handler2.get(), 1, 1)).WillOnce(Return(true));
 
-    sender.Enqueue(move(message1), make_shared<string>(""), move(handler1), 0);
-    sender.Enqueue(move(message2), make_shared<string>(""), move(handler2), 1);
+    sender.Enqueue(move(message1), move(command1), make_shared<string>(""), move(handler1), 0);
+    sender.Enqueue(move(message2), move(command2), make_shared<string>(""), move(handler2), 1);
 
     // first handler should not get called
-
     ASSERT_TRUE(sender.Remove(0));
 
     ASSERT_EQ(kIdle, sender.Send());

@@ -27,7 +27,7 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_Algorithm;
+using com::seagate::kinetic::client::proto::Command_Algorithm;
 using std::shared_ptr;
 using std::string;
 using std::make_shared;
@@ -38,12 +38,12 @@ using std::make_shared;
 class KineticRecord {
     public:
     KineticRecord(const shared_ptr<const string> value, const shared_ptr<const string> version,
-            const shared_ptr<const string> tag, Message_Algorithm algorithm) :
+            const shared_ptr<const string> tag, Command_Algorithm algorithm) :
             value_(value), version_(version), tag_(tag), algorithm_(
                     algorithm) {
     }
     KineticRecord(const string value, const string version, const string tag,
-        Message_Algorithm algorithm) :
+            Command_Algorithm algorithm) :
         value_(make_shared<string>(value)), version_(make_shared<string>(version)),
         tag_(make_shared<string>(tag)), algorithm_(algorithm) {
     }
@@ -68,7 +68,7 @@ class KineticRecord {
     }
 
     /// The algorithm used to generate the tag
-    Message_Algorithm algorithm() const {
+    Command_Algorithm algorithm() const {
         return algorithm_;
     }
 
@@ -76,7 +76,7 @@ class KineticRecord {
     const shared_ptr<const string> value_;
     const shared_ptr<const string> version_;
     const shared_ptr<const string> tag_;
-    const Message_Algorithm algorithm_;
+    const Command_Algorithm algorithm_;
     // disallow operator=
     void operator=(const KineticRecord&);
 };

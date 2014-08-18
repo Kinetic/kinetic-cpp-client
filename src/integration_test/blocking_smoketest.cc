@@ -29,24 +29,24 @@ using std::shared_ptr;
 using std::make_shared;
 using std::vector;
 
-using com::seagate::kinetic::client::proto::Message_Algorithm_CRC32;
-using com::seagate::kinetic::client::proto::Message_Algorithm_SHA1;
+using com::seagate::kinetic::client::proto::Command_Algorithm_CRC32;
+using com::seagate::kinetic::client::proto::Command_Algorithm_SHA1;
 
 TEST_F(IntegrationTest, BlockingSmoketest) {
     ASSERT_TRUE(blocking_connection_->NoOp().ok());
 
     auto record1 = make_shared<KineticRecord>(make_shared<string>("value1"),
-        make_shared<string>("v1"), make_shared<string>("t1"), Message_Algorithm_CRC32);
+        make_shared<string>("v1"), make_shared<string>("t1"), Command_Algorithm_CRC32);
     KineticStatus kineticStatus = blocking_connection_->Put("key1", "", WriteMode::IGNORE_VERSION, *record1);
     ASSERT_TRUE(kineticStatus.ok());
 
     auto record2 = make_shared<KineticRecord>(make_shared<string>("value2"),
-        make_shared<string>("v2"), make_shared<string>("t2"), Message_Algorithm_SHA1);
+        make_shared<string>("v2"), make_shared<string>("t2"), Command_Algorithm_SHA1);
     ASSERT_TRUE(blocking_connection_->Put(make_shared<string>("key2"), make_shared<string>(""),
        WriteMode::IGNORE_VERSION, record2).ok());
 
     auto record3 = make_shared<KineticRecord>(make_shared<string>("value3"),
-        make_shared<string>("v3"), make_shared<string>("t3"), Message_Algorithm_CRC32);
+        make_shared<string>("v3"), make_shared<string>("t3"), Command_Algorithm_CRC32);
     ASSERT_TRUE(blocking_connection_->Put(make_shared<string>("key3"), make_shared<string>(""),
        WriteMode::IGNORE_VERSION, record3).ok());
 
@@ -63,7 +63,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     EXPECT_EQ("value2", *(result_record->value()));
     EXPECT_EQ("v2", *(result_record->version()));
     EXPECT_EQ("t2", *(result_record->tag()));
-    EXPECT_EQ(Message_Algorithm_SHA1, result_record->algorithm());
+    EXPECT_EQ(Command_Algorithm_SHA1, result_record->algorithm());
 
     unique_ptr<string> result_key(nullptr);
     ASSERT_TRUE(blocking_connection_->GetNext("key1", result_key, result_record).ok());
@@ -71,14 +71,14 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     EXPECT_EQ("value2", *(result_record->value()));
     EXPECT_EQ("v2", *(result_record->version()));
     EXPECT_EQ("t2", *(result_record->tag()));
-    EXPECT_EQ(Message_Algorithm_SHA1, result_record->algorithm());
+    EXPECT_EQ(Command_Algorithm_SHA1, result_record->algorithm());
 
     ASSERT_TRUE(blocking_connection_->GetPrevious("key3", result_key, result_record).ok());
     EXPECT_EQ("key2", *result_key);
     EXPECT_EQ("value2", *(result_record->value()));
     EXPECT_EQ("v2", *(result_record->version()));
     EXPECT_EQ("t2", *(result_record->tag()));
-    EXPECT_EQ(Message_Algorithm_SHA1, result_record->algorithm());
+    EXPECT_EQ(Command_Algorithm_SHA1, result_record->algorithm());
 
     unique_ptr<string> result_version(nullptr);
     ASSERT_TRUE(blocking_connection_->GetVersion("key3", result_version).ok());

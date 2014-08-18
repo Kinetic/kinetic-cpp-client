@@ -30,6 +30,7 @@
 namespace kinetic {
 
 using com::seagate::kinetic::client::proto::Message;
+using com::seagate::kinetic::client::proto::Command;
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -43,15 +44,15 @@ class HandlerInterface {
     virtual ~HandlerInterface() {}
 
     // response is re-used, so make sure to copy everything you need out of it
-    virtual void Handle(const Message &response, unique_ptr<const string> value) = 0;
-    virtual void Error(KineticStatus error, Message const * const response) = 0;
+    virtual void Handle(const Command &response, unique_ptr<const string> value) = 0;
+    virtual void Error(KineticStatus error, Command const * const response) = 0;
 };
 
 class NonblockingPacketServiceInterface {
     public:
     virtual ~NonblockingPacketServiceInterface() {}
     // message is modified in this call hierarchy
-    virtual HandlerKey Submit(unique_ptr<Message> message, const shared_ptr<const string> value,
+    virtual HandlerKey Submit(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
             unique_ptr<HandlerInterface> handler) = 0;
     virtual bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds) = 0;
     virtual bool Remove(HandlerKey handler_key) = 0;

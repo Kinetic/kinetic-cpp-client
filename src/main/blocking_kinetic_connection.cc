@@ -413,11 +413,11 @@ class BlockingP2PPushCallback : public P2PPushCallbackInterface, public Blocking
     public:
     explicit BlockingP2PPushCallback(unique_ptr<vector<KineticStatus>>& statuses)
     : statuses_(statuses) {}
-    virtual void Success(unique_ptr<vector<KineticStatus>> statuses, const Message& response) {
+    virtual void Success(unique_ptr<vector<KineticStatus>> statuses, const Command& response) {
         OnSuccess();
         statuses_ = std::move(statuses);
     }
-    virtual void Failure(KineticStatus error, Message const * const response) {
+    virtual void Failure(KineticStatus error, Command const * const response) {
         OnError(error);
     }
 

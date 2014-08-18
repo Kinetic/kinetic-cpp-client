@@ -50,10 +50,12 @@ NonblockingStringStatus NonblockingPacketWriter::Write() {
         PLOG(ERROR) << "Unable to fstat socket";
         return kFailed;
     }
+#ifndef __APPLE__
     if (S_ISSOCK(statbuf.st_mode)) {
         int optval = 1;
         setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
     }
+#endif
 
     while (true) {
         NonblockingStringStatus status = writer_->Write();
@@ -87,7 +89,9 @@ NonblockingStringStatus NonblockingPacketWriter::Write() {
                 }
                 if (S_ISSOCK(statbuf.st_mode)) {
                     int optval = 0;
+#ifndef __APPLE__
                     setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+#endif
                     optval = 1;
                     setsockopt(fd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
                 }

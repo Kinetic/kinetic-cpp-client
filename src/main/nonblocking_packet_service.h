@@ -41,7 +41,8 @@
 
 namespace kinetic {
 using com::seagate::kinetic::client::proto::Message;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
+using com::seagate::kinetic::client::proto::Command;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode;
 
 using std::string;
 using std::unique_ptr;
@@ -56,7 +57,7 @@ class NonblockingPacketService : public NonblockingPacketServiceInterface {
         shared_ptr<NonblockingReceiverInterface> receiver);
     ~NonblockingPacketService();
     // handler instances cannot be reused
-    HandlerKey Submit(unique_ptr<Message> message, const shared_ptr<const string> value,
+    HandlerKey Submit(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
         unique_ptr<HandlerInterface> handler);
     bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds);
     bool Remove(HandlerKey handler_key);

@@ -31,12 +31,12 @@ using std::queue;
 class MockHandler : public HandlerInterface {
     public:
     MockHandler() {}
-    void Handle(const Message &response, unique_ptr<const string> value) {
+    void Handle(const Command &response, unique_ptr<const string> value) {
         Handle_(response, *value);
     }
-    MOCK_METHOD2(Handle_, void(const Message &response, const string& value));
+    MOCK_METHOD2(Handle_, void(const Command &response, const string& value));
     MOCK_METHOD2
-    (Error, void(KineticStatus error, Message const * const response));
+    (Error, void(KineticStatus error, Command const * const response));
 };
 
 class MockNonblockingReceiver : public NonblockingReceiverInterface {
@@ -54,11 +54,11 @@ class MockNonblockingReceiver : public NonblockingReceiverInterface {
 
 class MockNonblockingSender : public NonblockingSenderInterface {
     public:
-    void Enqueue(unique_ptr<Message> message, const shared_ptr<const string> value,
+    void Enqueue(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
         unique_ptr<HandlerInterface> handler, HandlerKey handler_key) {
-        Enqueue_(*message, value, handler.get(), handler_key);
+        Enqueue_(*message, *command, value, handler.get(), handler_key);
     }
-    MOCK_METHOD4(Enqueue_, void(const Message& message, const shared_ptr<const string> value,
+    MOCK_METHOD5(Enqueue_, void(const Message& message, const Command& command, const shared_ptr<const string> value,
         HandlerInterface *handler, HandlerKey handler_key));
     MOCK_METHOD0(Send, NonblockingPacketServiceStatus());
     MOCK_METHOD1(Remove, bool(HandlerKey key));
@@ -83,11 +83,11 @@ class MockNonblockingPacketWriterFactory : public NonblockingPacketWriterFactory
 
 class MockNonblockingPacketService : public NonblockingPacketServiceInterface {
     public:
-    HandlerKey Submit(unique_ptr<Message> message, const shared_ptr<const string> value,
+    HandlerKey Submit(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
             unique_ptr<HandlerInterface> handler) {
-        return Submit_(*message, value, handler.get());
+        return Submit_(*message, *command, value, handler.get());
     }
-    MOCK_METHOD3(Submit_, HandlerKey(const Message &message, const shared_ptr<const string> value,
+    MOCK_METHOD4(Submit_, HandlerKey(const Message &message, const Command &command, const shared_ptr<const string> value,
     HandlerInterface* handler));
     MOCK_METHOD3(Run, bool(fd_set *read_fds, fd_set *write_fds, int *nfds));
     MOCK_METHOD1(Remove, bool(HandlerKey handler_key));

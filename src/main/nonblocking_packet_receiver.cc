@@ -22,7 +22,7 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
 using std::string;
 using std::shared_ptr;
 using std::unique_ptr;
@@ -122,7 +122,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
 
             // Start working on the next thing in the request queue
             nonblocking_response_ = new NonblockingPacketReader(
-                socket_wrapper_->fd(), &response_, value_);
+                socket_wrapper_->fd(), &message_, value_);
         }
 
         NonblockingStringStatus status = nonblocking_response_->Read();
@@ -137,26 +137,34 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
         // We're done receiving this response
         delete nonblocking_response_;
         nonblocking_response_ = NULL;
-        if (!hmac_provider_.ValidateHmac(response_, connection_options_.hmac_key)) {
+
+        if (!hmac_provider_.ValidateHmac(message_, connection_options_.hmac_key)) {
             LOG(INFO) << "Response HMAC mismatch";
             CallAllErrorHandlers(KineticStatus(StatusCode::CLIENT_RESPONSE_HMAC_VERIFICATION_ERROR,
                 "Response HMAC mismatch"));
             return kIdle;
         }
-        if (response_.command().header().has_connectionid()) {
-            connection_id_ = response_.command().header().connectionid();
+
+        if(!command_.ParseFromString(message_.commandbytes())){
+            CallAllErrorHandlers(KineticStatus(StatusCode::CLIENT_IO_ERROR, "I/O read error parsing proto::Command"));
+            return kError;
         }
-        if (!response_.command().header().has_acksequence()) {
+
+
+        if (command_.header().has_connectionid()) {
+            connection_id_ = command_.header().connectionid();
+        }
+        if (!command_.header().has_acksequence()) {
             LOG(INFO) << "Got response without an acksequence";
             CallAllErrorHandlers(KineticStatus(StatusCode::PROTOCOL_ERROR_RESPONSE_NO_ACKSEQUENCE,
                 "Response had no acksequence"));
             return kIdle;
         }
 
-        auto find_result = map_.find(response_.command().header().acksequence());
+        auto find_result = map_.find(command_.header().acksequence());
         if (find_result == map_.end()) {
             LOG(WARNING) << "Couldn't find a handler for acksequence " <<
-                response_.command().header().acksequence();
+                command_.header().acksequence();
 
             continue;
         }
@@ -168,12 +176,12 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
                 << "Couldn't delete handler key to sequence entry for handler_key "
                 << handler_pair.second;
 
-        if (response_.command().status().code() == Message_Status_StatusCode_SUCCESS) {
-            handler_->Handle(response_, move(value_));
+        if (command_.status().code() == Command_Status_StatusCode_SUCCESS) {
+            handler_->Handle(command_, move(value_));
         } else {
             handler_->Error(GetKineticStatus(ConvertFromProtoStatus(
-                    response_.command().status().code()), response_.command().header().clusterversion()),
-                    &response_);
+                    command_.status().code()), command_.header().clusterversion()),
+                    &command_);
         }
 
         handler_.reset();

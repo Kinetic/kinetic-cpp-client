@@ -39,7 +39,7 @@ NonblockingPacketService::~NonblockingPacketService() {
     CleanUp();
 }
 
-HandlerKey NonblockingPacketService::Submit(unique_ptr<Message> message,
+HandlerKey NonblockingPacketService::Submit(unique_ptr<Message> message, unique_ptr<Command> command,
         const shared_ptr<const string> value, unique_ptr<HandlerInterface> handler) {
     HandlerKey key = next_key_++;
 
@@ -47,7 +47,7 @@ HandlerKey NonblockingPacketService::Submit(unique_ptr<Message> message,
         handler->Error(
                 KineticStatus(StatusCode::CLIENT_SHUTDOWN, "Client already shut down"), nullptr);
     } else {
-        sender_->Enqueue(move(message), value, move(handler), key);
+        sender_->Enqueue(move(message), move(command), value, move(handler), key);
     }
 
     return key;

@@ -39,11 +39,10 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_MessageType;
-
-using com::seagate::kinetic::client::proto::Message_P2POperation;
-
-using com::seagate::kinetic::client::proto::Message_Synchronization;
+using com::seagate::kinetic::client::proto::Command;
+using com::seagate::kinetic::client::proto::Command_MessageType;
+using com::seagate::kinetic::client::proto::Command_P2POperation;
+using com::seagate::kinetic::client::proto::Command_Synchronization;
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -64,8 +63,8 @@ class SimpleCallbackInterface {
 class SimpleHandler : public HandlerInterface {
     public:
     explicit SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback);
-    void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command &response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<SimpleCallbackInterface> callback_;
@@ -82,8 +81,8 @@ class GetCallbackInterface {
 class GetHandler : public HandlerInterface {
     public:
     explicit GetHandler(const shared_ptr<GetCallbackInterface> callback);
-    void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command &response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<GetCallbackInterface> callback_;
@@ -100,8 +99,8 @@ class GetVersionCallbackInterface {
 class GetVersionHandler : public HandlerInterface {
     public:
     explicit GetVersionHandler(const shared_ptr<GetVersionCallbackInterface> callback);
-    void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command &response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<GetVersionCallbackInterface> callback_;
@@ -118,8 +117,8 @@ class GetKeyRangeCallbackInterface {
 class GetKeyRangeHandler : public HandlerInterface {
     public:
     explicit GetKeyRangeHandler(const shared_ptr<GetKeyRangeCallbackInterface> callback);
-    void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command &response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<GetKeyRangeCallbackInterface>  callback_;
@@ -137,8 +136,8 @@ class PutCallbackInterface {
 class PutHandler : public HandlerInterface {
     public:
     explicit PutHandler(const shared_ptr<PutCallbackInterface> callback);
-    void Handle(const Message &response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command &response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<PutCallbackInterface> callback_;
@@ -155,8 +154,8 @@ class GetLogCallbackInterface {
 class GetLogHandler : public HandlerInterface {
     public:
     explicit GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback);
-    void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command& response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<GetLogCallbackInterface> callback_;
@@ -166,15 +165,15 @@ class GetLogHandler : public HandlerInterface {
 class P2PPushCallbackInterface {
     public:
     virtual ~P2PPushCallbackInterface() {}
-    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses, const Message& response) = 0;
-    virtual void Failure(KineticStatus error, Message const * const response) = 0;
+    virtual void Success(unique_ptr<vector<KineticStatus>> operation_statuses, const Command& response) = 0;
+    virtual void Failure(KineticStatus error, Command const * const response) = 0;
 };
 
 class P2PPushHandler : public HandlerInterface {
     public:
     explicit P2PPushHandler(const shared_ptr<P2PPushCallbackInterface> callback);
-    void Handle(const Message& response, unique_ptr<const string> value);
-    void Error(KineticStatus error, Message const * const response);
+    void Handle(const Command& response, unique_ptr<const string> value);
+    void Error(KineticStatus error, Command const * const response);
 
     private:
     const shared_ptr<P2PPushCallbackInterface> callback_;
@@ -308,11 +307,11 @@ class NonblockingKineticConnection {
 
     private:
     HandlerKey GenericGet(const shared_ptr<const string> key,
-        const shared_ptr<GetCallbackInterface> callback, Message_MessageType message_type);
-    void PopulateP2PMessage(Message_P2POperation *mutable_p2pop,
+        const shared_ptr<GetCallbackInterface> callback, Command_MessageType message_type);
+    void PopulateP2PMessage(Command_P2POperation *mutable_p2pop,
         const shared_ptr<const P2PPushRequest> push_request);
-    unique_ptr<Message> NewMessage(Message_MessageType message_type);
-    Message_Synchronization GetSynchronizationForPersistMode(PersistMode persistMode);
+    unique_ptr<Command> NewCommand(Command_MessageType message_type);
+    Command_Synchronization GetSynchronizationForPersistMode(PersistMode persistMode);
 
     NonblockingPacketServiceInterface *service_;
     const shared_ptr<const string> empty_str_;

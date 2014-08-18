@@ -35,8 +35,9 @@ using ::testing::_;
 using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::StrictMock;
-using com::seagate::kinetic::client::proto::Message_MessageType_GET_RESPONSE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Command_MessageType_GET_RESPONSE;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH;
 
 using std::string;
 using std::make_shared;
@@ -54,7 +55,14 @@ class NonblockingReceiverTest : public ::testing::Test {
     }
 
     // Write a packet into the pipe
-    void WritePacket(const Message &message, const std::string &value) {
+    void WritePacket(Message &message, const Command &command, const std::string &value) {
+        message.set_commandbytes(command.SerializeAsString());
+        if(!message.has_authtype()){
+            message.set_authtype(Message_AuthType_HMACAUTH);
+            message.mutable_hmacauth()->set_identity(3);
+            message.mutable_hmacauth()->set_hmac(hmac_provider_.ComputeHmac(message, "key"));
+        }
+
         std::string serialized_message;
         ASSERT_TRUE(message.SerializeToString(&serialized_message));
         ASSERT_EQ(1, write(fds_[1], "F", 1));
@@ -70,13 +78,13 @@ class NonblockingReceiverTest : public ::testing::Test {
     int fds_[2];
     HmacProvider hmac_provider_;
 
-    void defaultReceiverSetup(Message &message,
+    void defaultReceiverSetup(Command &command,
             shared_ptr<MockSocketWrapperInterface> socket_wrapper, ConnectionOptions &options) {
-        message.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
-        message.mutable_command()->mutable_header()->set_acksequence(33);
-        message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
+        command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+        command.mutable_header()->set_acksequence(33);
 
-        WritePacket(message, "value");
+        Message message;
+        WritePacket(message, command, "value");
         EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
 
         options.user_id = 3;
@@ -85,11 +93,11 @@ class NonblockingReceiverTest : public ::testing::Test {
 };
 
 TEST_F(NonblockingReceiverTest, SimpleMessageAndValue) {
+    Command command;
     Message message;
-    message.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
-    message.mutable_command()->mutable_header()->set_acksequence(33);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "value");
+    command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+    command.mutable_header()->set_acksequence(33);
+    WritePacket(message, command, "value");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
     ConnectionOptions options;
@@ -104,15 +112,15 @@ TEST_F(NonblockingReceiverTest, SimpleMessageAndValue) {
 }
 
 TEST_F(NonblockingReceiverTest, ReceiveResponsesOutOfOrder) {
+    Command command;
     Message message;
-    message.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
-    message.mutable_command()->mutable_header()->set_acksequence(44);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "value2");
+    command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+    command.mutable_header()->set_acksequence(44);
+    WritePacket(message, command, "value2");
 
-    message.mutable_command()->mutable_header()->set_acksequence(33);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "value");
+    message.Clear();
+    command.mutable_header()->set_acksequence(33);
+    WritePacket(message, command, "value");
 
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
@@ -131,10 +139,10 @@ TEST_F(NonblockingReceiverTest, ReceiveResponsesOutOfOrder) {
 }
 
 TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
+    Command command;
     Message message;
-    message.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "value");
+    command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+    WritePacket(message, command, "value");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
     ConnectionOptions options;
@@ -152,10 +160,10 @@ TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
 TEST_F(NonblockingReceiverTest, SetsConnectionId) {
     // The receiver should adjust its connection ID to whatever the server
     // decides it should be.
+    Command command;
     Message message;
-    message.mutable_command()->mutable_header()->set_connectionid(42);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "");
+    command.mutable_header()->set_connectionid(42);
+    WritePacket(message, command, "");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
     ConnectionOptions options;
@@ -188,13 +196,18 @@ TEST_F(NonblockingReceiverTest, HandlesReadError) {
 
 TEST_F(NonblockingReceiverTest, HandlesHmacError) {
     Message message;
-    message.set_hmac("wrong_hmac");
-    WritePacket(message, "");
-    auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
-    EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    Command command;
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
+
+    message.set_commandbytes(command.SerializeAsString());
+    message.set_authtype(Message_AuthType_HMACAUTH);
+    message.mutable_hmacauth()->set_identity(options.user_id);
+    message.mutable_hmacauth()->set_hmac(hmac_provider_.ComputeHmac(message, "wrong_hmac"));
+    WritePacket(message, command,  "");
+    auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
+    EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<MockHandler>();
@@ -250,10 +263,10 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
 }
 
 TEST_F(NonblockingReceiverTest, RemoveInvalidHandlerKeyDoesntPerturbNormalOperation) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<StrictMock<MockHandler>>();
@@ -269,10 +282,10 @@ TEST_F(NonblockingReceiverTest, RemoveInvalidHandlerKeyDoesntPerturbNormalOperat
 
 
 TEST_F(NonblockingReceiverTest, RemoveValidHandlerKeyDeregistersHandler) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler1 = make_shared<StrictMock<MockHandler>>();
@@ -289,10 +302,10 @@ TEST_F(NonblockingReceiverTest, RemoveValidHandlerKeyDeregistersHandler) {
 }
 
 TEST_F(NonblockingReceiverTest, EnqueueReturnsFalseWhenReUsingHandlerKey) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler1 = make_shared<StrictMock<MockHandler>>();
@@ -307,10 +320,10 @@ TEST_F(NonblockingReceiverTest, EnqueueReturnsFalseWhenReUsingHandlerKey) {
 }
 
 TEST_F(NonblockingReceiverTest, EnqueueDoesntSaveHandlerWhenErroneouslyReUsingHandlerKey) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler1 = make_shared<StrictMock<MockHandler>>();
@@ -328,10 +341,10 @@ TEST_F(NonblockingReceiverTest, EnqueueDoesntSaveHandlerWhenErroneouslyReUsingHa
 
 TEST_F(NonblockingReceiverTest,
         EnqueueWithDuplicateHandlerKeyDoesntPreventSubsequentMessageSeqReuse) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler1 = make_shared<StrictMock<MockHandler>>();
@@ -351,19 +364,19 @@ TEST_F(NonblockingReceiverTest,
     EXPECT_CALL(*handler3, Handle_(_, "value2"));
     ASSERT_TRUE(receiver.Enqueue(handler3, 34, 1));
 
-    message.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
-    message.mutable_command()->mutable_header()->set_acksequence(34);
-    message.set_hmac(hmac_provider_.ComputeHmac(message, "key"));
-    WritePacket(message, "value2");
+    command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+    command.mutable_header()->set_acksequence(34);
+    Message message;
+    WritePacket(message, command, "value2");
 
     ASSERT_EQ(kIdle, receiver.Receive());
 }
 
 TEST_F(NonblockingReceiverTest, ExecutingHandlerRemovesHandlerKey) {
-    Message message;
+    Command command;
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     ConnectionOptions options;
-    defaultReceiverSetup(message, socket_wrapper, options);
+    defaultReceiverSetup(command, socket_wrapper, options);
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<StrictMock<MockHandler>>();
