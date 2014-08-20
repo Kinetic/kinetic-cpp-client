@@ -43,6 +43,7 @@ using com::seagate::kinetic::client::proto::Command;
 using com::seagate::kinetic::client::proto::Command_MessageType;
 using com::seagate::kinetic::client::proto::Command_P2POperation;
 using com::seagate::kinetic::client::proto::Command_Synchronization;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type;
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -289,6 +290,8 @@ class NonblockingKineticConnection {
     virtual HandlerKey SetClusterVersion(int64_t new_cluster_version,
         const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
+    virtual HandlerKey GetLog(Command_GetLog_Type type,
+            const shared_ptr<GetLogCallbackInterface> callback);
     virtual HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
         const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey SetACLs(const shared_ptr<const list<ACL>> acls,

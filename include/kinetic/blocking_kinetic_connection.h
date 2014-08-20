@@ -40,6 +40,7 @@ using std::vector;
 class KeyRangeIterator;
 class BlockingCallbackState;
 
+
 class BlockingKineticConnection {
     public:
     /// Takes ownership of the given NonblockingKineticConnection
@@ -156,6 +157,8 @@ class BlockingKineticConnection {
     virtual KineticStatus SetClusterVersion(int64_t cluster_version);
 
     virtual KineticStatus GetLog(unique_ptr<DriveLog>& drive_log);
+
+    virtual KineticStatus GetLog(Command_GetLog_Type type, unique_ptr<DriveLog>& drive_log);
 
     virtual KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);
 

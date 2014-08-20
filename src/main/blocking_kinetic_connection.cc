@@ -291,6 +291,11 @@ KineticStatus BlockingKineticConnection::GetLog(unique_ptr<DriveLog>& drive_log)
     return RunOperation(callback, nonblocking_connection_->GetLog(callback));
 }
 
+KineticStatus BlockingKineticConnection::GetLog(Command_GetLog_Type type, unique_ptr<DriveLog>& drive_log) {
+    auto callback = make_shared<GetLogCallback>(drive_log);
+    return RunOperation(callback, nonblocking_connection_->GetLog(type, callback));
+}
+
 KineticStatus BlockingKineticConnection::UpdateFirmware(const shared_ptr<const string>
         new_firmware) {
     auto callback = make_shared<SimpleCallback>();

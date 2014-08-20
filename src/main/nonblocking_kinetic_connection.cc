@@ -508,6 +508,20 @@ HandlerKey NonblockingKineticConnection::GetLog(
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
+HandlerKey NonblockingKineticConnection::GetLog(Command_GetLog_Type type,
+        const shared_ptr<GetLogCallbackInterface> callback) {
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+    unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
+
+    auto mutable_getlog = request->mutable_body()->mutable_getlog();
+    mutable_getlog->add_types(type);
+
+    unique_ptr<GetLogHandler> handler(new GetLogHandler(callback));
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
 HandlerKey NonblockingKineticConnection::UpdateFirmware(
         const shared_ptr<const string> new_firmware,
         const shared_ptr<SimpleCallbackInterface> callback) {
