@@ -97,7 +97,7 @@ class IntegrationTest : public ::testing::Test {
         ASSERT_TRUE(connected);
 
         shared_ptr<string> null_ptr(nullptr);
-        blocking_connection_->InstantSecureErase(null_ptr);
+        ASSERT_TRUE(blocking_connection_->InstantSecureErase(null_ptr).ok());
     }
 
     void TearDown() {

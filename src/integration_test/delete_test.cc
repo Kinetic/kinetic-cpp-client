@@ -47,10 +47,7 @@ TEST_F(IntegrationTest, DeleteWithWrongVersion) {
         make_shared<string>("v1"), make_shared<string>("tag"), Command_Algorithm_SHA1);
     nonblocking_connection_->Put(make_shared<string>("key"),  make_shared<string>(""),
         WriteMode::REQUIRE_SAME_VERSION, record, put_callback);
-
-    printf("put wait start\n");
     WaitForSuccessSharedPtr(put_callback);
-    printf("done\n");
 
     // Attempt to delete version "v2"
     auto delete_callback = make_shared<StrictMock<MockSimpleCallback>>();
@@ -58,7 +55,6 @@ TEST_F(IntegrationTest, DeleteWithWrongVersion) {
     EXPECT_CALL(*delete_callback,
         Failure(KineticStatusEq(StatusCode::REMOTE_VERSION_MISMATCH, "Version mismatch")))
         .WillOnce(Assign(&done_, true));
-
     RunSelectLoop();
 }
 
