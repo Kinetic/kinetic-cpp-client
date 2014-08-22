@@ -121,8 +121,12 @@ Status KineticConnectionFactory::doNewConnection(
         return Status::makeInternalError("Connection error");
     }
 
-    auto receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper,
-        hmac_provider_, options));
+    shared_ptr<NonblockingReceiverInterface> receiver;
+    try{
+    receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper, hmac_provider_, options));
+    }catch(std::exception& e){
+        return Status::makeInternalError("Connection error:"+std::string(e.what()));
+    }
     auto writer_factory =
         unique_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
     auto sender = unique_ptr<NonblockingSenderInterface>(new NonblockingSender(socket_wrapper,
