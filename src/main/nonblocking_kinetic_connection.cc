@@ -490,33 +490,29 @@ HandlerKey NonblockingKineticConnection::SetClusterVersion(int64_t new_cluster_v
 
 HandlerKey NonblockingKineticConnection::GetLog(
         const shared_ptr<GetLogCallbackInterface> callback) {
+    vector<Command_GetLog_Type> types;
+    types.push_back(Command_GetLog_Type_UTILIZATIONS);
+    types.push_back(Command_GetLog_Type_TEMPERATURES);
+    types.push_back(Command_GetLog_Type_CAPACITIES);
+    types.push_back(Command_GetLog_Type_CONFIGURATION);
+    types.push_back(Command_GetLog_Type_STATISTICS);
+    types.push_back(Command_GetLog_Type_MESSAGES);
+    types.push_back(Command_GetLog_Type_LIMITS);
 
-    unique_ptr<Message> msg(new Message());
-    msg->set_authtype(Message_AuthType_HMACAUTH);
-    unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
-
-    auto mutable_getlog = request->mutable_body()->mutable_getlog();
-    mutable_getlog->add_types(Command_GetLog_Type_UTILIZATIONS);
-    mutable_getlog->add_types(Command_GetLog_Type_TEMPERATURES);
-    mutable_getlog->add_types(Command_GetLog_Type_CAPACITIES);
-    mutable_getlog->add_types(Command_GetLog_Type_CONFIGURATION);
-    mutable_getlog->add_types(Command_GetLog_Type_STATISTICS);
-    mutable_getlog->add_types(Command_GetLog_Type_MESSAGES);
-    mutable_getlog->add_types(Command_GetLog_Type_LIMITS);
-
-    unique_ptr<GetLogHandler> handler(new GetLogHandler(callback));
-    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+    return GetLog(types, callback);
 }
 
-HandlerKey NonblockingKineticConnection::GetLog(Command_GetLog_Type type,
+HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types,
         const shared_ptr<GetLogCallbackInterface> callback) {
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
 
-    auto mutable_getlog = request->mutable_body()->mutable_getlog();
-    mutable_getlog->add_types(type);
+    for(auto type : types){
+        auto mutable_getlog = request->mutable_body()->mutable_getlog();
+        mutable_getlog->add_types(type);
+    }
 
     unique_ptr<GetLogHandler> handler(new GetLogHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));

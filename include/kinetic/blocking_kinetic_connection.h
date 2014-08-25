@@ -158,7 +158,7 @@ class BlockingKineticConnection {
 
     virtual KineticStatus GetLog(unique_ptr<DriveLog>& drive_log);
 
-    virtual KineticStatus GetLog(Command_GetLog_Type type, unique_ptr<DriveLog>& drive_log);
+    virtual KineticStatus GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log);
 
     virtual KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);
 

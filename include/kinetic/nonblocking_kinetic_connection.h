@@ -290,7 +290,7 @@ class NonblockingKineticConnection {
     virtual HandlerKey SetClusterVersion(int64_t new_cluster_version,
         const shared_ptr<SimpleCallbackInterface> callback);
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
-    virtual HandlerKey GetLog(Command_GetLog_Type type,
+    virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
             const shared_ptr<GetLogCallbackInterface> callback);
     virtual HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
         const shared_ptr<SimpleCallbackInterface> callback);
