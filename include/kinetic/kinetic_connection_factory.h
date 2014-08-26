@@ -21,7 +21,6 @@
 #ifndef KINETIC_CPP_CLIENT_KINETIC_CONNECTION_FACTORY_H_
 #define KINETIC_CPP_CLIENT_KINETIC_CONNECTION_FACTORY_H_
 
-#include "kinetic/message_stream.h"
 #include "kinetic/connection_options.h"
 #include "kinetic/hmac_provider.h"
 #include "kinetic/blocking_kinetic_connection.h"
@@ -29,6 +28,7 @@
 #include "kinetic/threadsafe_nonblocking_connection.h"
 #include "kinetic/threadsafe_blocking_kinetic_connection.h"
 #include "kinetic/status.h"
+#include <memory>
 
 namespace kinetic {
 
@@ -51,20 +51,20 @@ class KineticConnectionFactory {
     ///                                     data the operation fails
     /// @param[out] connection              Populated with a NonblockingKineticConnection if the request
     ///                                     succeeds
-    virtual Status NewNonblockingConnection(
+    Status NewNonblockingConnection(
             const ConnectionOptions& options,
             unique_ptr <NonblockingKineticConnection>& connection);
 
-    virtual Status NewNonblockingConnection(
+    Status NewNonblockingConnection(
             const ConnectionOptions& options,
             shared_ptr <NonblockingKineticConnection>& connection);
 
     /// Like NewNonblockingConnection, except the connection is safe for use by multiple threads.
-    virtual Status NewThreadsafeNonblockingConnection(
+    Status NewThreadsafeNonblockingConnection(
             const ConnectionOptions& options,
             unique_ptr <ThreadsafeNonblockingKineticConnection>& connection);
 
-    virtual Status NewThreadsafeNonblockingConnection(
+    Status NewThreadsafeNonblockingConnection(
             const ConnectionOptions& options,
             shared_ptr <ThreadsafeNonblockingKineticConnection>& connection);
 
@@ -79,23 +79,23 @@ class KineticConnectionFactory {
     ///                                     data the operation fails
     /// @param[out] connection              Populated with a BlockingKineticConnection if the request
     ///                                     succeeds
-    virtual Status NewBlockingConnection(
+    Status NewBlockingConnection(
             const ConnectionOptions& options,
             unique_ptr <BlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
-    virtual Status NewBlockingConnection(
+    Status NewBlockingConnection(
             const ConnectionOptions& options,
             shared_ptr <BlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
     /// Like NewBlockingConnection, except the connection is safe for use by multiple threads
-    virtual Status NewThreadsafeBlockingConnection(
+    Status NewThreadsafeBlockingConnection(
             const ConnectionOptions& options,
             unique_ptr <ThreadsafeBlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
-    virtual Status NewThreadsafeBlockingConnection(
+    Status NewThreadsafeBlockingConnection(
             const ConnectionOptions& options,
             shared_ptr <ThreadsafeBlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);

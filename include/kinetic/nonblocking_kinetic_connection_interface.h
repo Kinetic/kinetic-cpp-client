@@ -21,10 +21,6 @@
 #ifndef NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
 #define NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
 
-#include <string>
-#include <memory>
-#include <cinttypes>
-#include <sys/select.h>
 #include "kinetic/common.h"
 #include "kinetic_client.pb.h"
 #include "kinetic/kinetic_record.h"
@@ -33,6 +29,10 @@
 #include "kinetic/kinetic_connection.h"
 #include "kinetic/kinetic_status.h"
 #include "kinetic/nonblocking_packet_service_interface.h"
+#include <memory>
+#include <string>
+#include <vector>
+#include <list>
 
 namespace kinetic {
 

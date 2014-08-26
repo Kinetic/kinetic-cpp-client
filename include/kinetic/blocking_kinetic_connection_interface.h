@@ -26,7 +26,9 @@
 #include "kinetic/key_range_iterator.h"
 #include "kinetic/common.h"
 #include "kinetic/nonblocking_kinetic_connection.h"
-
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace kinetic {
 

@@ -21,10 +21,9 @@
 #ifndef KINETIC_CPP_CLIENT_THREADSAFE_NONBLOCKING_CONNECTION_H_
 #define KINETIC_CPP_CLIENT_THREADSAFE_NONBLOCKING_CONNECTION_H_
 
-#include <mutex>
-
 #include "kinetic/nonblocking_kinetic_connection_interface.h"
 #include "kinetic/nonblocking_kinetic_connection.h"
+#include <mutex>
 
 namespace kinetic {
 
