@@ -29,6 +29,15 @@
 #include "mock_nonblocking_packet_service.h"
 #include "matchers.h"
 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+
+
 namespace kinetic {
 
 using ::testing::_;
@@ -38,6 +47,7 @@ using ::testing::StrictMock;
 using com::seagate::kinetic::client::proto::Command_MessageType_GET_RESPONSE;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
 using com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH;
+using com::seagate::kinetic::client::proto::Message_AuthType_UNSOLICITEDSTATUS;
 
 using std::string;
 using std::make_shared;
@@ -47,6 +57,14 @@ class NonblockingReceiverTest : public ::testing::Test {
     // Create a pipe that we can use to feed data to the NonblockingReceiver
     void SetUp() {
         ASSERT_EQ(0, pipe(fds_));
+        ASSERT_EQ(0, fcntl(fds_[0], F_SETFL, O_NONBLOCK));
+        ASSERT_EQ(0, fcntl(fds_[1], F_SETFL, O_NONBLOCK));
+
+        Message handshake;
+        Command command;
+        handshake.set_authtype(Message_AuthType_UNSOLICITEDSTATUS);
+        command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
+        WritePacket(handshake, command, "");
     }
 
     void TearDown() {
@@ -98,8 +116,10 @@ TEST_F(NonblockingReceiverTest, SimpleMessageAndValue) {
     command.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
     command.mutable_header()->set_acksequence(33);
     WritePacket(message, command, "value");
+
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -245,6 +265,7 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
     // When the receiver's destructor is called, it should execute the error
     // callback on any outstanding requests and also delete their handlers.
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
+    EXPECT_CALL(*socket_wrapper, fd()).WillOnce(Return(fds_[0]));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";

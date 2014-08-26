@@ -139,7 +139,7 @@ TEST_F(MessageStreamTest, WriteMessageSendsCorrectDataForEmptyValue) {
     MessageStream message_stream(1000, byte_stream);
     int err;
 
-    ASSERT_TRUE(message_stream.WriteMessage(message_, OutgoingStringValue(""), &err));
+    ASSERT_EQ(message_stream.WriteMessage(message_, OutgoingStringValue(""), &err), 0);
 
     EXPECT_EQ('F', buffer[0]) << "Incorrect magic value";
     EXPECT_EQ(0U, *(uint32_t*)(buffer + 1)) << "Wrong message length";
@@ -155,7 +155,7 @@ TEST_F(MessageStreamTest, WriteMessageSendsCorrectDataForNonemptyValue) {
 
     std::string message_value = "What";
 
-    ASSERT_TRUE(message_stream.WriteMessage(message_, OutgoingStringValue(message_value), &err));
+    ASSERT_EQ(message_stream.WriteMessage(message_, OutgoingStringValue(message_value), &err), 0);
 
     EXPECT_EQ('F', buffer[0]) << "Incorrect magic value";
     EXPECT_EQ(0U, *(uint32_t*)(buffer + 1)) << "Wrong message length";
