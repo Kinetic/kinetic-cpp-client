@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "kinetic/blocking_kinetic_connection.h"
 

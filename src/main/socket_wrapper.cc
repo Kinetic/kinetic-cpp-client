@@ -25,11 +25,10 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-
 #include <string>
-
+#include <exception>
+#include <stdexcept>
 #include "glog/logging.h"
-
 #include "socket_wrapper.h"
 
 namespace kinetic {

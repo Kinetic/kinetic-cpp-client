@@ -21,6 +21,8 @@
 #include "kinetic/kinetic_connection_factory.h"
 #include "socket_wrapper.h"
 #include "nonblocking_packet_service.h"
+#include <exception>
+#include <stdexcept>
 
 namespace kinetic {
 
