@@ -41,16 +41,17 @@ NonblockingSender::NonblockingSender(shared_ptr<SocketWrapperInterface> socket_w
 void NonblockingSender::Enqueue(unique_ptr<Message> message, unique_ptr<Command> command,
     const shared_ptr<const string> value, unique_ptr<HandlerInterface> handler,
     HandlerKey handler_key) {
+
     command->mutable_header()->set_connectionid(receiver_->connection_id());
     command->mutable_header()->set_sequence(sequence_number_++);
     /* COMMAND PART OF MESSAGE IS FINALIZED */
     message->set_commandbytes(command->SerializeAsString());
 
-    // Should user be set for pinop authed operations? This is not clear.
-    // if(message->authtype() == com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH){
+    //if(message->authtype() == com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH){
         message->mutable_hmacauth()->set_identity(connection_options_.user_id);
         message->mutable_hmacauth()->set_hmac(hmac_provider_.ComputeHmac(*message, connection_options_.hmac_key));
-    //   }
+    //}
+
     unique_ptr<Request> request(new Request());
     request->message = move(message);
     request->command = move(command);
@@ -83,7 +84,7 @@ NonblockingPacketServiceStatus NonblockingSender::Send() {
             request_queue_.pop_front();
             message_sequence_ = request->command->header().sequence();
             handler_key_ = request->handler_key;
-            current_writer_ = move(packet_writer_factory_->CreateWriter(socket_wrapper_->fd(),
+            current_writer_ = move(packet_writer_factory_->CreateWriter(socket_wrapper_,
                 move(request->message), request->value));
             handler_ = move(request->handler);
         }

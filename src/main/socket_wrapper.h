@@ -24,15 +24,22 @@
 #include "socket_wrapper_interface.h"
 #include "kinetic/connection_options.h"
 
+
 namespace kinetic {
 
 class SocketWrapper : public SocketWrapperInterface {
   public:
-    explicit SocketWrapper(const std::string &host, int port, bool nonblocking = false);
+    explicit SocketWrapper(const std::string &host, int port, bool use_ssl, bool nonblocking = false);
     bool Connect();
-    int fd();
+    int  fd();
+    SSL *getSSL();
     ~SocketWrapper();
+
   private:
+    bool ConnectSSL();
+
+    SSL_CTX * ctx_;
+    SSL * ssl_;
     std::string host_;
     int port_;
     bool nonblocking_;

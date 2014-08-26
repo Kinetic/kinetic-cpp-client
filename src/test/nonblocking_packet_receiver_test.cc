@@ -104,7 +104,7 @@ class NonblockingReceiverTest : public ::testing::Test {
         Message message;
         WritePacket(message, command, "value");
         EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-
+        EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
         options.user_id = 3;
         options.hmac_key = "key";
     }
@@ -119,6 +119,7 @@ TEST_F(NonblockingReceiverTest, SimpleMessageAndValue) {
 
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
 
     ConnectionOptions options;
     options.user_id = 3;
@@ -144,6 +145,7 @@ TEST_F(NonblockingReceiverTest, ReceiveResponsesOutOfOrder) {
 
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -165,6 +167,7 @@ TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
     WritePacket(message, command, "value");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -186,6 +189,7 @@ TEST_F(NonblockingReceiverTest, SetsConnectionId) {
     WritePacket(message, command, "");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -202,6 +206,7 @@ TEST_F(NonblockingReceiverTest, HandlesReadError) {
     ASSERT_EQ(static_cast<ssize_t>(sizeof(header)), write(fds_[1], header, sizeof(header)));
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -228,6 +233,7 @@ TEST_F(NonblockingReceiverTest, HandlesHmacError) {
     WritePacket(message, command,  "");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<MockHandler>();
@@ -245,6 +251,7 @@ TEST_F(NonblockingReceiverTest, ErrorCausesAllEnqueuedRequestsToFail) {
     ASSERT_EQ(static_cast<ssize_t>(sizeof(header)), write(fds_[1], header, sizeof(header)));
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -265,7 +272,8 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
     // When the receiver's destructor is called, it should execute the error
     // callback on any outstanding requests and also delete their handlers.
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
-    EXPECT_CALL(*socket_wrapper, fd()).WillOnce(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";

@@ -71,13 +71,13 @@ class MockNonblockingPacketWriter : public NonblockingPacketWriterInterface {
 
 class MockNonblockingPacketWriterFactory : public NonblockingPacketWriterFactoryInterface {
     public:
-    unique_ptr<NonblockingPacketWriterInterface> CreateWriter(int fd,
+    unique_ptr<NonblockingPacketWriterInterface> CreateWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
         unique_ptr<const Message> message, const shared_ptr<const string> value) {
         return unique_ptr<NonblockingPacketWriterInterface>(
-            CreateWriter_(fd, *message, value));
+            CreateWriter_(socket_wrapper, *message, value));
     }
 
-    MOCK_METHOD3(CreateWriter_,  NonblockingPacketWriterInterface* (const int fd,
+    MOCK_METHOD3(CreateWriter_,  NonblockingPacketWriterInterface* (shared_ptr<SocketWrapperInterface> socket_wrapper,
         const Message& message, const shared_ptr<const string> value));
 };
 

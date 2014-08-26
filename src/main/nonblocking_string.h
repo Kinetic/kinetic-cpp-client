@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "kinetic/common.h"
+#include "socket_wrapper_interface.h"
 
 namespace kinetic {
 
@@ -40,12 +41,12 @@ enum NonblockingStringStatus {
 
 class NonblockingStringReader {
     public:
-    NonblockingStringReader(int fd, size_t size, unique_ptr<const string> &s);
+    NonblockingStringReader(shared_ptr<SocketWrapperInterface> socket_wrapper, size_t size, unique_ptr<const string> &s);
     ~NonblockingStringReader();
     NonblockingStringStatus Read();
 
     private:
-    const int fd_;
+    shared_ptr<SocketWrapperInterface> socket_wrapper_;
     const size_t size_;
     unique_ptr<const string> &s_;
     char *const buf_;
@@ -55,11 +56,11 @@ class NonblockingStringReader {
 
 class NonblockingStringWriter {
     public:
-    NonblockingStringWriter(int fd, const shared_ptr<const string> s);
+    NonblockingStringWriter(shared_ptr<SocketWrapperInterface> socket_wrapper, const shared_ptr<const string> s);
     NonblockingStringStatus Write();
 
     private:
-    int fd_;
+    shared_ptr<SocketWrapperInterface> socket_wrapper_;
     const shared_ptr<const string> s_;
     size_t bytes_written_;
     DISALLOW_COPY_AND_ASSIGN(NonblockingStringWriter);

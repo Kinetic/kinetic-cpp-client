@@ -35,6 +35,8 @@
 #include "mock_callbacks.h"
 #include "matchers.h"
 
+#include "glog/logging.h"
+
 namespace kinetic {
 
 using ::testing::StrictMock;
@@ -57,7 +59,9 @@ class IntegrationTest : public ::testing::Test {
     IntegrationTest() : use_external_(false),
                         pid_(0), done_(false),
                         nonblocking_connection_(nullptr),
-                        blocking_connection_(nullptr) {}
+                        blocking_connection_(nullptr) {
+          //google::LogToStderr();
+    }
 
     void SetUp() {
         const char *kinetic_path = getenv("KINETIC_PATH");
@@ -71,8 +75,8 @@ class IntegrationTest : public ::testing::Test {
         }
         ConnectionOptions options;
         options.host = "localhost";
-        options.port = 8123;
-        options.use_ssl = false;
+        options.port = 8443;
+        options.use_ssl = true;
         options.user_id = 1;
         options.hmac_key = "asdfasdf";
 

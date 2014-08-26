@@ -115,31 +115,29 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
 Status KineticConnectionFactory::doNewConnection(
         ConnectionOptions const& options,
         unique_ptr <NonblockingKineticConnection>& connection, bool threadsafe) {
-    auto socket_wrapper = make_shared<SocketWrapper>(options.host, options.port, true);
-
-    if (!socket_wrapper->Connect()) {
-        return Status::makeInternalError("Connection error");
-    }
-
-    shared_ptr<NonblockingReceiverInterface> receiver;
     try{
-    receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper, hmac_provider_, options));
-    }catch(std::exception& e){
-        return Status::makeInternalError("Connection error:"+std::string(e.what()));
+        auto socket_wrapper = make_shared<SocketWrapper>(options.host, options.port, options.use_ssl, true);
+        if (!socket_wrapper->Connect())
+            throw std::runtime_error("Could not connect to socket.");
+
+        shared_ptr<NonblockingReceiverInterface> receiver;
+        receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper, hmac_provider_, options));
+
+        auto writer_factory =
+            unique_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
+        auto sender = unique_ptr<NonblockingSenderInterface>(new NonblockingSender(socket_wrapper,
+            receiver, move(writer_factory), hmac_provider_, options));
+
+        NonblockingPacketService *service = new NonblockingPacketService(socket_wrapper, move(sender), receiver);
+
+        if (threadsafe) {
+            connection.reset(new ThreadsafeNonblockingKineticConnection(service));
+        } else {
+            connection.reset(new NonblockingKineticConnection(service));
+        }
+    } catch(std::exception& e){
+           return Status::makeInternalError("Connection error: "+std::string(e.what()));
     }
-    auto writer_factory =
-        unique_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
-    auto sender = unique_ptr<NonblockingSenderInterface>(new NonblockingSender(socket_wrapper,
-        receiver, move(writer_factory), hmac_provider_, options));
-
-    NonblockingPacketService *service = new NonblockingPacketService(socket_wrapper, move(sender), receiver);
-
-    if (threadsafe) {
-        connection.reset(new ThreadsafeNonblockingKineticConnection(service));
-    } else {
-        connection.reset(new NonblockingKineticConnection(service));
-    }
-
     return Status::makeOk();
 }
 } // namespace kinetic

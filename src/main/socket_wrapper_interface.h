@@ -21,6 +21,8 @@
 #ifndef KINETIC_CPP_CLIENT_SOCKET_WRAPPER_INTERFACE_H_
 #define KINETIC_CPP_CLIENT_SOCKET_WRAPPER_INTERFACE_H_
 
+#include <openssl/ssl.h>
+
 namespace kinetic {
 
 /// Simple wrapper around a socket FD that closes the FD
@@ -35,6 +37,9 @@ class SocketWrapperInterface {
 
     /// Returns the FD
     virtual int fd() = 0;
+
+    /// Returns nullptr if SSL hasn't been initialized.
+    virtual SSL* getSSL() = 0;
 
     /// The destructor should close the FD if it was opened
     /// by connect

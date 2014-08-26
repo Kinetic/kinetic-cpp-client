@@ -79,6 +79,7 @@ TEST_F(NonblockingSenderTest, SimpleMessageAndValue) {
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(true));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
@@ -127,6 +128,7 @@ TEST_F(NonblockingSenderTest, CallsErrorWhenCannotEnqueueHandler) {
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(false));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -146,7 +148,7 @@ TEST_F(NonblockingSenderTest, UsesCorrectConnectionId) {
     auto receiver = make_shared<MockNonblockingReceiver>();
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(true));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(42));
-
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
@@ -190,6 +192,7 @@ TEST_F(NonblockingSenderTest, HandlesWriteError) {
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -243,6 +246,7 @@ TEST_F(NonblockingSenderTest, MaintainsCorrectHandlerKeyWhenWriteDoesntCompleteO
         .WillOnce(Return(mock_writer2))
         .WillOnce(Return(mock_writer3));
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver,
         unique_ptr<NonblockingPacketWriterFactoryInterface>(mock_factory), hmac_provider_,
         options);
@@ -269,6 +273,7 @@ TEST_F(NonblockingSenderTest, ErrorCausesAllEnqueuedRequestsToFail) {
     options.user_id = 3;
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -294,6 +299,7 @@ TEST_F(NonblockingSenderTest, DestructorDeletesOutstandingRequests) {
     options.user_id = 3;
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender *sender = new NonblockingSender(socket_wrapper, receiver,
         move(writer_factory_), hmac_provider_, options);
 
@@ -322,6 +328,7 @@ TEST_F(NonblockingSenderTest, EnqueueAndRemoveDoesntInvoke) {
     auto receiver = make_shared<StrictMock<MockNonblockingReceiver>>();
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -353,6 +360,7 @@ TEST_F(NonblockingSenderTest, RemoveInvalidKeyReturnsFalse) {
     auto receiver = make_shared<StrictMock<MockNonblockingReceiver>>();
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 

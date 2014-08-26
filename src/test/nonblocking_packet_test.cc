@@ -21,7 +21,10 @@
 #include <unistd.h>
 
 #include "gtest/gtest.h"
-
+#include "gmock/gmock.h"
+#include "kinetic/kinetic.h"
+#include "mock_socket_wrapper_interface.h"
+#include "matchers.h"
 #include "kinetic_client.pb.h"
 #include "nonblocking_packet.h"
 
@@ -31,13 +34,16 @@ using std::make_shared;
 using std::unique_ptr;
 using std::move;
 using std::string;
+using ::testing::Return;
 
 TEST(NonblockingPacketWriterTest, EmptyMessageAndValue) {
     int fds[2];
     ASSERT_EQ(0, pipe(fds));
     unique_ptr<Message> message(new Message());
     auto value = make_shared<string>("");
-    NonblockingPacketWriter request(fds[1], move(message), move(value));
+    auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
+    EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds[1]));
+    NonblockingPacketWriter request(socket_wrapper, move(message), move(value));
     ASSERT_EQ(kDone, request.Write());
     ASSERT_EQ(0, close(fds[1]));
 
@@ -64,11 +70,13 @@ TEST(NonblockingPacketReaderTest, EmptyMessageAndValue) {
     // We should now be able to read it using a NonblockingPacketReader
     Message message;
     unique_ptr<const string> value;
-    NonblockingPacketReader response(fds[0], &message, value);
+    auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
+    EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds[0]));
+    NonblockingPacketReader response(socket_wrapper, &message, value);
     ASSERT_EQ(kDone, response.Read());
     ASSERT_EQ("", *value);
 
     ASSERT_EQ(0, close(fds[0]));
 }
 
-}  // namespace kinetic
+}// namespace kinetic

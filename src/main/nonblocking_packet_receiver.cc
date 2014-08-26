@@ -155,7 +155,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
 
             // Start working on the next thing in the request queue
             nonblocking_response_ = new NonblockingPacketReader(
-                socket_wrapper_->fd(), &message_, value_);
+                socket_wrapper_, &message_, value_);
         }
 
         NonblockingStringStatus status = nonblocking_response_->Read();

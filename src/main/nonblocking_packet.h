@@ -53,7 +53,7 @@ class NonblockingPacketWriterInterface {
 
 class NonblockingPacketWriter : public NonblockingPacketWriterInterface {
     public:
-    NonblockingPacketWriter(int fd, unique_ptr<const Message> message,
+    NonblockingPacketWriter(shared_ptr<SocketWrapperInterface> socket_wrapper, unique_ptr<const Message> message,
             const shared_ptr<const string> value);
     ~NonblockingPacketWriter();
     NonblockingStringStatus Write();
@@ -64,7 +64,7 @@ class NonblockingPacketWriter : public NonblockingPacketWriterInterface {
     void TransitionFromValueLength();
     void TransitionFromMessage();
     void TransitionFromValue();
-    const int fd_;
+    shared_ptr<SocketWrapperInterface> socket_wrapper_;
     unique_ptr<const Message> message_;
     const shared_ptr<const string> value_;
     State state_;
@@ -75,7 +75,7 @@ class NonblockingPacketWriter : public NonblockingPacketWriterInterface {
 
 class NonblockingPacketReader {
     public:
-    NonblockingPacketReader(int fd, Message* response, unique_ptr<const string>& value);
+    NonblockingPacketReader(shared_ptr<SocketWrapperInterface> socket_wrapper, Message* response, unique_ptr<const string>& value);
     ~NonblockingPacketReader();
     NonblockingStringStatus Read();
 
@@ -85,7 +85,7 @@ class NonblockingPacketReader {
     void TransitionFromValueLength();
     void TransitionFromMessage();
     bool TransitionFromValue();
-    const int fd_;
+    shared_ptr<SocketWrapperInterface> socket_wrapper_;
     Message* const response_;
     State state_;
     unique_ptr<const string>& value_;
@@ -100,13 +100,13 @@ class NonblockingPacketReader {
 class NonblockingPacketWriterFactoryInterface {
     public:
     virtual ~NonblockingPacketWriterFactoryInterface() {}
-    virtual unique_ptr<NonblockingPacketWriterInterface> CreateWriter(int fd,
+    virtual unique_ptr<NonblockingPacketWriterInterface> CreateWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
         unique_ptr<const Message> message, const shared_ptr<const string> value) = 0;
 };
 
 class NonblockingPacketWriterFactory : public NonblockingPacketWriterFactoryInterface {
     public:
-    unique_ptr<NonblockingPacketWriterInterface> CreateWriter(int fd,
+    unique_ptr<NonblockingPacketWriterInterface> CreateWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
         unique_ptr<const Message> message, const shared_ptr<const string> value);
 };
 
