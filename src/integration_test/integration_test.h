@@ -80,25 +80,9 @@ class IntegrationTest : public ::testing::Test {
         options.user_id = 1;
         options.hmac_key = "asdfasdf";
 
-        // Poll the server until it is ready to accept connections
-        struct timespec sleep_time;
-        sleep_time.tv_sec = 0;
-        sleep_time.tv_nsec = 50000000;
-
-        const size_t kMaxRetries = 20;
-        bool connected = false;
-
         KineticConnectionFactory connection_factory = kinetic::NewKineticConnectionFactory();
-
-        for (size_t i = 0; i < kMaxRetries; ++i) {
-            ASSERT_EQ(0, nanosleep(&sleep_time, NULL));
-            if (connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok()) {
-                connected = true;
-                blocking_connection_.reset(new BlockingKineticConnection(nonblocking_connection_, 10));
-                break;
-            }
-        }
-        ASSERT_TRUE(connected);
+        ASSERT_TRUE(connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok());
+        ASSERT_TRUE(connection_factory.NewBlockingConnection(options,blocking_connection_, 10).ok());
 
         shared_ptr<string> null_ptr(nullptr);
         ASSERT_TRUE(blocking_connection_->InstantSecureErase(null_ptr).ok());
