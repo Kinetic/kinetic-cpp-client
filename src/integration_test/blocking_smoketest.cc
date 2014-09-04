@@ -95,7 +95,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
 
     ASSERT_EQ(blocking_connection_->Get("key1", result_record).statusCode(), StatusCode::REMOTE_NOT_FOUND);
 
-    ASSERT_TRUE(blocking_connection_->InstantSecureErase("").ok());
+    ASSERT_TRUE(blocking_connection_->InstantErase("").ok());
 
     ASSERT_EQ(blocking_connection_->Get("key3", result_record).statusCode(), StatusCode::REMOTE_NOT_FOUND);
 

@@ -41,117 +41,122 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnectionInte
 
      KineticStatus NoOp();
 
-     KineticStatus Get(
-             const shared_ptr<const string> key,
-             unique_ptr<KineticRecord>& record);
+      KineticStatus Get(
+              const shared_ptr<const string> key,
+              unique_ptr<KineticRecord>& record);
 
-     KineticStatus Get(const string& key, unique_ptr<KineticRecord>& record);
+      KineticStatus Get(const string& key, unique_ptr<KineticRecord>& record);
 
-     KineticStatus GetNext(
-             const shared_ptr<const string> key,
-             unique_ptr<string>& actual_key,
-             unique_ptr<KineticRecord>& record);
+      KineticStatus GetNext(
+              const shared_ptr<const string> key,
+              unique_ptr<string>& actual_key,
+              unique_ptr<KineticRecord>& record);
 
-     KineticStatus GetNext(
-             const string& key,
-             unique_ptr<string>& actual_key,
-             unique_ptr<KineticRecord>& record);
+      KineticStatus GetNext(
+              const string& key,
+              unique_ptr<string>& actual_key,
+              unique_ptr<KineticRecord>& record);
 
-     KineticStatus GetPrevious(const shared_ptr<const string> key,
-             unique_ptr<string>& actual_key,
-             unique_ptr<KineticRecord>& record);
+      KineticStatus GetPrevious(const shared_ptr<const string> key,
+              unique_ptr<string>& actual_key,
+              unique_ptr<KineticRecord>& record);
 
-     KineticStatus GetPrevious(const string& key,
-             unique_ptr<string>& actual_key,
-             unique_ptr<KineticRecord>& record);
+      KineticStatus GetPrevious(const string& key,
+              unique_ptr<string>& actual_key,
+              unique_ptr<KineticRecord>& record);
 
-     KineticStatus GetVersion(const shared_ptr<const string> key,
-             unique_ptr<string>& version);
+      KineticStatus GetVersion(const shared_ptr<const string> key,
+              unique_ptr<string>& version);
 
-     KineticStatus GetVersion(const string& key, unique_ptr<string>& version);
+      KineticStatus GetVersion(const string& key, unique_ptr<string>& version);
 
-     KineticStatus GetKeyRange(const shared_ptr<const string> start_key,
-             bool start_key_inclusive,
-             const shared_ptr<const string> end_key,
-             bool end_key_inclusive,
-             bool reverse_results,
-             int32_t max_results,
-             unique_ptr<vector<string>>& keys);
+      KineticStatus GetKeyRange(const shared_ptr<const string> start_key,
+              bool start_key_inclusive,
+              const shared_ptr<const string> end_key,
+              bool end_key_inclusive,
+              bool reverse_results,
+              int32_t max_results,
+              unique_ptr<vector<string>>& keys);
 
-     KineticStatus GetKeyRange(const string& start_key,
-             bool start_key_inclusive,
-             const string& end_key,
-             bool end_key_inclusive,
-             bool reverse_results,
-             int32_t max_results,
-             unique_ptr<vector<string>>& keys);
+      KineticStatus GetKeyRange(const string& start_key,
+              bool start_key_inclusive,
+              const string& end_key,
+              bool end_key_inclusive,
+              bool reverse_results,
+              int32_t max_results,
+              unique_ptr<vector<string>>& keys);
+
+      KeyRangeIterator IterateKeyRange(const shared_ptr<const string> start_key,
+              bool start_key_inclusive,
+              const shared_ptr<const string> end_key,
+              bool end_key_inclusive,
+              unsigned int frame_size);
+
+      KeyRangeIterator IterateKeyRange(const string& start_key,
+              bool start_key_inclusive,
+              const string& end_key,
+              bool end_key_inclusive,
+              unsigned int frame_size);
+
+      KineticStatus Put(const shared_ptr<const string> key,
+              const shared_ptr<const string> current_version, WriteMode mode,
+              const shared_ptr<const KineticRecord> record,
+              PersistMode persistMode);
+
+      KineticStatus Put(const string& key,
+              const string& current_version, WriteMode mode,
+              const KineticRecord& record,
+              PersistMode persistMode);
+
+      KineticStatus Put(const shared_ptr<const string> key,
+              const shared_ptr<const string> current_version, WriteMode mode,
+              const shared_ptr<const KineticRecord> record);
+
+      KineticStatus Put(const string& key,
+              const string& current_version, WriteMode mode,
+              const KineticRecord& record);
+
+      KineticStatus Delete(const shared_ptr<const string> key,
+              const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode);
+
+      KineticStatus Delete(const string& key, const string& version,
+              WriteMode mode, PersistMode persistMode);
+
+      KineticStatus Delete(const shared_ptr<const string> key,
+              const shared_ptr<const string> version, WriteMode mode);
+
+      KineticStatus Delete(const string& key, const string& version, WriteMode mode);
+
+      KineticStatus GetLog(unique_ptr<DriveLog>& drive_log);
+
+      KineticStatus GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log);
+
+      KineticStatus P2PPush(const P2PPushRequest& push_request,
+              unique_ptr<vector<KineticStatus>>& operation_statuses);
+
+      KineticStatus P2PPush(const shared_ptr<const P2PPushRequest> push_request,
+              unique_ptr<vector<KineticStatus>>& operation_statuses);
+
+      KineticStatus SetClusterVersion(int64_t cluster_version);
+      KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);
+      KineticStatus SetACLs(const shared_ptr<const list<ACL>> acls);
+
+      KineticStatus SetErasePIN(const shared_ptr<const string> new_pin,
+              const shared_ptr<const string> current_pin = make_shared<string>());
+      KineticStatus SetErasePIN(const string& new_pin, const string& current_pin);
+      KineticStatus SetLockPIN(const shared_ptr<const string> new_pin,
+              const shared_ptr<const string> current_pin = make_shared<string>());
+      KineticStatus SetLockPIN(const string& new_pin, const string& current_pin);
+      KineticStatus InstantErase(const shared_ptr<string> pin);
+      KineticStatus InstantErase(const string& pin);
+      KineticStatus SecureErase(const shared_ptr<string> pin);
+      KineticStatus SecureErase(const string& pin);
+      KineticStatus LockDevice(const shared_ptr<string> pin);
+      KineticStatus LockDevice(const string& pin);
+      KineticStatus UnlockDevice(const shared_ptr<string> pin);
+      KineticStatus UnlockDevice(const string& pin);
 
 
-     KeyRangeIterator IterateKeyRange(const shared_ptr<const string> start_key,
-             bool start_key_inclusive,
-             const shared_ptr<const string> end_key,
-             bool end_key_inclusive,
-             unsigned int frame_size);
-
-     KeyRangeIterator IterateKeyRange(const string& start_key,
-             bool start_key_inclusive,
-             const string& end_key,
-             bool end_key_inclusive,
-             unsigned int frame_size);
-
-     KineticStatus Put(const shared_ptr<const string> key,
-             const shared_ptr<const string> current_version, WriteMode mode,
-             const shared_ptr<const KineticRecord> record,
-             PersistMode persistMode);
-
-     KineticStatus Put(const string& key,
-             const string& current_version, WriteMode mode,
-             const KineticRecord& record,
-             PersistMode persistMode);
-
-     KineticStatus Put(const shared_ptr<const string> key,
-             const shared_ptr<const string> current_version, WriteMode mode,
-             const shared_ptr<const KineticRecord> record);
-
-     KineticStatus Put(const string& key,
-             const string& current_version, WriteMode mode,
-             const KineticRecord& record);
-
-     KineticStatus Delete(const shared_ptr<const string> key,
-             const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode);
-
-     KineticStatus Delete(const string& key, const string& version,
-             WriteMode mode, PersistMode persistMode);
-
-     KineticStatus Delete(const shared_ptr<const string> key,
-             const shared_ptr<const string> version, WriteMode mode);
-
-     KineticStatus Delete(const string& key, const string& version, WriteMode mode);
-
-     KineticStatus InstantSecureErase(const shared_ptr<string> pin);
-
-     KineticStatus InstantSecureErase(const string& pin);
-
-     KineticStatus SetClusterVersion(int64_t cluster_version);
-
-     KineticStatus GetLog(unique_ptr<DriveLog>& drive_log);
-
-     KineticStatus GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log);
-
-     KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);
-
-     KineticStatus SetACLs(const shared_ptr<const list<ACL>> acls);
-
-     KineticStatus SetPin(const shared_ptr<const string> new_pin,
-             const shared_ptr<const string> current_pin = make_shared<string>());
-
-     KineticStatus SetPin(const string& new_pin, const string& current_pin);
-
-     KineticStatus P2PPush(const P2PPushRequest& push_request,
-             unique_ptr<vector<KineticStatus>>& operation_statuses);
-
-     KineticStatus P2PPush(const shared_ptr<const P2PPushRequest> push_request,
-             unique_ptr<vector<KineticStatus>>& operation_statuses);
     private:
     std::recursive_mutex mutex_;
     unique_ptr<BlockingKineticConnection> connection_;

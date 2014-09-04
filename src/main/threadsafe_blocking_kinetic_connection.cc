@@ -110,14 +110,24 @@ KineticStatus ThreadsafeBlockingKineticConnection::Delete(const string& key, con
     return connection_->Delete(key, version, mode);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin) {
+KineticStatus ThreadsafeBlockingKineticConnection::InstantErase(const shared_ptr<string> pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->InstantSecureErase(pin);
+    return connection_->InstantErase(pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::InstantSecureErase(const string& pin) {
+KineticStatus ThreadsafeBlockingKineticConnection::InstantErase(const string& pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->InstantSecureErase(pin);
+    return connection_->InstantErase(pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::SecureErase(const shared_ptr<string> pin) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->InstantErase(pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::SecureErase(const string& pin) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->InstantErase(pin);
 }
 
 KineticStatus ThreadsafeBlockingKineticConnection::SetClusterVersion(int64_t new_cluster_version) {
@@ -147,15 +157,46 @@ KineticStatus ThreadsafeBlockingKineticConnection::SetACLs(const shared_ptr<cons
     return connection_->SetACLs(acls);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::SetPin(const shared_ptr<const string> new_pin,
+KineticStatus ThreadsafeBlockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
     const shared_ptr<const string> current_pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->SetPin(new_pin, current_pin);
+    return connection_->SetErasePIN(new_pin, current_pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::SetPin(const string& new_pin, const string& current_pin) {
+KineticStatus ThreadsafeBlockingKineticConnection::SetErasePIN(const string& new_pin, const string& current_pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->SetPin(new_pin, current_pin);
+    return connection_->SetErasePIN(new_pin, current_pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
+    const shared_ptr<const string> current_pin) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SetLockPIN(new_pin, current_pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::SetLockPIN(const string& new_pin, const string& current_pin) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SetLockPIN(new_pin, current_pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const shared_ptr<string> pin){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->LockDevice(pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const string& pin){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->LockDevice(pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->UnlockDevice(pin);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const string& pin){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->UnlockDevice(pin);
 }
 
 KineticStatus ThreadsafeBlockingKineticConnection::GetNext(const shared_ptr<const string> key,

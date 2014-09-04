@@ -58,6 +58,9 @@ using com::seagate::kinetic::client::proto::Command_Synchronization;
 using com::seagate::kinetic::client::proto::Command_Synchronization_FLUSH;
 using com::seagate::kinetic::client::proto::Command_Synchronization_WRITEBACK;
 using com::seagate::kinetic::client::proto::Command_Synchronization_WRITETHROUGH;
+using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_UNLOCK_PINOP;
+using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_LOCK_PINOP;
+using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_ERASE_PINOP;
 using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_SECURE_ERASE_PINOP;
 using com::seagate::kinetic::client::proto::Message_AuthType_PINAUTH;
 using com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH;
@@ -444,7 +447,7 @@ HandlerKey NonblockingKineticConnection::Delete(const string key, const string v
     return this->Delete(make_shared<string>(key), make_shared<string>(version), mode, callback);
 }
 
-HandlerKey NonblockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin,
+HandlerKey NonblockingKineticConnection::SecureErase(const shared_ptr<string> pin,
         const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
@@ -458,9 +461,69 @@ HandlerKey NonblockingKineticConnection::InstantSecureErase(const shared_ptr<str
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::InstantSecureErase(const string pin,
+HandlerKey NonblockingKineticConnection::SecureErase(const string pin,
     const shared_ptr<SimpleCallbackInterface> callback) {
-    return this->InstantSecureErase(make_shared<string>(pin), callback);
+    return this->SecureErase(make_shared<string>(pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::InstantErase(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_PINAUTH);
+    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
+    request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_ERASE_PINOP);
+
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::InstantErase(const string pin,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    return this->InstantErase(make_shared<string>(pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::LockDevice(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback)
+{
+   unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+   unique_ptr<Message> msg(new Message());
+   msg->set_authtype(Message_AuthType_PINAUTH);
+   if(pin) msg->mutable_pinauth()->set_pin(*pin);
+
+   unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
+   request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_LOCK_PINOP);
+   return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+
+
+}
+HandlerKey NonblockingKineticConnection::LockDevice(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback)
+{
+    return this->LockDevice(make_shared<string>(pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback)
+{
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_PINAUTH);
+    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
+    request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_UNLOCK_PINOP);
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::UnlockDevice(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback)
+{
+    return this->UnlockDevice(make_shared<string>(pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GenericGet(const shared_ptr<const string> key,
@@ -591,29 +654,48 @@ HandlerKey NonblockingKineticConnection::SetACLs(const shared_ptr<const list<ACL
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetPIN(const shared_ptr<const string> new_pin,
-    const shared_ptr<const string> current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback) {
-
+HandlerKey NonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback)
+{
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-    if(current_pin){
-        request->mutable_body()->mutable_security()->set_olderasepin(current_pin->c_str());
-        request->mutable_body()->mutable_security()->set_oldlockpin(current_pin->c_str());
-    }
-    if(new_pin){
-        request->mutable_body()->mutable_security()->set_newerasepin(new_pin->c_str());
-        request->mutable_body()->mutable_security()->set_newlockpin(new_pin->c_str());
-    }
+    if(current_pin)
+        request->mutable_body()->mutable_security()->set_oldlockpin(*current_pin);
+    if(new_pin)
+        request->mutable_body()->mutable_security()->set_newlockpin(*new_pin);
+
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetPIN(const string new_pin, const string current_pin,
+HandlerKey NonblockingKineticConnection::SetLockPIN(const string new_pin, const string current_pin,
+    const shared_ptr<SimpleCallbackInterface> callback)
+{
+    return this->SetLockPIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
+    const shared_ptr<const string> current_pin,
+    const shared_ptr<SimpleCallbackInterface> callback)
+{
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
+    if(current_pin)
+        request->mutable_body()->mutable_security()->set_olderasepin(*current_pin);
+    if(new_pin)
+        request->mutable_body()->mutable_security()->set_newerasepin(*new_pin);
+
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::SetErasePIN(const string new_pin, const string current_pin,
     const shared_ptr<SimpleCallbackInterface> callback) {
-    return this->SetPIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
+    return this->SetErasePIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::P2PPush(const P2PPushRequest& push_request,

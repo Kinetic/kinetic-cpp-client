@@ -66,20 +66,33 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
             const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey Delete(const string key, const string version, WriteMode mode,
         const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey InstantSecureErase(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey InstantSecureErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey SetClusterVersion(int64_t new_cluster_version, const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
-    HandlerKey GetLog(const vector<Command_GetLog_Type>& types, const shared_ptr<GetLogCallbackInterface> callback);
-    HandlerKey SetACLs(const shared_ptr<const list<ACL>> acls, const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey SetPIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey SetPIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey P2PPush(const P2PPushRequest& push_request, const shared_ptr<P2PPushCallbackInterface> callback);
     HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
             const shared_ptr<P2PPushCallbackInterface> callback);
-    HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
+    HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
+    HandlerKey GetLog(const vector<Command_GetLog_Type>& types, const shared_ptr<GetLogCallbackInterface> callback);
+
+    HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SetClusterVersion(int64_t new_cluster_version, const shared_ptr<SimpleCallbackInterface> callback);
+
+    HandlerKey InstantErase(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey InstantErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SecureErase(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SecureErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey LockDevice(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey LockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey UnlockDevice(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey UnlockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback);
+
+    HandlerKey SetACLs(const shared_ptr<const list<ACL>> acls, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SetErasePIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SetErasePIN(const string new_pin, const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SetLockPIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
             const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey SetLockPIN(const string new_pin, const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback);
 
 
     private:

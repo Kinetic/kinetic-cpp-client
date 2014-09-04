@@ -68,7 +68,7 @@ using com::seagate::kinetic::client::proto::Command_Synchronization;
 using com::seagate::kinetic::client::proto::Command_Synchronization_FLUSH;
 using com::seagate::kinetic::client::proto::Command_Synchronization_WRITEBACK;
 using com::seagate::kinetic::client::proto::Command_Synchronization_WRITETHROUGH;
-using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_SECURE_ERASE_PINOP;
+using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_ERASE_PINOP;
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -227,28 +227,28 @@ TEST_F(NonblockingKineticConnectionTest, GetKeyRangeParsesResult) {
     handler.Handle(response, move(empty_str));
 }
 
-TEST_F(NonblockingKineticConnectionTest, InstantSecureEraseWorksWithNullPin) {
+TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNullPin) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<string> null_ptr(nullptr);
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.InstantSecureErase(null_ptr, null_callback);
+    connection_.InstantErase(null_ptr, null_callback);
 
     ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
-    ASSERT_EQ(Command_PinOperation_PinOpType_SECURE_ERASE_PINOP, message.body().pinop().pinoptype());
+    ASSERT_EQ(Command_PinOperation_PinOpType_ERASE_PINOP, message.body().pinop().pinoptype());
 }
 
-TEST_F(NonblockingKineticConnectionTest, InstantSecureEraseWorksWithNonNullPin) {
+TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNonNullPin) {
     const std::string pin("1234");
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.InstantSecureErase(pin, nullptr);
+    connection_.InstantErase(pin, nullptr);
 
     ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
-    ASSERT_EQ(Command_PinOperation_PinOpType_SECURE_ERASE_PINOP, message.body().pinop().pinoptype());
+    ASSERT_EQ(Command_PinOperation_PinOpType_ERASE_PINOP, message.body().pinop().pinoptype());
 }
 
 TEST_F(NonblockingKineticConnectionTest, SetClusterVersionSendsCorrectVersion) {
@@ -460,26 +460,26 @@ TEST_F(NonblockingKineticConnectionTest, SetACLsBuildsCorrectMessage) {
 }
 
 
-TEST_F(NonblockingKineticConnectionTest, SetPinBuildsCorrectMessageForNoCurrentPin) {
+TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageForNoCurrentPin) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
     shared_ptr<string> null_str(nullptr);
-    connection_.SetPIN(make_shared<string>("newnewnew"), null_str, null_callback);
+    connection_.SetErasePIN(make_shared<string>("newnewnew"), null_str, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
     EXPECT_EQ("newnewnew", message.body().security().newerasepin());
     EXPECT_FALSE(message.body().security().has_olderasepin());
 }
 
-TEST_F(NonblockingKineticConnectionTest, SetPinBuildsCorrectMessageIfCurrentPin) {
+TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageIfCurrentPin) {
     auto oldpin = "oldoldold";
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.SetPIN("newnewnew", oldpin, null_callback);
+    connection_.SetErasePIN("newnewnew", oldpin, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
     EXPECT_EQ(message.body().security().newerasepin(),"newnewnew");

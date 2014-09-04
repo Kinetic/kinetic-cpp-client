@@ -281,29 +281,51 @@ public:
             const shared_ptr<SimpleCallbackInterface> callback) = 0;
     virtual HandlerKey Delete(const string key, const string version, WriteMode mode,
         const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey InstantSecureErase(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey InstantSecureErase(const string pin,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey SetClusterVersion(int64_t new_cluster_version,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;
-    virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
-            const shared_ptr<GetLogCallbackInterface> callback) = 0;
-    virtual HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey SetACLs(const shared_ptr<const list<ACL>> acls,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey SetPIN(const shared_ptr<const string> new_pin,
-        const shared_ptr<const string> current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey SetPIN(const string new_pin,
-        const string current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
     virtual HandlerKey P2PPush(const P2PPushRequest& push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
     virtual HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
+    virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;
+    virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
+            const shared_ptr<GetLogCallbackInterface> callback) = 0;
+
+    virtual HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SetClusterVersion(int64_t new_cluster_version,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+
+    virtual HandlerKey SetACLs(const shared_ptr<const list<ACL>> acls,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SetErasePIN(const shared_ptr<const string> new_pin,
+        const shared_ptr<const string> current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SetErasePIN(const string new_pin,
+        const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SetLockPIN(const shared_ptr<const string> new_pin,
+            const shared_ptr<const string> current_pin,
+            const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SetLockPIN(const string new_pin,
+        const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+
+    virtual HandlerKey InstantErase(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey InstantErase(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SecureErase(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey SecureErase(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey LockDevice(const shared_ptr<string> pin,
+            const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey LockDevice(const string pin,
+            const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey UnlockDevice(const shared_ptr<string> pin,
+            const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey UnlockDevice(const string pin,
+            const shared_ptr<SimpleCallbackInterface> callback) = 0;
+
 };
 
 } // namespace kinetic

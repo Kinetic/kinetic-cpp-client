@@ -163,14 +163,24 @@ HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const string key, cons
     return connection_->Delete(key, version, mode, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::InstantSecureErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::InstantErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->InstantSecureErase(pin, callback);
+    return connection_->InstantErase(pin, callback);
 }
-HandlerKey ThreadsafeNonblockingKineticConnection::InstantSecureErase(const shared_ptr<string> pin,
+HandlerKey ThreadsafeNonblockingKineticConnection::InstantErase(const shared_ptr<string> pin,
     const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->InstantSecureErase(pin, callback);
+    return connection_->InstantErase(pin, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::SecureErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SecureErase(pin, callback);
+}
+HandlerKey ThreadsafeNonblockingKineticConnection::SecureErase(const shared_ptr<string> pin,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SecureErase(pin, callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::SetClusterVersion(int64_t new_cluster_version,
@@ -203,16 +213,48 @@ HandlerKey ThreadsafeNonblockingKineticConnection::SetACLs(const shared_ptr<cons
     return connection_->SetACLs(acls, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::SetPIN(const shared_ptr<const string> new_pin,
+HandlerKey ThreadsafeNonblockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
     const shared_ptr<const string> current_pin,
     const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->SetPIN(new_pin, current_pin, callback);
+    return connection_->SetErasePIN(new_pin, current_pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::SetPIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::SetErasePIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->SetPIN(new_pin, current_pin, callback);
+    return connection_->SetErasePIN(new_pin, current_pin, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::LockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->LockDevice(pin, callback);
+}
+HandlerKey ThreadsafeNonblockingKineticConnection::LockDevice(const shared_ptr<string> pin,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->LockDevice(pin, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::UnlockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->UnlockDevice(pin, callback);
+}
+HandlerKey ThreadsafeNonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->UnlockDevice(pin, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
+    const shared_ptr<const string> current_pin,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SetLockPIN(new_pin, current_pin, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::SetLockPIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->SetLockPIN(new_pin, current_pin, callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::P2PPush(

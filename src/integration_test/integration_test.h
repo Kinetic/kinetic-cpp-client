@@ -85,7 +85,7 @@ class IntegrationTest : public ::testing::Test {
         ASSERT_TRUE(connection_factory.NewBlockingConnection(options,blocking_connection_, 10).ok());
 
         shared_ptr<string> null_ptr(nullptr);
-        ASSERT_TRUE(blocking_connection_->InstantSecureErase(null_ptr).ok());
+        ASSERT_TRUE(blocking_connection_->InstantErase(null_ptr).ok());
     }
 
     void TearDown() {
