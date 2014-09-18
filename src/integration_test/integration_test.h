@@ -35,6 +35,8 @@
 #include "mock_callbacks.h"
 #include "matchers.h"
 
+#include "glog/logging.h"
+
 namespace kinetic {
 
 using ::testing::StrictMock;
@@ -57,7 +59,9 @@ class IntegrationTest : public ::testing::Test {
     IntegrationTest() : use_external_(false),
                         pid_(0), done_(false),
                         nonblocking_connection_(nullptr),
-                        blocking_connection_(nullptr) {}
+                        blocking_connection_(nullptr) {
+          //google::LogToStderr();
+    }
 
     void SetUp() {
         const char *kinetic_path = getenv("KINETIC_PATH");
@@ -71,33 +75,17 @@ class IntegrationTest : public ::testing::Test {
         }
         ConnectionOptions options;
         options.host = "localhost";
-        options.port = 8123;
-        options.use_ssl = false;
+        options.port = 8443;
+        options.use_ssl = true;
         options.user_id = 1;
         options.hmac_key = "asdfasdf";
 
-        // Poll the server until it is ready to accept connections
-        struct timespec sleep_time;
-        sleep_time.tv_sec = 0;
-        sleep_time.tv_nsec = 50000000;
-
-        const size_t kMaxRetries = 20;
-        bool connected = false;
-
         KineticConnectionFactory connection_factory = kinetic::NewKineticConnectionFactory();
-
-        for (size_t i = 0; i < kMaxRetries; ++i) {
-            ASSERT_EQ(0, nanosleep(&sleep_time, NULL));
-            if (connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok()) {
-                connected = true;
-                blocking_connection_.reset(new BlockingKineticConnection(nonblocking_connection_, 10));
-                break;
-            }
-        }
-        ASSERT_TRUE(connected);
+        ASSERT_TRUE(connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok());
+        ASSERT_TRUE(connection_factory.NewBlockingConnection(options,blocking_connection_, 10).ok());
 
         shared_ptr<string> null_ptr(nullptr);
-        blocking_connection_->InstantSecureErase(null_ptr);
+        ASSERT_TRUE(blocking_connection_->InstantErase(null_ptr).ok());
     }
 
     void TearDown() {
@@ -182,7 +170,7 @@ class KineticRecordMatcher : public MatcherInterface<KineticRecord*> {
     KineticRecordMatcher(const std::string& value,
             const std::string& version,
             const std::string& tag,
-            Message_Algorithm algorithm)
+            Command_Algorithm algorithm)
     : value_(value), version_(version), tag_(tag), algorithm_(algorithm) {}
 
     virtual bool MatchAndExplain(KineticRecord* other,
@@ -208,7 +196,7 @@ class KineticRecordMatcher : public MatcherInterface<KineticRecord*> {
     const std::string value_;
     const std::string version_;
     const std::string tag_;
-    Message_Algorithm algorithm_;
+    Command_Algorithm algorithm_;
 };
 
 
@@ -216,7 +204,7 @@ inline Matcher<KineticRecord*> KineticRecordEq(
         const std::string& value,
         const std::string& version,
         const std::string& tag,
-        Message_Algorithm algorithm) {
+        Command_Algorithm algorithm) {
     return MakeMatcher(new KineticRecordMatcher(value, version, tag, algorithm));
 }
 

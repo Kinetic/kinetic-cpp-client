@@ -23,13 +23,20 @@
 #include <string.h>
 
 #include "gtest/gtest.h"
-
+#include "gmock/gmock.h"
+#include "kinetic/kinetic.h"
 #include "nonblocking_string.h"
+#include "mock_socket_wrapper_interface.h"
+#include "matchers.h"
+
 
 namespace kinetic {
 
 using std::make_shared;
 using std::string;
+using ::testing::NiceMock;
+using ::testing::Return;
+using ::testing::StrictMock;
 
 static void MakeNonblockingPipe(int *fds) {
     ASSERT_EQ(0, pipe(fds));
@@ -43,6 +50,8 @@ class NonblockingStringReaderTest : public ::testing::Test {
 
     void SetUp() {
         MakeNonblockingPipe(fds_);
+        socket_wrapper = make_shared<MockSocketWrapperInterface>();
+        EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
     }
 
     void TearDown() {
@@ -53,19 +62,20 @@ class NonblockingStringReaderTest : public ::testing::Test {
     }
 
     int fds_[2];
+    shared_ptr<MockSocketWrapperInterface> socket_wrapper;
     bool closed_write_end_;
 };
 
 TEST_F(NonblockingStringReaderTest, ReadsZeroLengthString) {
     unique_ptr<const string> output;
-    NonblockingStringReader reader(fds_[0], 0, output);
+    NonblockingStringReader reader(socket_wrapper, 0, output);
     ASSERT_EQ(kDone, reader.Read());
     ASSERT_EQ("", *output);
 }
 
 TEST_F(NonblockingStringReaderTest, ReadsStringOneByteAtATime) {
     unique_ptr<const string> output;
-    NonblockingStringReader reader(fds_[0], 3, output);
+    NonblockingStringReader reader(socket_wrapper, 3, output);
 
     ASSERT_EQ(1, write(fds_[1], "a", 1));
     ASSERT_EQ(kInProgress, reader.Read());
@@ -82,14 +92,14 @@ TEST_F(NonblockingStringReaderTest, ReadsStringAllAtOnce) {
     std::string input("abc");
     unique_ptr<const string> output;
     ASSERT_EQ(static_cast<int>(input.size()), write(fds_[1], input.data(), input.size()));
-    NonblockingStringReader reader(fds_[0], input.size(), output);
+    NonblockingStringReader reader(socket_wrapper, input.size(), output);
     ASSERT_EQ(kDone, reader.Read());
     ASSERT_EQ(input, *output);
 }
 
 TEST_F(NonblockingStringReaderTest, ReturnsErrorOnPrematureEof) {
     unique_ptr<const string> output;
-    NonblockingStringReader reader(fds_[0], 1, output);
+    NonblockingStringReader reader(socket_wrapper, 1, output);
 
     // Close the write end early and verify that we get an error
     ASSERT_EQ(0, close(fds_[1]));
@@ -103,6 +113,8 @@ class NonblockingStringWriterTest : public ::testing::Test {
 
     void SetUp() {
         MakeNonblockingPipe(fds_);
+        socket_wrapper = make_shared<MockSocketWrapperInterface>();
+        EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[1]));
     }
 
     void TearDown() {
@@ -113,12 +125,13 @@ class NonblockingStringWriterTest : public ::testing::Test {
     }
 
     int fds_[2];
+    shared_ptr<MockSocketWrapperInterface> socket_wrapper;
     bool closed_read_end_;
 };
 
 TEST_F(NonblockingStringWriterTest, WritesZeroLengthString) {
     auto s = make_shared<string>("");
-    NonblockingStringWriter writer(fds_[1], s);
+    NonblockingStringWriter writer(socket_wrapper, s);
     ASSERT_EQ(kDone, writer.Write());
 
     // Verify that there's nothing to be read from the other end
@@ -131,7 +144,7 @@ TEST_F(NonblockingStringWriterTest, WritesZeroLengthString) {
 TEST_F(NonblockingStringWriterTest, WritesStringAllAtOnce) {
     // A write of "abc" should succeed immediately without blocking
     auto s = make_shared<string>("abc");
-    NonblockingStringWriter writer(fds_[1], s);
+    NonblockingStringWriter writer(socket_wrapper, s);
     ASSERT_EQ(kDone, writer.Write());
 
     char result[3];
@@ -147,7 +160,7 @@ TEST_F(NonblockingStringWriterTest, ReturnsErrorIfWriteFails) {
     closed_read_end_ = true;
 
     auto s = make_shared<string>("abc");
-    NonblockingStringWriter writer(fds_[1], s);
+    NonblockingStringWriter writer(socket_wrapper, s);
     ASSERT_EQ(kFailed, writer.Write());
 }
 

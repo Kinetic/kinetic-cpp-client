@@ -27,46 +27,48 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_Algorithm_SHA1;
-using com::seagate::kinetic::client::proto::Message_MessageType_DELETE;
-using com::seagate::kinetic::client::proto::Message_MessageType_GET;
-using com::seagate::kinetic::client::proto::Message_MessageType_GETNEXT;
-using com::seagate::kinetic::client::proto::Message_MessageType_GETPREVIOUS;
-using com::seagate::kinetic::client::proto::Message_MessageType_GETKEYRANGE;
-using com::seagate::kinetic::client::proto::Message_MessageType_GETVERSION;
-using com::seagate::kinetic::client::proto::Message_MessageType_NOOP;
-using com::seagate::kinetic::client::proto::Message_MessageType_PUT;
-using com::seagate::kinetic::client::proto::Message_MessageType_SETUP;
-using com::seagate::kinetic::client::proto::Message_MessageType_GETLOG;
-using com::seagate::kinetic::client::proto::Message_MessageType_SECURITY;
-using com::seagate::kinetic::client::proto::Message_MessageType_PEER2PEERPUSH;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_INTERNAL_ERROR;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_UTILIZATIONS;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_TEMPERATURES;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_CAPACITIES;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_CONFIGURATION;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_STATISTICS;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_MESSAGES;
-using com::seagate::kinetic::client::proto::Message_GetLog_Type_LIMITS;
-using com::seagate::kinetic::client::proto::Message_Security;
-using com::seagate::kinetic::client::proto::Message_Security_ACL;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Scope;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_READ;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_WRITE;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_DELETE;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_RANGE;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_SETUP;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_P2POP;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_GETLOG;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_Permission_SECURITY;
-using com::seagate::kinetic::client::proto::Message_Security_ACL_HMACAlgorithm_HmacSHA1;
-using com::seagate::kinetic::client::proto::Message_Status;
-using com::seagate::kinetic::client::proto::Message_P2POperation;
-using com::seagate::kinetic::client::proto::Message_Synchronization;
-using com::seagate::kinetic::client::proto::Message_Synchronization_FLUSH;
-using com::seagate::kinetic::client::proto::Message_Synchronization_WRITEBACK;
-using com::seagate::kinetic::client::proto::Message_Synchronization_WRITETHROUGH;
+using com::seagate::kinetic::client::proto::Command_Algorithm_SHA1;
+using com::seagate::kinetic::client::proto::Command_MessageType_DELETE;
+using com::seagate::kinetic::client::proto::Command_MessageType_GET;
+using com::seagate::kinetic::client::proto::Command_MessageType_GETNEXT;
+using com::seagate::kinetic::client::proto::Command_MessageType_GETPREVIOUS;
+using com::seagate::kinetic::client::proto::Command_MessageType_GETKEYRANGE;
+using com::seagate::kinetic::client::proto::Command_MessageType_GETVERSION;
+using com::seagate::kinetic::client::proto::Command_MessageType_NOOP;
+using com::seagate::kinetic::client::proto::Command_MessageType_PUT;
+using com::seagate::kinetic::client::proto::Command_MessageType_SETUP;
+using com::seagate::kinetic::client::proto::Command_MessageType_GETLOG;
+using com::seagate::kinetic::client::proto::Command_MessageType_SECURITY;
+using com::seagate::kinetic::client::proto::Command_MessageType_PEER2PEERPUSH;
+using com::seagate::kinetic::client::proto::Command_MessageType_PINOP;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_INTERNAL_ERROR;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_UTILIZATIONS;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_TEMPERATURES;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_CAPACITIES;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_CONFIGURATION;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_STATISTICS;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_MESSAGES;
+using com::seagate::kinetic::client::proto::Command_GetLog_Type_LIMITS;
+using com::seagate::kinetic::client::proto::Command_Security;
+using com::seagate::kinetic::client::proto::Command_Security_ACL;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Scope;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_READ;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_WRITE;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_DELETE;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_RANGE;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_SETUP;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_P2POP;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_GETLOG;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_SECURITY;
+using com::seagate::kinetic::client::proto::Command_Security_ACL_HMACAlgorithm_HmacSHA1;
+using com::seagate::kinetic::client::proto::Command_Status;
+using com::seagate::kinetic::client::proto::Command_P2POperation;
+using com::seagate::kinetic::client::proto::Command_Synchronization;
+using com::seagate::kinetic::client::proto::Command_Synchronization_FLUSH;
+using com::seagate::kinetic::client::proto::Command_Synchronization_WRITEBACK;
+using com::seagate::kinetic::client::proto::Command_Synchronization_WRITETHROUGH;
+using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_ERASE_PINOP;
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -93,126 +95,126 @@ class NonblockingKineticConnectionTest : public ::testing::Test {
 };
 
 TEST_F(NonblockingKineticConnectionTest, NoOpWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
-            .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _))
+            .WillOnce(DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<SimpleCallbackInterface> callback;
     connection_.NoOp(callback);
 
-    ASSERT_EQ(Message_MessageType_NOOP, message.command().header().messagetype());
+    ASSERT_EQ(Command_MessageType_NOOP, message.header().messagetype());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
-            .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _))
+            .WillOnce(DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<GetCallbackInterface> callback;
     connection_.Get("key", callback);
 
-    ASSERT_EQ(Message_MessageType_GET, message.command().header().messagetype());
-    ASSERT_EQ(0, message.command().header().clusterversion());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
+    ASSERT_EQ(Command_MessageType_GET, message.header().messagetype());
+    ASSERT_EQ(0, message.header().clusterversion());
+    ASSERT_EQ("key", message.body().keyvalue().key());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetWithClusterVersionWorks) {
     connection_.SetClientClusterVersion(123);
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _))
-            .WillOnce(DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _))
+            .WillOnce(DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<GetCallbackInterface> callback;
     connection_.Get("key", callback);
 
-    ASSERT_EQ(Message_MessageType_GET, message.command().header().messagetype());
-    ASSERT_EQ(123, message.command().header().clusterversion());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
+    ASSERT_EQ(Command_MessageType_GET, message.header().messagetype());
+    ASSERT_EQ(123, message.header().clusterversion());
+    ASSERT_EQ("key", message.body().keyvalue().key());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetNextWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<GetCallbackInterface> callback;
     connection_.GetNext("key", callback);
 
-    ASSERT_EQ(Message_MessageType_GETNEXT, message.command().header().messagetype());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
+    ASSERT_EQ(Command_MessageType_GETNEXT, message.header().messagetype());
+    ASSERT_EQ("key", message.body().keyvalue().key());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetPreviousWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.GetPrevious("key", NULL);
 
-    ASSERT_EQ(Message_MessageType_GETPREVIOUS, message.command().header().messagetype());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
+    ASSERT_EQ(Command_MessageType_GETPREVIOUS, message.header().messagetype());
+    ASSERT_EQ("key", message.body().keyvalue().key());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetVersionWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.GetVersion("key", NULL);
 
-    ASSERT_EQ(Message_MessageType_GETVERSION, message.command().header().messagetype());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
+    ASSERT_EQ(Command_MessageType_GETVERSION, message.header().messagetype());
+    ASSERT_EQ("key", message.body().keyvalue().key());
 }
 
 TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.Delete("key", "version", WriteMode::IGNORE_VERSION, NULL);
 
-    ASSERT_EQ(Message_MessageType_DELETE, message.command().header().messagetype());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
-    ASSERT_EQ("version", message.command().body().keyvalue().dbversion());
-    ASSERT_TRUE(message.command().body().keyvalue().force());
-    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
+    ASSERT_EQ(Command_MessageType_DELETE, message.header().messagetype());
+    ASSERT_EQ("key", message.body().keyvalue().key());
+    ASSERT_EQ("version", message.body().keyvalue().dbversion());
+    ASSERT_TRUE(message.body().keyvalue().force());
+    ASSERT_EQ(Command_Synchronization_WRITEBACK, message.body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, PutWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq("value"), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
-    auto record = make_shared<KineticRecord>("value", "new_version", "tag", Message_Algorithm_SHA1);
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq("value"), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
+    auto record = make_shared<KineticRecord>("value", "new_version", "tag", Command_Algorithm_SHA1);
     shared_ptr<PutCallbackInterface> callback;
     connection_.Put(make_shared<string>("key"), make_shared<string>("old_version"), WriteMode::IGNORE_VERSION,
             record, callback);
 
-    ASSERT_EQ(Message_MessageType_PUT, message.command().header().messagetype());
-    ASSERT_EQ("key", message.command().body().keyvalue().key());
-    ASSERT_EQ("old_version", message.command().body().keyvalue().dbversion());
-    ASSERT_TRUE(message.command().body().keyvalue().force());
-    ASSERT_EQ("new_version", message.command().body().keyvalue().newversion());
-    ASSERT_EQ("tag", message.command().body().keyvalue().tag());
-    ASSERT_EQ(Message_Algorithm_SHA1, message.command().body().keyvalue().algorithm());
-    ASSERT_EQ(Message_Synchronization_WRITEBACK, message.command().body().keyvalue().synchronization());
+    ASSERT_EQ(Command_MessageType_PUT, message.header().messagetype());
+    ASSERT_EQ("key", message.body().keyvalue().key());
+    ASSERT_EQ("old_version", message.body().keyvalue().dbversion());
+    ASSERT_TRUE(message.body().keyvalue().force());
+    ASSERT_EQ("new_version", message.body().keyvalue().newversion());
+    ASSERT_EQ("tag", message.body().keyvalue().tag());
+    ASSERT_EQ(Command_Algorithm_SHA1, message.body().keyvalue().algorithm());
+    ASSERT_EQ(Command_Synchronization_WRITEBACK, message.body().keyvalue().synchronization());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetKeyRangeWorks) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.GetKeyRange("first", true, "last", false, true, 1234, NULL);
 
-    ASSERT_EQ(Message_MessageType_GETKEYRANGE, message.command().header().messagetype());
-    ASSERT_EQ("first", message.command().body().range().startkey());
-    ASSERT_TRUE(message.command().body().range().startkeyinclusive());
-    ASSERT_EQ("last", message.command().body().range().endkey());
-    ASSERT_FALSE(message.command().body().range().endkeyinclusive());
-    ASSERT_TRUE(message.command().body().range().reverse());
-    ASSERT_EQ(1234, message.command().body().range().maxreturned());
+    ASSERT_EQ(Command_MessageType_GETKEYRANGE, message.header().messagetype());
+    ASSERT_EQ("first", message.body().range().startkey());
+    ASSERT_TRUE(message.body().range().startkeyinclusive());
+    ASSERT_EQ("last", message.body().range().endkey());
+    ASSERT_FALSE(message.body().range().endkeyinclusive());
+    ASSERT_TRUE(message.body().range().reverse());
+    ASSERT_EQ(1234, message.body().range().maxreturned());
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetKeyRangeParsesResult) {
     auto mock_getkeyrange_callback = make_shared<MockGetKeyRangeCallback>();
     GetKeyRangeHandler handler(mock_getkeyrange_callback);
 
-    Message response;
-    response.mutable_command()->mutable_body()->mutable_range()->add_key("foo");
-    response.mutable_command()->mutable_body()->mutable_range()->add_key("bar");
-    response.mutable_command()->mutable_body()->mutable_range()->add_key("baz");
+    Command response;
+    response.mutable_body()->mutable_range()->add_keys("foo");
+    response.mutable_body()->mutable_range()->add_keys("bar");
+    response.mutable_body()->mutable_range()->add_keys("baz");
 
     vector<string> expected_keys;
     expected_keys.push_back("foo");
@@ -225,48 +227,46 @@ TEST_F(NonblockingKineticConnectionTest, GetKeyRangeParsesResult) {
     handler.Handle(response, move(empty_str));
 }
 
-TEST_F(NonblockingKineticConnectionTest, InstantSecureEraseWorksWithNullPin) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNullPin) {
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<string> null_ptr(nullptr);
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.InstantSecureErase(null_ptr, null_callback);
+    connection_.InstantErase(null_ptr, null_callback);
 
-    ASSERT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    ASSERT_TRUE(message.command().body().setup().instantsecureerase());
-    ASSERT_EQ("", message.command().body().setup().pin());
+    ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
+    ASSERT_EQ(Command_PinOperation_PinOpType_ERASE_PINOP, message.body().pinop().pinoptype());
 }
 
-TEST_F(NonblockingKineticConnectionTest, InstantSecureEraseWorksWithNonNullPin) {
+TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNonNullPin) {
     const std::string pin("1234");
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.InstantSecureErase(pin, nullptr);
+    connection_.InstantErase(pin, nullptr);
 
-    ASSERT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    ASSERT_TRUE(message.command().body().setup().instantsecureerase());
-    ASSERT_EQ(pin, message.command().body().setup().pin());
+    ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
+    ASSERT_EQ(Command_PinOperation_PinOpType_ERASE_PINOP, message.body().pinop().pinoptype());
 }
 
 TEST_F(NonblockingKineticConnectionTest, SetClusterVersionSendsCorrectVersion) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.SetClusterVersion(1234, NULL);
 
-    EXPECT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    EXPECT_EQ(1234, message.command().body().setup().newclusterversion());
+    EXPECT_EQ(Command_MessageType_SETUP, message.header().messagetype());
+    EXPECT_EQ(1234, message.body().setup().newclusterversion());
 }
 
 TEST_F(NonblockingKineticConnectionTest, SetClusterVersionReturnsTrueForSuccess) {
     auto mock_simple_callback = make_shared<MockSimpleCallback>();
     SimpleHandler handler(mock_simple_callback);
 
-    Message response;
-    response.mutable_command()->mutable_status()->set_code(Message_Status_StatusCode_SUCCESS);
+    Command response;
+    response.mutable_status()->set_code(Command_Status_StatusCode_SUCCESS);
 
     EXPECT_CALL(*mock_simple_callback, Success());
 
@@ -275,66 +275,64 @@ TEST_F(NonblockingKineticConnectionTest, SetClusterVersionReturnsTrueForSuccess)
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetLogBuildsCorrectMessage) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.GetLog(NULL);
 
-    EXPECT_EQ(Message_MessageType_GETLOG, message.command().header().messagetype());
-    EXPECT_EQ(7, message.command().body().getlog().type_size());
-    EXPECT_EQ(Message_GetLog_Type_UTILIZATIONS, message.command().body().getlog().type(0));
-    EXPECT_EQ(Message_GetLog_Type_TEMPERATURES, message.command().body().getlog().type(1));
-    EXPECT_EQ(Message_GetLog_Type_CAPACITIES, message.command().body().getlog().type(2));
-    EXPECT_EQ(Message_GetLog_Type_CONFIGURATION, message.command().body().getlog().type(3));
-    EXPECT_EQ(Message_GetLog_Type_STATISTICS, message.command().body().getlog().type(4));
-    EXPECT_EQ(Message_GetLog_Type_MESSAGES, message.command().body().getlog().type(5));
-    EXPECT_EQ(Message_GetLog_Type_LIMITS, message.command().body().getlog().type(6));
+    EXPECT_EQ(Command_MessageType_GETLOG, message.header().messagetype());
+    EXPECT_EQ(7, message.body().getlog().types_size());
+    EXPECT_EQ(Command_GetLog_Type_UTILIZATIONS, message.body().getlog().types(0));
+    EXPECT_EQ(Command_GetLog_Type_TEMPERATURES, message.body().getlog().types(1));
+    EXPECT_EQ(Command_GetLog_Type_CAPACITIES, message.body().getlog().types(2));
+    EXPECT_EQ(Command_GetLog_Type_CONFIGURATION, message.body().getlog().types(3));
+    EXPECT_EQ(Command_GetLog_Type_STATISTICS, message.body().getlog().types(4));
+    EXPECT_EQ(Command_GetLog_Type_MESSAGES, message.body().getlog().types(5));
+    EXPECT_EQ(Command_GetLog_Type_LIMITS, message.body().getlog().types(6));
 }
 
 TEST_F(NonblockingKineticConnectionTest, GetLogParsesMessageCorrectly) {
-    Message response;
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    Command response;
+    response.mutable_body()->mutable_getlog()
             ->mutable_capacity()->set_nominalcapacityinbytes(123);
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_capacity()->set_portionfull(0.5);
 
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_vendor("vendor");
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_model("model");
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_serialnumber("sn");
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_version("version");
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_port(9999);
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_tlsport(8888);
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_compilationdate("compilation date");
-    response.mutable_command()->mutable_body()->mutable_getlog()
+    response.mutable_body()->mutable_getlog()
             ->mutable_configuration()->set_sourcehash("hash");
 
-    auto operation_statistic = response.mutable_command()
-            ->mutable_body()->mutable_getlog()->add_statistics();
-    operation_statistic->set_messagetype(Message_MessageType_GETLOG);
+    auto operation_statistic = response.mutable_body()->mutable_getlog()->add_statistics();
+    operation_statistic->set_messagetype(Command_MessageType_GETLOG);
     operation_statistic->set_count(111);
     operation_statistic->set_bytes(1024);
 
-    auto temperature = response.mutable_command()->mutable_body()
-            ->mutable_getlog()->add_temperature();
+    auto temperature = response.mutable_body()->mutable_getlog()->add_temperatures();
     temperature->set_name("coldthing");
     temperature->set_current(8);
     temperature->set_minimum(9);
     temperature->set_maximum(10);
     temperature->set_target(11);
 
-    auto utilization = response.mutable_command()->mutable_body()
-            ->mutable_getlog()->add_utilization();
+    auto utilization = response.mutable_body()
+            ->mutable_getlog()->add_utilizations();
     utilization->set_name("foo");
     utilization->set_value(0.5);
 
-    response.mutable_command()->mutable_body()->mutable_getlog()->set_messages("Some messages");
+    response.mutable_body()->mutable_getlog()->set_messages("Some messages");
 
     auto mock_getlog_callback = make_shared<MockGetLogCallback>();
     GetLogHandler handler(mock_getlog_callback);
@@ -377,13 +375,13 @@ TEST_F(NonblockingKineticConnectionTest, GetLogParsesMessageCorrectly) {
 }
 
 TEST_F(NonblockingKineticConnectionTest, FirmwareUpdateSendsFirmwareContents) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq("the new firmware"), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq("the new firmware"), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     connection_.UpdateFirmware(make_shared<string>("the new firmware"), NULL);
 
-    EXPECT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    EXPECT_EQ(true, message.command().body().setup().firmwaredownload());
+    EXPECT_EQ(Command_MessageType_SETUP, message.header().messagetype());
+    EXPECT_EQ(true, message.body().setup().firmwaredownload());
 }
 
 TEST_F(NonblockingKineticConnectionTest, SetACLsBuildsCorrectMessage) {
@@ -415,83 +413,84 @@ TEST_F(NonblockingKineticConnectionTest, SetACLsBuildsCorrectMessage) {
     acls->push_back(acl1);
     acls->push_back(acl2);
 
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
     connection_.SetACLs(acls, null_callback);
 
-    EXPECT_EQ(Message_MessageType_SECURITY, message.command().header().messagetype());
-    Message_Security const& security = message.command().body().security();
+    EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
+    Command_Security const& security = message.body().security();
 
     ASSERT_EQ(2, security.acl_size());
 
-    Message_Security_ACL const& proto_acl1 = security.acl(0);
+    Command_Security_ACL const& proto_acl1 = security.acl(0);
     EXPECT_EQ(1234, proto_acl1.identity());
     EXPECT_EQ("the first key", proto_acl1.key());
-    EXPECT_EQ(Message_Security_ACL_HMACAlgorithm_HmacSHA1, proto_acl1.hmacalgorithm());
+    EXPECT_EQ(Command_Security_ACL_HMACAlgorithm_HmacSHA1, proto_acl1.hmacalgorithm());
     ASSERT_EQ(2, proto_acl1.scope_size());
-    Message_Security_ACL_Scope const& proto_acl1_scope1 = proto_acl1.scope(0);
+    Command_Security_ACL_Scope const& proto_acl1_scope1 = proto_acl1.scope(0);
     EXPECT_EQ(0, proto_acl1_scope1.offset());
     EXPECT_EQ("prefix", proto_acl1_scope1.value());
     ASSERT_EQ(2, proto_acl1_scope1.permission_size());
-    EXPECT_EQ(Message_Security_ACL_Permission_READ, proto_acl1_scope1.permission(0));
-    EXPECT_EQ(Message_Security_ACL_Permission_WRITE, proto_acl1_scope1.permission(1));
-    Message_Security_ACL_Scope const& proto_acl1_scope2 = proto_acl1.scope(1);
+    EXPECT_EQ(Command_Security_ACL_Permission_READ, proto_acl1_scope1.permission(0));
+    EXPECT_EQ(Command_Security_ACL_Permission_WRITE, proto_acl1_scope1.permission(1));
+    Command_Security_ACL_Scope const& proto_acl1_scope2 = proto_acl1.scope(1);
     EXPECT_EQ(100, proto_acl1_scope2.offset());
     EXPECT_EQ("thing", proto_acl1_scope2.value());
     ASSERT_EQ(8, proto_acl1_scope2.permission_size());
-    EXPECT_EQ(Message_Security_ACL_Permission_READ, proto_acl1_scope2.permission(0));
-    EXPECT_EQ(Message_Security_ACL_Permission_WRITE, proto_acl1_scope2.permission(1));
-    EXPECT_EQ(Message_Security_ACL_Permission_DELETE, proto_acl1_scope2.permission(2));
-    EXPECT_EQ(Message_Security_ACL_Permission_RANGE, proto_acl1_scope2.permission(3));
-    EXPECT_EQ(Message_Security_ACL_Permission_SETUP, proto_acl1_scope2.permission(4));
-    EXPECT_EQ(Message_Security_ACL_Permission_P2POP, proto_acl1_scope2.permission(5));
-    EXPECT_EQ(Message_Security_ACL_Permission_GETLOG, proto_acl1_scope2.permission(6));
-    EXPECT_EQ(Message_Security_ACL_Permission_SECURITY, proto_acl1_scope2.permission(7));
+    EXPECT_EQ(Command_Security_ACL_Permission_READ, proto_acl1_scope2.permission(0));
+    EXPECT_EQ(Command_Security_ACL_Permission_WRITE, proto_acl1_scope2.permission(1));
+    EXPECT_EQ(Command_Security_ACL_Permission_DELETE, proto_acl1_scope2.permission(2));
+    EXPECT_EQ(Command_Security_ACL_Permission_RANGE, proto_acl1_scope2.permission(3));
+    EXPECT_EQ(Command_Security_ACL_Permission_SETUP, proto_acl1_scope2.permission(4));
+    EXPECT_EQ(Command_Security_ACL_Permission_P2POP, proto_acl1_scope2.permission(5));
+    EXPECT_EQ(Command_Security_ACL_Permission_GETLOG, proto_acl1_scope2.permission(6));
+    EXPECT_EQ(Command_Security_ACL_Permission_SECURITY, proto_acl1_scope2.permission(7));
 
-    Message_Security_ACL const& proto_acl2 = security.acl(1);
+    Command_Security_ACL const& proto_acl2 = security.acl(1);
     EXPECT_EQ(5678, proto_acl2.identity());
     EXPECT_EQ("second key", proto_acl2.key());
-    EXPECT_EQ(Message_Security_ACL_HMACAlgorithm_HmacSHA1, proto_acl2.hmacalgorithm());
+    EXPECT_EQ(Command_Security_ACL_HMACAlgorithm_HmacSHA1, proto_acl2.hmacalgorithm());
     ASSERT_EQ(1, proto_acl2.scope_size());
-    Message_Security_ACL_Scope const& proto_acl2_scope1 = proto_acl2.scope(0);
+    Command_Security_ACL_Scope const& proto_acl2_scope1 = proto_acl2.scope(0);
     EXPECT_EQ(0, proto_acl2_scope1.offset());
     EXPECT_EQ("", proto_acl2_scope1.value());
     EXPECT_EQ(0, proto_acl2_scope1.permission_size());
 }
 
 
-TEST_F(NonblockingKineticConnectionTest, SetPinBuildsCorrectMessageForNoCurrentPin) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageForNoCurrentPin) {
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
     shared_ptr<string> null_str(nullptr);
-    connection_.SetPIN(make_shared<string>("newnewnew"), null_str, null_callback);
+    connection_.SetErasePIN(make_shared<string>("newnewnew"), null_str, null_callback);
 
-    EXPECT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    EXPECT_EQ("newnewnew", message.command().body().setup().setpin());
-    EXPECT_FALSE(message.command().body().setup().has_pin());
+    EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
+    EXPECT_EQ("newnewnew", message.body().security().newerasepin());
+    EXPECT_FALSE(message.body().security().has_olderasepin());
 }
 
-TEST_F(NonblockingKineticConnectionTest, SetPinBuildsCorrectMessageIfCurrentPin) {
+TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageIfCurrentPin) {
     auto oldpin = "oldoldold";
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
     shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.SetPIN("newnewnew", oldpin, null_callback);
+    connection_.SetErasePIN("newnewnew", oldpin, null_callback);
 
-    EXPECT_EQ(Message_MessageType_SETUP, message.command().header().messagetype());
-    EXPECT_EQ("newnewnew", message.command().body().setup().setpin());
-    EXPECT_EQ(oldpin, message.command().body().setup().pin());
+    EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
+    EXPECT_EQ(message.body().security().newerasepin(),"newnewnew");
+    EXPECT_EQ(message.body().security().olderasepin(),oldpin);
 }
+
 
 TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
-    Message message;
-    EXPECT_CALL(*packet_service_, Submit_(_, StringSharedPtrEq(""), _)).WillOnce(
-            DoAll(SaveArg<0>(&message), Return(0)));
+    Command message;
+    EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
+            DoAll(SaveArg<1>(&message), Return(0)));
 
 
     auto double_nested_request = make_shared<P2PPushRequest>();
@@ -532,14 +531,14 @@ TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
 
     connection_.P2PPush(request, NULL);
 
-    EXPECT_EQ(Message_MessageType_PEER2PEERPUSH, message.command().header().messagetype());
+    EXPECT_EQ(Command_MessageType_PEER2PEERPUSH, message.header().messagetype());
 
-    EXPECT_EQ("foo.tld", message.command().body().p2poperation().peer().hostname());
-    EXPECT_EQ(1234, message.command().body().p2poperation().peer().port());
-    EXPECT_FALSE(message.command().body().p2poperation().peer().tls());
+    EXPECT_EQ("foo.tld", message.body().p2poperation().peer().hostname());
+    EXPECT_EQ(1234, message.body().p2poperation().peer().port());
+    EXPECT_FALSE(message.body().p2poperation().peer().tls());
 
-    auto operation0 = message.command().body().p2poperation().operation(0);
-    ASSERT_EQ(3, message.command().body().p2poperation().operation_size());
+    auto operation0 = message.body().p2poperation().operation(0);
+    ASSERT_EQ(3, message.body().p2poperation().operation_size());
     EXPECT_EQ("key1", operation0.key());
     EXPECT_FALSE(operation0.has_newkey());
 
@@ -557,27 +556,27 @@ TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
     auto operation0_double_nested = operation0_nested.p2pop().operation(0);
     EXPECT_EQ("double_nested_key1", operation0_double_nested.key());
 
-    EXPECT_EQ("key2", message.command().body().p2poperation().operation(1).key());
-    EXPECT_FALSE(message.command().body().p2poperation().operation(1).has_newkey());
-    EXPECT_TRUE(message.command().body().p2poperation().operation(1).force());
+    EXPECT_EQ("key2", message.body().p2poperation().operation(1).key());
+    EXPECT_FALSE(message.body().p2poperation().operation(1).has_newkey());
+    EXPECT_TRUE(message.body().p2poperation().operation(1).force());
 
-    EXPECT_EQ("key3", message.command().body().p2poperation().operation(2).key());
-    EXPECT_EQ("otherkey", message.command().body().p2poperation().operation(2).newkey());
+    EXPECT_EQ("key3", message.body().p2poperation().operation(2).key());
+    EXPECT_EQ("otherkey", message.body().p2poperation().operation(2).newkey());
 }
 
 TEST_F(NonblockingKineticConnectionTest, P2PHandlerInterpretsStatusCorrectly) {
-    Message response;
-    Message_P2POperation* mutable_op =
-            response.mutable_command()->mutable_body()->mutable_p2poperation();
-    Message_Status* status = mutable_op->add_operation()->mutable_status();
-    status->set_code(com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS);
+    Command response;
+    Command_P2POperation* mutable_op =
+            response.mutable_body()->mutable_p2poperation();
+    Command_Status* status = mutable_op->add_operation()->mutable_status();
+    status->set_code(com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS);
 
     status = mutable_op->add_operation()->mutable_status();
-    status->set_code(com::seagate::kinetic::client::proto::Message_Status_StatusCode_INTERNAL_ERROR);
+    status->set_code(com::seagate::kinetic::client::proto::Command_Status_StatusCode_INTERNAL_ERROR);
     status->set_statusmessage("Bugger");
 
     status = mutable_op->add_operation()->mutable_status();
-    status->set_code(com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS);
+    status->set_code(com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS);
 
     auto callback = make_shared<MockP2PPushCallback>();
     P2PPushHandler handler(callback);

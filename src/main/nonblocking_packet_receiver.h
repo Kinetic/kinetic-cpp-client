@@ -38,7 +38,8 @@
 namespace kinetic {
 
 using com::seagate::kinetic::client::proto::Message;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
+using com::seagate::kinetic::client::proto::Command;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode;
 
 using std::string;
 using std::unique_ptr;
@@ -83,7 +84,8 @@ class NonblockingReceiver : public NonblockingReceiverInterface {
     NonblockingPacketReader *nonblocking_response_;
     int64_t connection_id_;
     shared_ptr<HandlerInterface> handler_;
-    Message response_;
+    Message message_;
+    Command command_;
     unique_ptr<const string> value_;
     unordered_map<google::protobuf::int64, pair<shared_ptr<HandlerInterface>, HandlerKey>> map_;
     // handler_key is separate from message sequence so that we don't tie handler identification

@@ -25,7 +25,7 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode;
 using std::string;
 
 enum class StatusCode {
@@ -54,8 +54,8 @@ enum class StatusCode {
     REMOTE_NESTED_OPERATION_ERRORS
 };
 
-StatusCode ConvertFromProtoStatus(Message_Status_StatusCode status);
-Message_Status_StatusCode ConvertToProtoStatus(StatusCode status);
+StatusCode ConvertFromProtoStatus(Command_Status_StatusCode status);
+Command_Status_StatusCode ConvertToProtoStatus(StatusCode status);
 
 } // namespace kinetic
 

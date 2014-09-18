@@ -32,6 +32,7 @@ class MockSocketWrapperInterface : public SocketWrapperInterface {
     MockSocketWrapperInterface() {}
     MOCK_METHOD0(Connect, bool());
     MOCK_METHOD0(fd, int());
+    MOCK_METHOD0(getSSL, SSL*());
 };
 
 }  // namespace kinetic

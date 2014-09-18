@@ -35,8 +35,8 @@ using ::testing::_;
 using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::StrictMock;
-using com::seagate::kinetic::client::proto::Message_MessageType_GET_RESPONSE;
-using com::seagate::kinetic::client::proto::Message_Status_StatusCode_SUCCESS;
+using com::seagate::kinetic::client::proto::Command_MessageType_GET_RESPONSE;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
 
 using std::string;
 using std::make_shared;
@@ -80,7 +80,7 @@ TEST(NonblockingPacketServiceTest, SubmitAfterFailureInvokesErrorOnCallback) {
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
         "Client already shut down"), nullptr));
 
-    service.Submit(unique_ptr<Message>(nullptr), make_shared<string>("zomg"),
+    service.Submit(unique_ptr<Message>(nullptr), unique_ptr<Command>(nullptr), make_shared<string>("zomg"),
         unique_ptr<HandlerInterface>(handler));
 }
 

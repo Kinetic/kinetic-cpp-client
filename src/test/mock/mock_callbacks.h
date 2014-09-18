@@ -90,12 +90,12 @@ class MockGetLogCallback : public GetLogCallbackInterface {
 
 class MockP2PPushCallback : public P2PPushCallbackInterface {
     public:
-    void Success(unique_ptr<vector<KineticStatus>> statuses, const Message& response) {
+    void Success(unique_ptr<vector<KineticStatus>> statuses, const Command& response) {
         Success_(*statuses, response);
     }
 
-    MOCK_METHOD2(Success_, void(vector<KineticStatus> statuses, const Message& response));
-    MOCK_METHOD2(Failure, void(KineticStatus error, Message const * const response));
+    MOCK_METHOD2(Success_, void(vector<KineticStatus> statuses, const Command& response));
+    MOCK_METHOD2(Failure, void(KineticStatus error, Command const * const response));
 };
 
 

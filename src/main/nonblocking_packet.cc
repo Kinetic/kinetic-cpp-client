@@ -33,10 +33,10 @@ namespace kinetic {
 using std::make_shared;
 using std::string;
 
-NonblockingPacketWriter::NonblockingPacketWriter(int fd, unique_ptr<const Message> message,
+NonblockingPacketWriter::NonblockingPacketWriter(shared_ptr<SocketWrapperInterface> socket_wrapper, unique_ptr<const Message> message,
     const shared_ptr<const string> value)
-    : fd_(fd), message_(move(message)), value_(value), state_(kMagic),
-    writer_(new NonblockingStringWriter(fd, make_shared<string>("F"))) {}
+    : socket_wrapper_(socket_wrapper), message_(move(message)), value_(value), state_(kMagic),
+    writer_(new NonblockingStringWriter(socket_wrapper_, make_shared<string>("F"))) {}
 
 NonblockingPacketWriter::~NonblockingPacketWriter() {
     if (writer_ != NULL) {
@@ -46,14 +46,16 @@ NonblockingPacketWriter::~NonblockingPacketWriter() {
 
 NonblockingStringStatus NonblockingPacketWriter::Write() {
     struct stat statbuf;
-    if (fstat(fd_, &statbuf)) {
+    if (fstat(socket_wrapper_->fd(), &statbuf)) {
         PLOG(ERROR) << "Unable to fstat socket";
         return kFailed;
     }
+#ifndef __APPLE__
     if (S_ISSOCK(statbuf.st_mode)) {
         int optval = 1;
-        setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+        setsockopt(socket_wrapper_->fd(), IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
     }
+#endif
 
     while (true) {
         NonblockingStringStatus status = writer_->Write();
@@ -81,15 +83,17 @@ NonblockingStringStatus NonblockingPacketWriter::Write() {
                 TransitionFromValue();
                 break;
             case kFinished:
-                if (fstat(fd_, &statbuf)) {
+                if (fstat(socket_wrapper_->fd(), &statbuf)) {
                     PLOG(ERROR) << "Unable to fstat socket";
                     return kFailed;
                 }
                 if (S_ISSOCK(statbuf.st_mode)) {
                     int optval = 0;
-                    setsockopt(fd_, IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+#ifndef __APPLE__
+                    setsockopt(socket_wrapper_->fd(), IPPROTO_TCP, TCP_CORK, &optval, sizeof(optval));
+#endif
                     optval = 1;
-                    setsockopt(fd_, IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
+                    setsockopt(socket_wrapper_->fd(), IPPROTO_TCP, TCP_NODELAY, &optval, sizeof(optval));
                 }
                 return kDone;
             default:
@@ -107,7 +111,7 @@ bool NonblockingPacketWriter::TransitionFromMagic() {
     uint32_t size = htonl(serialized_message_.size());
     delete writer_;
     std::string encoded_size(reinterpret_cast<char *>(&size), sizeof(size));
-    writer_ = new NonblockingStringWriter(fd_, make_shared<string>(encoded_size));
+    writer_ = new NonblockingStringWriter(socket_wrapper_, make_shared<string>(encoded_size));
     state_ = kMessageLength;
     return true;
 }
@@ -117,21 +121,21 @@ void NonblockingPacketWriter::TransitionFromMessageLength() {
     uint32_t size = htonl(value_->size());
     delete writer_;
     std::string encoded_size(reinterpret_cast<char *>(&size), sizeof(size));
-    writer_ = new NonblockingStringWriter(fd_, make_shared<string>(encoded_size));
+    writer_ = new NonblockingStringWriter(socket_wrapper_, make_shared<string>(encoded_size));
     state_ = kValueLength;
 }
 
 void NonblockingPacketWriter::TransitionFromValueLength() {
     // Move on to writing the serialized message
     delete writer_;
-    writer_ = new NonblockingStringWriter(fd_, make_shared<string>(serialized_message_));
+    writer_ = new NonblockingStringWriter(socket_wrapper_, make_shared<string>(serialized_message_));
     state_ = kMessage;
 }
 
 void NonblockingPacketWriter::TransitionFromMessage() {
     // Move on to writing the value
     delete writer_;
-    writer_ = new NonblockingStringWriter(fd_, value_);
+    writer_ = new NonblockingStringWriter(socket_wrapper_, value_);
     state_ = kValue;
 }
 
@@ -140,10 +144,10 @@ void NonblockingPacketWriter::TransitionFromValue() {
     state_ = kFinished;
 }
 
-NonblockingPacketReader::NonblockingPacketReader(int fd, Message* response,
+NonblockingPacketReader::NonblockingPacketReader(shared_ptr<SocketWrapperInterface> socket_wrapper, Message* response,
         unique_ptr<const string> &value)
-    : fd_(fd), response_(response), state_(kMagic), value_(value), magic_(),
-    reader_(new NonblockingStringReader(fd, 1, magic_)) {
+    : socket_wrapper_(socket_wrapper), response_(response), state_(kMagic), value_(value), magic_(),
+    reader_(new NonblockingStringReader(socket_wrapper_, 1, magic_)) {
 }
 
 NonblockingPacketReader::~NonblockingPacketReader() {
@@ -195,7 +199,7 @@ bool NonblockingPacketReader::TransitionFromMagic() {
         return false;
     }
     delete reader_;
-    reader_ = new NonblockingStringReader(fd_, 4, message_length_);
+    reader_ = new NonblockingStringReader(socket_wrapper_, 4, message_length_);
     state_ = kMessageLength;
     return true;
 }
@@ -203,7 +207,7 @@ bool NonblockingPacketReader::TransitionFromMagic() {
 void NonblockingPacketReader::TransitionFromMessageLength() {
     // Move on to reading the value length
     delete reader_;
-    reader_ = new NonblockingStringReader(fd_, 4, value_length_);
+    reader_ = new NonblockingStringReader(socket_wrapper_, 4, value_length_);
     state_ = kValueLength;
 }
 
@@ -212,7 +216,7 @@ void NonblockingPacketReader::TransitionFromValueLength() {
     delete reader_;
     CHECK_EQ(4u, message_length_->size());
     uint32_t length = ntohl(*reinterpret_cast<const uint32_t *>(message_length_->data()));
-    reader_ = new NonblockingStringReader(fd_, length, message_);
+    reader_ = new NonblockingStringReader(socket_wrapper_, length, message_);
     state_ = kMessage;
 }
 
@@ -221,7 +225,7 @@ void NonblockingPacketReader::TransitionFromMessage() {
     delete reader_;
     CHECK_EQ(4u, value_length_->size());
     uint32_t length = ntohl(*reinterpret_cast<const uint32_t *>(value_length_->data()));
-    reader_ = new NonblockingStringReader(fd_, length, value_);
+    reader_ = new NonblockingStringReader(socket_wrapper_, length, value_);
     state_ = kValue;
 }
 
