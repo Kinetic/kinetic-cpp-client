@@ -19,9 +19,10 @@
  */
 
 #include "nonblocking_packet_receiver.h"
-#include <chrono>
 #include <exception>
 #include <stdexcept>
+#include <ctime>
+
 namespace kinetic {
 
 using com::seagate::kinetic::client::proto::Message_AuthType_UNSOLICITEDSTATUS;
@@ -102,15 +103,16 @@ connection_id_(0), handler_(NULL) {
     map_.insert(make_pair(-1,make_pair(hh,-1)));
     handler_to_message_seq_map_.insert(make_pair(-1, -1));
 
-    auto start = std::chrono::steady_clock::now();
+
+    auto start = std::time(0);
 
     while(true){
         if(Receive() == kError)
             break;
         if(hh->done)
             break;
-        auto now = std::chrono::steady_clock::now();
-        if(std::chrono::duration_cast<std::chrono::seconds>(now-start).count() > 30)
+        auto now = std::time(0);
+        if(now-start > 30)
             break;
     }
     if(!hh->success)
