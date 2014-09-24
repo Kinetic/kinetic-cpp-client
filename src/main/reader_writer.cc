@@ -25,24 +25,32 @@
 
 #include "glog/logging.h"
 
+const uint32_t SOCKET_TIMEOUT = 10000;  //10 seconds
+
 namespace kinetic {
 
 ReaderWriter::ReaderWriter(int fd) : fd_(fd) {}
 
 bool ReaderWriter::Read(void *buf, size_t n, int* err) {
     size_t bytes_read = 0;
-    while (bytes_read < n) {
+    uint32_t socket_timeout = 0;
+    while (bytes_read < n && socket_timeout < SOCKET_TIMEOUT) {
         int status = read(fd_, reinterpret_cast<char *>(buf) + bytes_read, n - bytes_read);
         if (status == -1 && errno == EINTR) {
             continue;
-        }
-        if (status < 0) {
+        } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK )) {
+	    LOG(INFO) << "Peer is slow to transmit";
+	    //Wait for 500us;
+	    usleep(500);
+            socket_timeout++;
+            continue;
+        } else if (status < 0) {
             *err = errno;
             PLOG(WARNING) << "Failed to read from socket";
             return false;
         }
         if (status == 0) {
-            LOG(WARNING) << "Failed to read from socket";
+            LOG(WARNING) << "Unexpected EOF. Socket (TX) may be closed by Peer";
             return false;
         }
         bytes_read += status;
@@ -53,18 +61,23 @@ bool ReaderWriter::Read(void *buf, size_t n, int* err) {
 
 bool ReaderWriter::Write(const void *buf, size_t n) {
     size_t bytes_written = 0;
-    while (bytes_written < n) {
+    uint32_t socket_timeout = 0;
+    while (bytes_written < n && socket_timeout < SOCKET_TIMEOUT) {
         int status = write(fd_, reinterpret_cast<const char *>(buf) + bytes_written,
             n - bytes_written);
         if (status == -1 && errno == EINTR) {
             continue;
-        }
-        if (status < 0) {
+        } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+	    LOG(INFO) << " Peer is slow to receive";
+	    usleep(500);
+	    socket_timeout++;
+            continue;
+        } else if (status < 0) {	
             PLOG(WARNING) << "Failed to write to socket";
             return false;
         }
         if (status == 0) {
-            LOG(WARNING) << "Failed to write to socket";
+            LOG(WARNING) << "Unexpected EOF, Socket(RX) may be closed by Peer";
             return false;
         }
         bytes_written += status;
