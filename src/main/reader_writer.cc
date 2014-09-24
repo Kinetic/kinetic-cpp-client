@@ -25,7 +25,7 @@
 
 #include "glog/logging.h"
 
-const uint32_t SOCKET_TIMEOUT = 10000;  //10 seconds
+const uint32_t SOCKET_TIMEOUT = 20000;  //10 seconds
 
 namespace kinetic {
 
