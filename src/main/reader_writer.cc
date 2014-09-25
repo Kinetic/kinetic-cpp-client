@@ -39,7 +39,6 @@ bool ReaderWriter::Read(void *buf, size_t n, int* err) {
         if (status == -1 && errno == EINTR) {
             continue;
         } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK )) {
-	    LOG(INFO) << "Peer is slow to transmit";
 	    //Wait for 500us;
 	    usleep(500);
             socket_timeout++;
@@ -55,7 +54,10 @@ bool ReaderWriter::Read(void *buf, size_t n, int* err) {
         }
         bytes_read += status;
     }
-
+    if (socket_timeout >= SOCKET_TIMEOUT) {
+        LOG(INFO) << "Peer is slow to transmit";
+        return false;
+    }
     return true;
 }
 
@@ -68,7 +70,6 @@ bool ReaderWriter::Write(const void *buf, size_t n) {
         if (status == -1 && errno == EINTR) {
             continue;
         } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-	    LOG(INFO) << " Peer is slow to receive";
 	    usleep(500);
 	    socket_timeout++;
             continue;
@@ -81,6 +82,10 @@ bool ReaderWriter::Write(const void *buf, size_t n) {
             return false;
         }
         bytes_written += status;
+    }
+    if (socket_timeout >= SOCKET_TIMEOUT) {
+        LOG(INFO) << " Peer is slow to receive";
+        return false;
     }
 
     return true;
