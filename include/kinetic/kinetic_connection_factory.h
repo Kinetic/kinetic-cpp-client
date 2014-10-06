@@ -39,6 +39,7 @@ using std::unique_ptr;
 class KineticConnectionFactory {
     public:
     explicit KineticConnectionFactory(HmacProvider hmac_provider);
+    virtual ~KineticConnectionFactory(){};
 
     /// Creates and opens a new nonblocking connection using the given options. If the returned
     /// Status indicates success then the connection is ready to perform
@@ -51,20 +52,20 @@ class KineticConnectionFactory {
     ///                                     data the operation fails
     /// @param[out] connection              Populated with a NonblockingKineticConnection if the request
     ///                                     succeeds
-    Status NewNonblockingConnection(
+    virtual Status NewNonblockingConnection(
             const ConnectionOptions& options,
             unique_ptr <NonblockingKineticConnection>& connection);
 
-    Status NewNonblockingConnection(
+    virtual Status NewNonblockingConnection(
             const ConnectionOptions& options,
             shared_ptr <NonblockingKineticConnection>& connection);
 
     /// Like NewNonblockingConnection, except the connection is safe for use by multiple threads.
-    Status NewThreadsafeNonblockingConnection(
+    virtual Status NewThreadsafeNonblockingConnection(
             const ConnectionOptions& options,
             unique_ptr <ThreadsafeNonblockingKineticConnection>& connection);
 
-    Status NewThreadsafeNonblockingConnection(
+    virtual Status NewThreadsafeNonblockingConnection(
             const ConnectionOptions& options,
             shared_ptr <ThreadsafeNonblockingKineticConnection>& connection);
 
@@ -79,26 +80,27 @@ class KineticConnectionFactory {
     ///                                     data the operation fails
     /// @param[out] connection              Populated with a BlockingKineticConnection if the request
     ///                                     succeeds
-    Status NewBlockingConnection(
+    virtual Status NewBlockingConnection(
             const ConnectionOptions& options,
             unique_ptr <BlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
-    Status NewBlockingConnection(
+    virtual Status NewBlockingConnection(
             const ConnectionOptions& options,
             shared_ptr <BlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
     /// Like NewBlockingConnection, except the connection is safe for use by multiple threads
-    Status NewThreadsafeBlockingConnection(
+    virtual Status NewThreadsafeBlockingConnection(
             const ConnectionOptions& options,
             unique_ptr <ThreadsafeBlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
 
-    Status NewThreadsafeBlockingConnection(
+    virtual Status NewThreadsafeBlockingConnection(
             const ConnectionOptions& options,
             shared_ptr <ThreadsafeBlockingKineticConnection>& connection,
             unsigned int network_timeout_seconds);
+
 
     private:
     HmacProvider hmac_provider_;
