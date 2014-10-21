@@ -1,0 +1,18 @@
+language: cpp
+compiler: 
+  - gcc
+  - clang
+os: 
+  - linux
+  - osx
+install: 
+  - cmake .
+  - make
+before_script:
+  - git clone https://github.com/Seagate/kinetic-java
+  - mvn -f ./kinetic-java/pom.xml -DskipTests clean package 
+  - ./kinetic-java/bin/startSimulator.sh &
+  - sleep 10
+script: 
+  - ./kinetic_client_test
+  - ./kinetic_integration_test
