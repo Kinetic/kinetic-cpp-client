@@ -10,7 +10,12 @@ install:
   - make
 before_script:
   - git clone https://github.com/Seagate/kinetic-java
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then JAVA_HOME=$(/usr/libexec/java_home); fi
+  - echo TRAVIS_OS_NAME=$TRAVIS_OS_NAME
+  - echo JAVA_HOME=$JAVA_HOME
+  - if [ "$(uname)" == "Darwin" ]; then JAVA_HOME=$(/usr/libexec/java_home); fi
+  - echo JAVA_HOME=$JAVA_HOME
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then JAVA_HOME=$(/usr/libexec/java_home); fi
+  - echo JAVA_HOME=$JAVA_HOME
   - mvn -f ./kinetic-java/pom.xml -DskipTests clean package 
   - ./kinetic-java/bin/startSimulator.sh &
   - sleep 10
