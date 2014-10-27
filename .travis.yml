@@ -1,0 +1,20 @@
+language: cpp
+compiler: 
+  - gcc
+  - clang
+os: 
+  - linux
+  - osx
+install: 
+  - cmake .
+  - make
+before_script:
+  - git clone https://github.com/Seagate/kinetic-java
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
+  - echo $JAVA_HOME
+  - mvn -f ./kinetic-java/pom.xml -DskipTests clean package 
+  - ./kinetic-java/bin/startSimulator.sh &
+  - sleep 10
+script: 
+  - ./kinetic_client_test
+  - ./kinetic_integration_test
