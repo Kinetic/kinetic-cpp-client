@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Seagate/kinetic-cpp-client.svg?branch=travis)](https://travis-ci.org/Seagate/kinetic-cpp-client)
+[![Build Status](https://travis-ci.org/Seagate/kinetic-cpp-client.svg?branch=master)](https://travis-ci.org/Seagate/kinetic-cpp-client)
 Introduction
 ============
 This repo contains code for producing C and C++ kinetic clients.
