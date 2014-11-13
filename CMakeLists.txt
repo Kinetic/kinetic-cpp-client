@@ -176,6 +176,16 @@ set(LIBRARY_DEPENDENCIES
     dl
 )
 
+# If libunwind is installed it is used by glog and thus has to linked. 
+# Otherwise glog uses the standard glibc unwinder and there is no dependency.
+find_library(LIBUNWIND "unwind")
+if(LIBUNWIND)
+    set(LIBRARY_DEPENDENCIES 
+        ${LIBRARY_DEPENDENCIES} 
+        ${LIBUNWIND}
+    )
+endif()
+
 add_library(kinetic_client
     src/main/generated/kinetic_client.pb.cc
     src/main/hmac_provider.cc
@@ -197,7 +207,6 @@ add_library(kinetic_client
     src/main/message_stream.cc
     src/main/outgoing_string_value.cc
     src/main/reader_writer.cc
-
     src/main/key_range_iterator.cc
 )
 add_dependencies(kinetic_client openssl)
