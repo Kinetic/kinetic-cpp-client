@@ -36,6 +36,7 @@
 #include "matchers.h"
 
 #include "glog/logging.h"
+#include "gtest/gtest.h"
 
 namespace kinetic {
 
@@ -59,7 +60,8 @@ class IntegrationTest : public ::testing::Test {
     IntegrationTest() : use_external_(false),
                         pid_(0), done_(false),
                         nonblocking_connection_(nullptr),
-                        blocking_connection_(nullptr) {
+                        blocking_connection_(nullptr),
+                        blocking_ssl_connection_(nullptr){
           //google::LogToStderr();
     }
 
@@ -75,17 +77,18 @@ class IntegrationTest : public ::testing::Test {
         }
         ConnectionOptions options;
         options.host = "localhost";
-        options.port = 8443;
-        options.use_ssl = true;
+        options.port = 8123;
+        options.use_ssl = false;
         options.user_id = 1;
         options.hmac_key = "asdfasdf";
 
         KineticConnectionFactory connection_factory = kinetic::NewKineticConnectionFactory();
         ASSERT_TRUE(connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok());
-        ASSERT_TRUE(connection_factory.NewBlockingConnection(options,blocking_connection_, 10).ok());
-
-        shared_ptr<string> null_ptr(nullptr);
-        ASSERT_TRUE(blocking_connection_->InstantErase(null_ptr).ok());
+        ASSERT_TRUE(connection_factory.NewBlockingConnection(options, blocking_connection_, 10).ok());
+        options.port = 8443;
+        options.use_ssl = true;
+        ASSERT_TRUE(connection_factory.NewBlockingConnection(options, blocking_ssl_connection_, 10).ok());
+        ASSERT_TRUE(blocking_ssl_connection_->InstantErase("").ok());
     }
 
     void TearDown() {
@@ -144,6 +147,7 @@ class IntegrationTest : public ::testing::Test {
     bool done_;
     shared_ptr<kinetic::NonblockingKineticConnection> nonblocking_connection_;
     unique_ptr<kinetic::BlockingKineticConnection> blocking_connection_;
+    unique_ptr<kinetic::BlockingKineticConnection> blocking_ssl_connection_;
 };
 
 // when the cap is reached, set the flag bool to true

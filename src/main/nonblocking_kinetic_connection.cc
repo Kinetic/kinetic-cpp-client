@@ -38,6 +38,9 @@ using com::seagate::kinetic::client::proto::Command_MessageType_GETLOG;
 using com::seagate::kinetic::client::proto::Command_MessageType_SECURITY;
 using com::seagate::kinetic::client::proto::Command_MessageType_PEER2PEERPUSH;
 using com::seagate::kinetic::client::proto::Command_MessageType_PINOP;
+using com::seagate::kinetic::client::proto::Command_MessageType_START_BATCH;
+using com::seagate::kinetic::client::proto::Command_MessageType_END_BATCH;
+using com::seagate::kinetic::client::proto::Command_MessageType_ABORT_BATCH;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NOT_AUTHORIZED;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NOT_FOUND;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
@@ -64,6 +67,7 @@ using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_ERASE
 using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_SECURE_ERASE_PINOP;
 using com::seagate::kinetic::client::proto::Message_AuthType_PINAUTH;
 using com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH;
+
 
 using std::shared_ptr;
 using std::string;
@@ -233,7 +237,7 @@ void P2PPushHandler::Error(KineticStatus error, Command const * const response) 
 
 NonblockingKineticConnection::NonblockingKineticConnection(
         NonblockingPacketServiceInterface *service)
-    : service_(service), empty_str_(make_shared<string>("")), cluster_version_(0) {}
+    : service_(service), empty_str_(make_shared<string>("")), cluster_version_(0), batch_id_counter_(0) {}
 
 NonblockingKineticConnection::~NonblockingKineticConnection() {
     delete service_;
@@ -345,11 +349,12 @@ HandlerKey NonblockingKineticConnection::GetKeyRange(const string start_key,
         make_shared<string>(end_key), end_key_inclusive, reverse_results, max_results, callback);
 }
 
-HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
+HandlerKey NonblockingKineticConnection::doPut(const shared_ptr<const string> key,
     const shared_ptr<const string> current_version, WriteMode mode,
     const shared_ptr<const KineticRecord> record,
     const shared_ptr<PutCallbackInterface> callback,
-    PersistMode persistMode) {
+    PersistMode persistMode, int batch_id){
+
     unique_ptr<PutHandler> handler(new PutHandler(callback));
 
     unique_ptr<Message> msg(new Message());
@@ -360,22 +365,34 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
     bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_body()->mutable_keyvalue()->set_key(*key);
     request->mutable_body()->mutable_keyvalue()->set_dbversion(
-            *current_version);
+           *current_version);
     request->mutable_body()->mutable_keyvalue()->set_force(force);
 
     if (record->version().get() != nullptr) {
-        request->mutable_body()->mutable_keyvalue()->set_newversion(
-            *(record->version()));
+       request->mutable_body()->mutable_keyvalue()->set_newversion(
+           *(record->version()));
+    }
+    if (batch_id) {
+        request->mutable_header()->set_batchid(batch_id);
     }
 
     request->mutable_body()->mutable_keyvalue()->set_tag(*(record->tag()));
     request->mutable_body()->mutable_keyvalue()->set_algorithm(
-            record->algorithm());
+           record->algorithm());
 
     request->mutable_body()->mutable_keyvalue()->set_synchronization(
-            this->GetSynchronizationForPersistMode(persistMode));
+           this->GetSynchronizationForPersistMode(persistMode));
 
     return service_->Submit(move(msg), move(request), record->value(), move(handler));
+}
+
+
+HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
+    const shared_ptr<const string> current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record,
+    const shared_ptr<PutCallbackInterface> callback,
+    PersistMode persistMode) {
+    return this->doPut(key, current_version, mode, record, callback, persistMode, 0);
 }
 
 HandlerKey NonblockingKineticConnection::Put(const string key,
@@ -405,16 +422,21 @@ HandlerKey NonblockingKineticConnection::Put(const string key,
         callback);
 }
 
-HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+HandlerKey NonblockingKineticConnection::doDelete(const shared_ptr<const string> key,
     const shared_ptr<const string> version, WriteMode mode,
     const shared_ptr<SimpleCallbackInterface> callback,
-    PersistMode persistMode) {
+    PersistMode persistMode, int batch_id) {
+
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_DELETE);
+
+    if (batch_id) {
+        request->mutable_header()->set_batchid(batch_id);
+    }
 
     bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_body()->mutable_keyvalue()->set_key(*key);
@@ -425,6 +447,14 @@ HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> k
             this->GetSynchronizationForPersistMode(persistMode));
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+
+HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+    const shared_ptr<const string> version, WriteMode mode,
+    const shared_ptr<SimpleCallbackInterface> callback,
+    PersistMode persistMode) {
+    return this->doDelete(key, version, mode, callback, persistMode, 0);
 }
 
 HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
@@ -758,6 +788,71 @@ Command_Synchronization NonblockingKineticConnection::GetSynchronizationForPersi
             break;
     }
     return sync_option;
+}
+
+HandlerKey NonblockingKineticConnection::BatchStart (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id) {
+    int id = ++ batch_id_counter_;
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_START_BATCH);
+    request->mutable_header()->set_batchid(id);
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+    if(batch_id) *batch_id = id;
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::BatchPutKey (int batch_id, const shared_ptr<const string> key,
+       const shared_ptr<const string> current_version, WriteMode mode,
+       const shared_ptr<const KineticRecord> record,
+       const shared_ptr<PutCallbackInterface> callback,
+       PersistMode persistMode) {
+    return doPut(key, current_version, mode, record, callback, persistMode, batch_id);
+}
+
+HandlerKey NonblockingKineticConnection::BatchPutKey (int batch_id, const string key,
+   const string current_version, WriteMode mode,
+   const shared_ptr<const KineticRecord> record,
+   const shared_ptr<PutCallbackInterface> callback,
+   PersistMode persistMode) {
+    return BatchPutKey(batch_id, make_shared<string>(key), make_shared<string>(current_version),
+           mode, record, callback, persistMode);
+}
+
+HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+   const shared_ptr<const string> version, WriteMode mode,
+   const shared_ptr<SimpleCallbackInterface> callback,
+   PersistMode persistMode) {
+    return doDelete(key,version,mode,callback,persistMode,batch_id);
+}
+
+HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
+    const string version, WriteMode mode,
+    const shared_ptr<SimpleCallbackInterface> callback,
+    PersistMode persistMode) {
+    return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version), mode, callback, persistMode);
+}
+
+HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_END_BATCH);
+    request->mutable_header()->set_batchid(batch_id);
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_ABORT_BATCH);
+    request->mutable_header()->set_batchid(batch_id);
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
 } // namespace kinetic

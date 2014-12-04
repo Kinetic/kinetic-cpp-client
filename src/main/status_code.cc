@@ -41,6 +41,7 @@ using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NO_SPACE;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NO_SUCH_HMAC_ALGORITHM;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_INVALID_REQUEST;
 using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NESTED_OPERATION_ERRORS;
+using com::seagate::kinetic::client::proto::Command_Status_StatusCode_INVALID_BATCH;
 
 StatusCode ConvertFromProtoStatus(Command_Status_StatusCode status) {
     switch (status) {
@@ -80,6 +81,8 @@ StatusCode ConvertFromProtoStatus(Command_Status_StatusCode status) {
             return StatusCode::CLIENT_INTERNAL_ERROR;
         case Command_Status_StatusCode_NESTED_OPERATION_ERRORS:
             return StatusCode::REMOTE_NESTED_OPERATION_ERRORS;
+        case Command_Status_StatusCode_INVALID_BATCH:
+            return StatusCode::REMOTE_INVALID_BATCH;
         default:
             return StatusCode::REMOTE_OTHER_ERROR;
     }
@@ -121,6 +124,8 @@ Command_Status_StatusCode ConvertToProtoStatus(StatusCode status) {
             return Command_Status_StatusCode_INVALID_REQUEST;
         case StatusCode::REMOTE_NESTED_OPERATION_ERRORS:
             return Command_Status_StatusCode_NESTED_OPERATION_ERRORS;
+        case StatusCode::REMOTE_INVALID_BATCH:
+            return Command_Status_StatusCode_INVALID_BATCH;
         default:
             return Command_Status_StatusCode_INTERNAL_ERROR;
     }

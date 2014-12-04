@@ -58,7 +58,7 @@ set(KINETIC_PROTO_MD5 "85ca027b870811a297c1f6d792498934")
 ExternalProject_add(
     kinetic-proto
     PREFIX ${PREFIX}
-    DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
+#    DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -208,6 +208,7 @@ add_library(kinetic_client
     src/main/outgoing_string_value.cc
     src/main/reader_writer.cc
     src/main/key_range_iterator.cc
+    src/main/batch_operation.cc
 )
 add_dependencies(kinetic_client openssl)
 
@@ -231,6 +232,7 @@ add_executable(${INTEGRATION_TEST_BINARY}
     src/integration_test/nonexistent_server_test.cc
     src/integration_test/put_test.cc
     src/integration_test/blocking_smoketest.cc
+    src/integration_test/batch_operation_test.cc
     src/test/kinetic_cpp_client_test.cc
 )
 target_link_libraries(${INTEGRATION_TEST_BINARY} ${LIBRARY_DEPENDENCIES})

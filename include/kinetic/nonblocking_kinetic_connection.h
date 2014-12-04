@@ -25,7 +25,7 @@
 
 namespace kinetic {
 
-class NonblockingKineticConnection : public NonblockingKineticConnectionInterface{
+class NonblockingKineticConnection : public NonblockingKineticConnectionInterface {
     public:
     explicit NonblockingKineticConnection(NonblockingPacketServiceInterface *service);
     ~NonblockingKineticConnection();
@@ -94,10 +94,40 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
     HandlerKey SetLockPIN(const string new_pin, const string current_pin,
         const shared_ptr<SimpleCallbackInterface> callback);
 
+    HandlerKey BatchStart (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id);
+    HandlerKey BatchPutKey (int batch_id, const shared_ptr<const string> key,
+      const shared_ptr<const string> current_version, WriteMode mode,
+      const shared_ptr<const KineticRecord> record,
+      const shared_ptr<PutCallbackInterface> callback,
+      PersistMode persistMode);
+    HandlerKey BatchPutKey (int batch_id, const string key,
+      const string current_version, WriteMode mode,
+      const shared_ptr<const KineticRecord> record,
+      const shared_ptr<PutCallbackInterface> callback,
+      PersistMode persistMode);
+    HandlerKey BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+      const shared_ptr<const string> version, WriteMode mode,
+      const shared_ptr<SimpleCallbackInterface> callback,
+      PersistMode persistMode);
+    HandlerKey BatchDeleteKey(int batch_id, const string key,
+       const string version, WriteMode mode,
+       const shared_ptr<SimpleCallbackInterface> callback,
+       PersistMode persistMode);
+    HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
 
     private:
     HandlerKey GenericGet(const shared_ptr<const string> key,
         const shared_ptr<GetCallbackInterface> callback, Command_MessageType message_type);
+    HandlerKey doPut(const shared_ptr<const string> key,
+            const shared_ptr<const string> current_version, WriteMode mode,
+            const shared_ptr<const KineticRecord> record,
+            const shared_ptr<PutCallbackInterface> callback,
+            PersistMode persistMode, int batch_id);
+    HandlerKey doDelete(const shared_ptr<const string> key,
+            const shared_ptr<const string> version, WriteMode mode,
+            const shared_ptr<SimpleCallbackInterface> callback,
+            PersistMode persistMode, int batch_id);
     void PopulateP2PMessage(Command_P2POperation *mutable_p2pop,
         const shared_ptr<const P2PPushRequest> push_request);
     unique_ptr<Command> NewCommand(Command_MessageType message_type);
@@ -107,6 +137,7 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
     const shared_ptr<const string> empty_str_;
 
     int64_t cluster_version_;
+    int32_t batch_id_counter_;
 
     DISALLOW_COPY_AND_ASSIGN(NonblockingKineticConnection);
 };

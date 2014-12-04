@@ -20,7 +20,6 @@
 
 #include <memory>
 
-#include "gtest/gtest.h"
 #include "integration_test.h"
 
 namespace kinetic {
@@ -95,7 +94,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
 
     ASSERT_EQ(blocking_connection_->Get("key1", result_record).statusCode(), StatusCode::REMOTE_NOT_FOUND);
 
-    ASSERT_TRUE(blocking_connection_->InstantErase("").ok());
+    ASSERT_TRUE(blocking_ssl_connection_->InstantErase("").ok());
 
     ASSERT_EQ(blocking_connection_->Get("key3", result_record).statusCode(), StatusCode::REMOTE_NOT_FOUND);
 

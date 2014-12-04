@@ -36,6 +36,6 @@ docs
 doxygen_warnings.log
 
 # Compiled protobuf files
-*.pb.cc
-*.pb.h
+#*.pb.cc
+#*.pb.h
 tmp
