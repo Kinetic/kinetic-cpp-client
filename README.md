@@ -6,7 +6,7 @@ This repo contains code for producing C and C++ kinetic clients.
 Temporary Branch Information
 ============
 Please note that this branch supplies the generated protobuf files because the release for protocol version 3.0.6 is not final at the moment. 
-Before this branch hits master, all files in src/main/generated/* should be removed (as well as this notice) and the CMakeLists.txt edited to re-enable the download step for the  kinetic-proto project and set kinetic-proto target version to 3.0.6. 
+Before this branch hits master, all files in src/main/generated/* should be removed (as well as this notice) and the CMakeLists.txt edited to set kinetic-proto target version to 3.0.6. 
 
 Protocol Version
 =================
