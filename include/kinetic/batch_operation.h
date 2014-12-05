@@ -34,7 +34,6 @@ using std::shared_ptr;
 class BatchOperation {
  private:
     int batch_id;
-    PersistMode persistMode;
     shared_ptr<NonblockingKineticConnectionInterface> con;
     KineticStatus invalid;
 
@@ -51,8 +50,7 @@ class BatchOperation {
     KineticStatus Commit(const shared_ptr<SimpleCallbackInterface> callback = nullptr);
     KineticStatus Abort(const shared_ptr<SimpleCallbackInterface> callback = nullptr);
 
-    explicit BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection,
-            PersistMode mode = PersistMode::WRITE_BACK);
+    explicit BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection);
     ~BatchOperation();
 };
 

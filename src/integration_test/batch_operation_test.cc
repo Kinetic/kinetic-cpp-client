@@ -96,6 +96,19 @@ TEST_F(IntegrationTest, BatchOperationAbort) {
     ASSERT_FALSE(blocking_connection_->Get("key2", readrecord).ok());
 }
 
+TEST_F(IntegrationTest, BatchOperationMulipleOperationSameKey) {
+    auto bop = BatchOperation(nonblocking_connection_);
+    auto record = make_shared<KineticRecord>(make_shared<string>("value"),
+       make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
+    unique_ptr<KineticRecord> readrecord;
+
+    bop.Put("key1", "", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key1", "v", WriteMode::REQUIRE_SAME_VERSION, record);
+
+    ASSERT_FALSE(bop.Commit().ok());
+    ASSERT_FALSE(blocking_connection_->Get("key1", readrecord).ok());
+}
+
 TEST_F(IntegrationTest, BatchOperationMultipleBatches) {
     auto bop1 = BatchOperation(nonblocking_connection_);
     auto bop2 = BatchOperation(nonblocking_connection_);
@@ -117,32 +130,34 @@ TEST_F(IntegrationTest, BatchOperationMultipleBatches) {
     ASSERT_TRUE(bop2.Commit().ok());
 }
 
-/*
-TEST_F(IntegrationTest, BatchOperationOutOfOrder) {
+TEST_F(IntegrationTest, BatchOperationKeyDeleteFailure) {
+    auto bop = BatchOperation(nonblocking_connection_);
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
-          make_shared<string>("v1"), make_shared<string>("t"), Command_Algorithm_SHA1);
-    auto callback = make_shared<StrictMock<MockPutCallback>>();
+       make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
+    unique_ptr<KineticRecord> readrecord;
 
-    nonblocking_connection_->BatchPutKey(1000, "key", "version", WriteMode::IGNORE_VERSION, record, callback, PersistMode::WRITE_BACK);
-    EXPECT_CALL(*callback,
-        Failure(KineticStatusEq(StatusCode::REMOTE_INVALID_BATCH, "")))
-        .WillOnce(Assign(&done_, true)); RunSelectLoop();
+    KineticStatus status = blocking_connection_->Put(make_shared<string>("key1"),
+                make_shared<string>(""), WriteMode::REQUIRE_SAME_VERSION, record);
+    ASSERT_TRUE(status.ok());
+
+    bop.Delete("key1", "x", WriteMode::REQUIRE_SAME_VERSION);
+    bop.Put("key2", "", WriteMode::REQUIRE_SAME_VERSION, record);
+
+    ASSERT_FALSE(bop.Commit().ok());
+    ASSERT_TRUE(blocking_connection_->Get("key1", readrecord).ok());
+    ASSERT_FALSE(blocking_connection_->Get("key2", readrecord).ok());
 }
 
 TEST_F(IntegrationTest, BatchOperationInvalidBatchId) {
     auto record = make_shared<KineticRecord>(make_shared<string>("value"),
           make_shared<string>("v1"), make_shared<string>("t"), Command_Algorithm_SHA1);
-    auto put_callback = make_shared<StrictMock<MockPutCallback>>();
-    auto simple_callback = make_shared<StrictMock<MockSimpleCallback>>();
+    auto callback = make_shared<StrictMock<MockPutCallback>>();
 
-    int batch_id = 0;
-    nonblocking_connection_->BatchStart(simple_callback, &batch_id);
-    nonblocking_connection_->BatchPutKey(batch_id, "key", "version", WriteMode::IGNORE_VERSION, record, put_callback, PersistMode::WRITE_BACK);
-    nonblocking_connection_->BatchPutKey(batch_id+1, "key", "version", WriteMode::IGNORE_VERSION, record, put_callback, PersistMode::WRITE_BACK);
-    EXPECT_CALL(*put_callback,
-          Failure(KineticStatusEq(StatusCode::REMOTE_INVALID_BATCH, "")))
-          .WillOnce(Assign(&done_, true));
+    nonblocking_connection_->BatchPutKey(1000, "key", "version", WriteMode::IGNORE_VERSION, record,
+            callback);
+    EXPECT_CALL(*callback,
+        Failure(KineticStatusEq(StatusCode::REMOTE_INVALID_REQUEST, "Internal Error")))
+        .WillOnce(Assign(&done_, true)); RunSelectLoop();
 }
-*/
 
 } // namespace kinetic

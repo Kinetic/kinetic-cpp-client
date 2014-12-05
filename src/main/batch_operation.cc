@@ -52,8 +52,8 @@ class ResultCallback : public SimpleCallbackInterface {
     }
 };
 
-BatchOperation::BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection, PersistMode mode)
-:batch_id(0), persistMode(mode), con(connection), invalid(KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR,
+BatchOperation::BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection)
+:batch_id(0), con(connection), invalid(KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR,
         "This Batch Operation is invalid.")) {
     con->BatchStart(std::make_shared<FireAndForget>(), &batch_id);
 }
@@ -65,28 +65,28 @@ BatchOperation::~BatchOperation() {
 KineticStatus BatchOperation::Put(const string key, const string current_version,
         WriteMode mode, const shared_ptr<const KineticRecord> record) {
     if (batch_id == 0) return invalid;
-    con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>(), persistMode);
+    con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>());
     return KineticStatus(StatusCode::OK, "");
 }
 
 KineticStatus BatchOperation::Put(const shared_ptr<const string> key, const shared_ptr<const string> current_version,
         WriteMode mode, const shared_ptr<const KineticRecord> record) {
     if (batch_id == 0) return invalid;
-    con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>(), persistMode);
+    con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>());
     return KineticStatus(StatusCode::OK, "");
 }
 
 KineticStatus BatchOperation::Delete(const string key,
         const string version, WriteMode mode) {
     if (batch_id == 0) return invalid;
-    con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>(), persistMode);
+    con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>());
     return KineticStatus(StatusCode::OK, "");
 }
 
 KineticStatus BatchOperation::Delete(const shared_ptr<const string> key,
         const shared_ptr<const string> version, WriteMode mode) {
     if (batch_id == 0) return invalid;
-    con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>(), persistMode);
+    con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>());
     return KineticStatus(StatusCode::OK, "");
 }
 

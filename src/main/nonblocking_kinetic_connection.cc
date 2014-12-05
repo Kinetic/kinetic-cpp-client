@@ -795,28 +795,27 @@ HandlerKey NonblockingKineticConnection::BatchStart(const shared_ptr<SimpleCallb
 
 HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback, PersistMode persistMode) {
-    return doPut(key, current_version, mode, record, callback, persistMode, batch_id);
+        const shared_ptr<PutCallbackInterface> callback) {
+    // persist mode not applicable to batch operations. just set arbitrary.
+    return doPut(key, current_version, mode, record, callback, PersistMode::WRITE_THROUGH, batch_id);
 }
 
 HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const string key,
         const string current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback, PersistMode persistMode) {
+        const shared_ptr<PutCallbackInterface> callback) {
     return BatchPutKey(batch_id, make_shared<string>(key), make_shared<string>(current_version),
-           mode, record, callback, persistMode);
+           mode, record, callback);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-        const shared_ptr<const string> version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
-        PersistMode persistMode) {
-    return doDelete(key, version, mode, callback, persistMode, batch_id);
+        const shared_ptr<const string> version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
+    return doDelete(key, version, mode, callback, PersistMode::WRITE_THROUGH, batch_id);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
-        const string version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
-        PersistMode persistMode) {
+        const string version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
     return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version),
-            mode, callback, persistMode);
+            mode, callback);
 }
 
 HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) {
