@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
-#define NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
+#ifndef KINETIC_CPP_CLIENT_NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
+#define KINETIC_CPP_CLIENT_NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_
 
 #include "kinetic/common.h"
 #include "kinetic_client.pb.h"
@@ -216,9 +216,8 @@ struct P2PPushRequest {
 };
 
 class NonblockingKineticConnectionInterface {
-
-public:
-    virtual ~NonblockingKineticConnectionInterface() {};
+ public:
+    virtual ~NonblockingKineticConnectionInterface() {}
     virtual void SetClientClusterVersion(int64_t cluster_version) = 0;
     virtual bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds) = 0;
     virtual bool RemoveHandler(HandlerKey handler_key) = 0;
@@ -332,13 +331,13 @@ public:
      * committed or aborted.
      * Use the BatchOperation class defined in kinetic/batch_operation.h to minimize code
      * complexity. */
-    virtual HandlerKey BatchStart  (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id) = 0;
-    virtual HandlerKey BatchPutKey (int batch_id, const shared_ptr<const string> key,
+    virtual HandlerKey BatchStart(const shared_ptr<SimpleCallbackInterface> callback, int * batch_id) = 0;
+    virtual HandlerKey BatchPutKey(int batch_id, const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode,
         const shared_ptr<const KineticRecord> record,
         const shared_ptr<PutCallbackInterface> callback,
         PersistMode persistMode) = 0;
-    virtual HandlerKey BatchPutKey (int batch_id, const string key,
+    virtual HandlerKey BatchPutKey(int batch_id, const string key,
         const string current_version, WriteMode mode,
         const shared_ptr<const KineticRecord> record,
         const shared_ptr<PutCallbackInterface> callback,
@@ -352,11 +351,9 @@ public:
          const shared_ptr<SimpleCallbackInterface> callback,
          PersistMode persistMode) = 0;
     virtual HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) = 0;
 };
 
 } // namespace kinetic
 
-
-
-#endif
+#endif  // KINETIC_CPP_CLIENT_NONBLOCKING_KINETIC_CONNECTION_INTERFACE_H_

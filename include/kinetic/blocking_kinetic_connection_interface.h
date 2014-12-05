@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef BLOCKING_KINETIC_CONNECTION_INTERFACE_H_
-#define BLOCKING_KINETIC_CONNECTION_INTERFACE_H_
+#ifndef KINETIC_CPP_CLIENT_BLOCKING_KINETIC_CONNECTION_INTERFACE_H_
+#define KINETIC_CPP_CLIENT_BLOCKING_KINETIC_CONNECTION_INTERFACE_H_
 
 #include "kinetic/status.h"
 #include "kinetic/kinetic_connection.h"
@@ -43,7 +43,7 @@ class BlockingCallbackState;
 
 class BlockingKineticConnectionInterface {
     public:
-    virtual ~BlockingKineticConnectionInterface(){};
+    virtual ~BlockingKineticConnectionInterface() {}
 
     virtual void SetClientClusterVersion(int64_t cluster_version) = 0;
 
@@ -139,11 +139,9 @@ class BlockingKineticConnectionInterface {
     virtual KineticStatus LockDevice(const string& pin) = 0;
     virtual KineticStatus UnlockDevice(const shared_ptr<string> pin) = 0;
     virtual KineticStatus UnlockDevice(const string& pin) = 0;
-
 };
 
 } // namespace kinetic
 
 
-
-#endif /* BLOCKING_KINETIC_CONNECTION_INTERFACE_H_ */
+#endif  // KINETIC_CPP_CLIENT_BLOCKING_KINETIC_CONNECTION_INTERFACE_H_

@@ -87,8 +87,8 @@ class MockNonblockingPacketService : public NonblockingPacketServiceInterface {
             unique_ptr<HandlerInterface> handler) {
         return Submit_(*message, *command, value, handler.get());
     }
-    MOCK_METHOD4(Submit_, HandlerKey(const Message &message, const Command &command, const shared_ptr<const string> value,
-    HandlerInterface* handler));
+    MOCK_METHOD4(Submit_, HandlerKey(const Message &message, const Command &command,
+            const shared_ptr<const string> value, HandlerInterface* handler));
     MOCK_METHOD3(Run, bool(fd_set *read_fds, fd_set *write_fds, int *nfds));
     MOCK_METHOD1(Remove, bool(HandlerKey handler_key));
 };

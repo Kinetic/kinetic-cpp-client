@@ -31,7 +31,7 @@ using std::make_shared;
 using std::move;
 
 ThreadsafeBlockingKineticConnection::ThreadsafeBlockingKineticConnection(
-        unique_ptr<BlockingKineticConnection> connection) : connection_(std::move(connection)){
+        unique_ptr<BlockingKineticConnection> connection) : connection_(std::move(connection)) {
 }
 
 ThreadsafeBlockingKineticConnection::~ThreadsafeBlockingKineticConnection() {}
@@ -140,7 +140,8 @@ KineticStatus ThreadsafeBlockingKineticConnection::GetLog(unique_ptr<DriveLog>& 
     return connection_->GetLog(drive_log);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log) {
+KineticStatus ThreadsafeBlockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types,
+        unique_ptr<DriveLog>& drive_log) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetLog(types, drive_log);
 }
@@ -179,22 +180,22 @@ KineticStatus ThreadsafeBlockingKineticConnection::SetLockPIN(const string& new_
     return connection_->SetLockPIN(new_pin, current_pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const shared_ptr<string> pin){
+KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const shared_ptr<string> pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->LockDevice(pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const string& pin){
+KineticStatus ThreadsafeBlockingKineticConnection::LockDevice(const string& pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->LockDevice(pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin){
+KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->UnlockDevice(pin);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const string& pin){
+KineticStatus ThreadsafeBlockingKineticConnection::UnlockDevice(const string& pin) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->UnlockDevice(pin);
 }
@@ -205,7 +206,8 @@ KineticStatus ThreadsafeBlockingKineticConnection::GetNext(const shared_ptr<cons
     return connection_->GetNext(key, actual_key, record);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::GetNext( const string& key, unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
+KineticStatus ThreadsafeBlockingKineticConnection::GetNext(const string& key, unique_ptr<string>& actual_key,
+        unique_ptr<KineticRecord>& record) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetNext(key, actual_key, record);
 }
@@ -229,7 +231,7 @@ KineticStatus ThreadsafeBlockingKineticConnection::GetVersion(const shared_ptr<c
     return connection_->GetVersion(key, version);
 }
 
-KineticStatus ThreadsafeBlockingKineticConnection::GetVersion(const string& key, unique_ptr<string>& version){
+KineticStatus ThreadsafeBlockingKineticConnection::GetVersion(const string& key, unique_ptr<string>& version) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetVersion(key, version);
 }
@@ -286,7 +288,7 @@ KeyRangeIterator ThreadsafeBlockingKineticConnection::IterateKeyRange(const stri
         bool start_key_inclusive,
         const string& end_key,
         bool end_key_inclusive,
-        unsigned int frame_size){
+        unsigned int frame_size) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->IterateKeyRange(start_key,
             start_key_inclusive,

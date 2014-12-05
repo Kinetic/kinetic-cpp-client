@@ -39,8 +39,8 @@ bool ReaderWriter::Read(void *buf, size_t n, int* err) {
         if (status == -1 && errno == EINTR) {
             continue;
         } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK )) {
-	    //Wait for 500us;
-	    usleep(500);
+            //Wait for 500us;
+            usleep(500);
             socket_timeout++;
             continue;
         } else if (status < 0) {
@@ -70,10 +70,10 @@ bool ReaderWriter::Write(const void *buf, size_t n) {
         if (status == -1 && errno == EINTR) {
             continue;
         } else if (status == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
-	    usleep(500);
-	    socket_timeout++;
+            usleep(500);
+            socket_timeout++;
             continue;
-        } else if (status < 0) {	
+        } else if (status < 0) {
             PLOG(WARNING) << "Failed to write to socket";
             return false;
         }

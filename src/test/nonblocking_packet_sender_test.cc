@@ -250,11 +250,14 @@ TEST_F(NonblockingSenderTest, MaintainsCorrectHandlerKeyWhenWriteDoesntCompleteO
     NonblockingSender sender(socket_wrapper, receiver,
         unique_ptr<NonblockingPacketWriterFactoryInterface>(mock_factory), hmac_provider_,
         options);
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler1), 0);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())),
+            move(unique_ptr<Command>(new Command())), value, move(handler1), 0);
     ASSERT_EQ(kIoWait, sender.Send());
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler2), 1);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())),
+            move(unique_ptr<Command>(new Command())), value, move(handler2), 1);
     ASSERT_EQ(kIoWait, sender.Send());
-    sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler3), 2);
+    sender.Enqueue(move(unique_ptr<Message>(new Message())),
+            move(unique_ptr<Command>(new Command())), value, move(handler3), 2);
     ASSERT_EQ(kIoWait, sender.Send());
     ASSERT_EQ(kIoWait, sender.Send());
     ASSERT_EQ(kIoWait, sender.Send());

@@ -80,15 +80,15 @@ KineticStatus GetKineticStatus(StatusCode code, int64_t expected_cluster_version
     }
 }
 
-class HandshakeHandler : public HandlerInterface{
-public:
+class HandshakeHandler : public HandlerInterface {
+ public:
     bool done;
     bool success;
-    HandshakeHandler():done(false),success(false){}
-    void Handle(const Command &response, unique_ptr<const string> value){
+    HandshakeHandler() : done(false), success(false) {}
+    void Handle(const Command &response, unique_ptr<const string> value) {
         done = success = true;
     }
-    void Error(KineticStatus error, Command const * const response){
+    void Error(KineticStatus error, Command const * const response) {
         done = true;
     }
 };
@@ -98,26 +98,23 @@ NonblockingReceiver::NonblockingReceiver(shared_ptr<SocketWrapperInterface> sock
 : socket_wrapper_(socket_wrapper), hmac_provider_(hmac_provider),
 connection_options_(connection_options), nonblocking_response_(NULL),
 connection_id_(0), handler_(NULL) {
-
     shared_ptr<HandshakeHandler> hh = std::make_shared<HandshakeHandler>();
-    map_.insert(make_pair(-1,make_pair(hh,-1)));
+    map_.insert(make_pair(-1, make_pair(hh, -1)));
     handler_to_message_seq_map_.insert(make_pair(-1, -1));
-
 
     auto start = std::time(0);
 
-    while(true){
-        if(Receive() == kError)
+    while (true) {
+        if (Receive() == kError)
             break;
-        if(hh->done)
+        if (hh->done)
             break;
         auto now = std::time(0);
-        if(now-start > 30)
+        if (now-start > 30)
             break;
     }
-    if(!hh->success)
+    if (!hh->success)
         throw std::runtime_error("Could not complete handshake.");
-
 }
 
 NonblockingReceiver::~NonblockingReceiver() {
@@ -175,14 +172,14 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
         delete nonblocking_response_;
         nonblocking_response_ = NULL;
 
-        if(message_.has_hmacauth())
+        if (message_.has_hmacauth())
         if (!hmac_provider_.ValidateHmac(message_, connection_options_.hmac_key)) {
             LOG(INFO) << "Response HMAC mismatch";
             CallAllErrorHandlers(KineticStatus(StatusCode::CLIENT_RESPONSE_HMAC_VERIFICATION_ERROR,
                 "Response HMAC mismatch"));
             return kIdle;
         }
-        if(!command_.ParseFromString(message_.commandbytes())){
+        if (!command_.ParseFromString(message_.commandbytes())) {
             CallAllErrorHandlers(KineticStatus(StatusCode::CLIENT_IO_ERROR, "I/O read error parsing proto::Command"));
             return kError;
         }
@@ -190,7 +187,7 @@ NonblockingPacketServiceStatus NonblockingReceiver::Receive() {
             connection_id_ = command_.header().connectionid();
         }
 
-        if(message_.authtype() == Message_AuthType_UNSOLICITEDSTATUS)
+        if (message_.authtype() == Message_AuthType_UNSOLICITEDSTATUS)
             command_.mutable_header()->set_acksequence(-1);
 
         if (!command_.header().has_acksequence()) {

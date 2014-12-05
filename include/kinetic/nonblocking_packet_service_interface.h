@@ -52,8 +52,8 @@ class NonblockingPacketServiceInterface {
     public:
     virtual ~NonblockingPacketServiceInterface() {}
     // message is modified in this call hierarchy
-    virtual HandlerKey Submit(unique_ptr<Message> message, unique_ptr<Command> command, const shared_ptr<const string> value,
-            unique_ptr<HandlerInterface> handler) = 0;
+    virtual HandlerKey Submit(unique_ptr<Message> message, unique_ptr<Command> command,
+            const shared_ptr<const string> value, unique_ptr<HandlerInterface> handler) = 0;
     virtual bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds) = 0;
     virtual bool Remove(HandlerKey handler_key) = 0;
 };

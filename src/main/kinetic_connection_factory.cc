@@ -57,7 +57,7 @@ Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
         unique_ptr<ThreadsafeNonblockingKineticConnection>& connection) {
     unique_ptr<NonblockingKineticConnection> nbc(nullptr);
     Status status = doNewConnection(options, nbc);
-    if(status.ok())
+    if (status.ok())
         connection.reset(new ThreadsafeNonblockingKineticConnection(std::move(nbc)));
     return status;
 }
@@ -67,7 +67,7 @@ Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
         shared_ptr<ThreadsafeNonblockingKineticConnection>& connection) {
     unique_ptr<NonblockingKineticConnection> nbc(nullptr);
     Status status = doNewConnection(options, nbc);
-    if(status.ok())
+    if (status.ok())
         connection.reset(new ThreadsafeNonblockingKineticConnection(std::move(nbc)));
     return status;
 }
@@ -78,7 +78,7 @@ Status KineticConnectionFactory::NewBlockingConnection(
         unsigned int network_timeout_seconds) {
     unique_ptr<NonblockingKineticConnection> nbc(nullptr);
     Status status = doNewConnection(options, nbc);
-    if(status.ok())
+    if (status.ok())
        connection.reset(new BlockingKineticConnection(std::move(nbc), network_timeout_seconds));
     return status;
 }
@@ -89,7 +89,7 @@ Status KineticConnectionFactory::NewBlockingConnection(
         unsigned int network_timeout_seconds) {
     unique_ptr<NonblockingKineticConnection> nbc(nullptr);
     Status status = doNewConnection(options, nbc);
-    if(status.ok())
+    if (status.ok())
        connection.reset(new BlockingKineticConnection(std::move(nbc), network_timeout_seconds));
     return status;
 }
@@ -100,7 +100,7 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
         unsigned int network_timeout_seconds) {
     unique_ptr<BlockingKineticConnection> bc(nullptr);
     Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
-    if(status.ok())
+    if (status.ok())
        connection.reset(new ThreadsafeBlockingKineticConnection(std::move(bc)));
     return status;
 }
@@ -111,7 +111,7 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
         unsigned int network_timeout_seconds) {
     unique_ptr<BlockingKineticConnection> bc(nullptr);
     Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
-    if(status.ok())
+    if (status.ok())
        connection.reset(new ThreadsafeBlockingKineticConnection(std::move(bc)));
     return status;
 }
@@ -119,13 +119,14 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
 Status KineticConnectionFactory::doNewConnection(
         ConnectionOptions const& options,
         unique_ptr <NonblockingKineticConnection>& connection) {
-    try{
+    try {
         auto socket_wrapper = make_shared<SocketWrapper>(options.host, options.port, options.use_ssl, true);
         if (!socket_wrapper->Connect())
             throw std::runtime_error("Could not connect to socket.");
 
         shared_ptr<NonblockingReceiverInterface> receiver;
-        receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper, hmac_provider_, options));
+        receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper,
+                hmac_provider_, options));
 
         auto writer_factory =
             unique_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
@@ -134,8 +135,7 @@ Status KineticConnectionFactory::doNewConnection(
 
         NonblockingPacketService *service = new NonblockingPacketService(socket_wrapper, move(sender), receiver);
         connection.reset(new NonblockingKineticConnection(service));
-
-    } catch(std::exception& e){
+    } catch(std::exception& e) {
            return Status::makeInternalError("Connection error: "+std::string(e.what()));
     }
     return Status::makeOk();

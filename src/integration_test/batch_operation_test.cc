@@ -39,8 +39,8 @@ TEST_F(IntegrationTest, BatchOperationCommit) {
        make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
     unique_ptr<KineticRecord> readrecord;
 
-    bop.Put("key1","",WriteMode::REQUIRE_SAME_VERSION, record);
-    bop.Put("key2","",WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key1", "", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key2", "", WriteMode::REQUIRE_SAME_VERSION, record);
 
     ASSERT_TRUE(bop.Commit().ok());
     ASSERT_TRUE(blocking_connection_->Get("key1", readrecord).ok());
@@ -53,8 +53,8 @@ TEST_F(IntegrationTest, BatchOperationCommitAsync) {
        make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
     unique_ptr<KineticRecord> readrecord;
 
-    bop.Put("key1","",WriteMode::REQUIRE_SAME_VERSION, record);
-    bop.Put("key2","",WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key1", "", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key2", "", WriteMode::REQUIRE_SAME_VERSION, record);
 
     auto simple_callback = make_shared<StrictMock<MockSimpleCallback>>();
     ASSERT_TRUE(bop.Commit(simple_callback).ok());
@@ -71,14 +71,14 @@ TEST_F(IntegrationTest, BatchOperationCommitFailure) {
     unique_ptr<KineticRecord> readrecord;
 
     KineticStatus status = blocking_connection_->Put(make_shared<string>("key1"),
-            make_shared<string>(""),WriteMode::REQUIRE_SAME_VERSION, record);
+            make_shared<string>(""), WriteMode::REQUIRE_SAME_VERSION, record);
     ASSERT_TRUE(status.ok());
 
-    bop.Put("key1","x",WriteMode::REQUIRE_SAME_VERSION, record);
-    bop.Put("key2","", WriteMode::IGNORE_VERSION, record);
+    bop.Put("key1", "x", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop.Put("key2", "",  WriteMode::IGNORE_VERSION, record);
 
     ASSERT_FALSE(bop.Commit().ok());
-    ASSERT_TRUE (blocking_connection_->Get("key1", readrecord).ok());
+    ASSERT_TRUE(blocking_connection_->Get("key1", readrecord).ok());
     ASSERT_FALSE(blocking_connection_->Get("key2", readrecord).ok());
 }
 
@@ -88,10 +88,10 @@ TEST_F(IntegrationTest, BatchOperationAbort) {
         make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
     unique_ptr<KineticRecord> readrecord;
 
-    bop.Put("key1","",WriteMode::IGNORE_VERSION, record);
-    bop.Put("key2","",WriteMode::IGNORE_VERSION, record);
+    bop.Put("key1", "", WriteMode::IGNORE_VERSION, record);
+    bop.Put("key2", "", WriteMode::IGNORE_VERSION, record);
 
-    ASSERT_TRUE( bop.Abort().ok() );
+    ASSERT_TRUE(bop.Abort().ok());
     ASSERT_FALSE(blocking_connection_->Get("key1", readrecord).ok());
     ASSERT_FALSE(blocking_connection_->Get("key2", readrecord).ok());
 }
@@ -105,18 +105,16 @@ TEST_F(IntegrationTest, BatchOperationMultipleBatches) {
            make_shared<string>("v"), make_shared<string>("t"), Command_Algorithm_SHA1);
     unique_ptr<KineticRecord> readrecord;
 
-    bop1.Put("key1","", WriteMode::REQUIRE_SAME_VERSION, record);
-    bop2.Put("key2","v",WriteMode::REQUIRE_SAME_VERSION, record);
-    bop2.Put("key1","v",WriteMode::REQUIRE_SAME_VERSION, record);
-    bop3.Put("key2","", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop1.Put("key1", "",  WriteMode::REQUIRE_SAME_VERSION, record);
+    bop2.Put("key2", "v", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop2.Put("key1", "v", WriteMode::REQUIRE_SAME_VERSION, record);
+    bop3.Put("key2", "", WriteMode::REQUIRE_SAME_VERSION, record);
 
     ASSERT_TRUE(bop1.Commit().ok());
-    ASSERT_TRUE( blocking_connection_->Get("key1", readrecord).ok());
+    ASSERT_TRUE(blocking_connection_->Get("key1", readrecord).ok());
     ASSERT_TRUE(bop3.Commit().ok());
-    ASSERT_TRUE( blocking_connection_->Get("key2", readrecord).ok());
+    ASSERT_TRUE(blocking_connection_->Get("key2", readrecord).ok());
     ASSERT_TRUE(bop2.Commit().ok());
-
-
 }
 
 /*
@@ -147,4 +145,4 @@ TEST_F(IntegrationTest, BatchOperationInvalidBatchId) {
 }
 */
 
-}
+} // namespace kinetic

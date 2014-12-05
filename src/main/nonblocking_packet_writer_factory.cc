@@ -28,10 +28,11 @@ using std::unique_ptr;
 using std::move;
 using std::string;
 
-unique_ptr<NonblockingPacketWriterInterface> NonblockingPacketWriterFactory::CreateWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
-    unique_ptr<const Message> message, const shared_ptr<const string> value) {
-    return
-        unique_ptr<NonblockingPacketWriterInterface>(
+unique_ptr<NonblockingPacketWriterInterface> NonblockingPacketWriterFactory::CreateWriter(
+        shared_ptr<SocketWrapperInterface> socket_wrapper,
+        unique_ptr<const Message> message,
+        const shared_ptr<const string> value) {
+    return unique_ptr<NonblockingPacketWriterInterface>(
             new NonblockingPacketWriter(socket_wrapper, move(message), value));
 }
 

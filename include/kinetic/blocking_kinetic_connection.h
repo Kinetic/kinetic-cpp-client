@@ -27,7 +27,6 @@
 namespace kinetic {
 
 class BlockingKineticConnection : public BlockingKineticConnectionInterface {
-
     public:
      explicit BlockingKineticConnection(
             unique_ptr<NonblockingKineticConnection> nonblocking_connection,

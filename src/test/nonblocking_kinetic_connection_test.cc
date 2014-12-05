@@ -482,8 +482,8 @@ TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageIfCurren
     connection_.SetErasePIN("newnewnew", oldpin, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
-    EXPECT_EQ(message.body().security().newerasepin(),"newnewnew");
-    EXPECT_EQ(message.body().security().olderasepin(),oldpin);
+    EXPECT_EQ(message.body().security().newerasepin(), "newnewnew");
+    EXPECT_EQ(message.body().security().olderasepin(), oldpin);
 }
 
 

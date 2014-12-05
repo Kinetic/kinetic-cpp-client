@@ -37,13 +37,13 @@ using std::string;
 
 SocketWrapper::SocketWrapper(const std::string& host, int port, bool use_ssl, bool nonblocking)
         : ctx_(nullptr), ssl_(nullptr), host_(host), port_(port), nonblocking_(nonblocking), fd_(-1) {
-    if(!use_ssl) return;
+    if (!use_ssl) return;
 
     SSL_library_init();
     OpenSSL_add_all_algorithms();
     ctx_ = SSL_CTX_new(SSLv23_client_method());
     ssl_ = SSL_new(ctx_);
-    if(!ssl_ || !ctx_)
+    if (!ssl_ || !ctx_)
         throw std::runtime_error("Failed Setting up SSL environment.");
     SSL_set_mode(ssl_, SSL_MODE_AUTO_RETRY);
 }
@@ -57,8 +57,8 @@ SocketWrapper::~SocketWrapper() {
             PLOG(ERROR) << "Error closing socket fd " << fd_;
         }
     }
-    if(ssl_) SSL_free(ssl_);
-    if(ctx_) SSL_CTX_free(ctx_);
+    if (ssl_) SSL_free(ssl_);
+    if (ctx_) SSL_CTX_free(ctx_);
 }
 
 bool SocketWrapper::Connect() {
@@ -154,33 +154,32 @@ bool SocketWrapper::Connect() {
     }
 
     fd_ = socket_fd;
-    if(ssl_) return ConnectSSL();
+    if (ssl_) return ConnectSSL();
     return true;
 }
 
 #include <openssl/err.h>
 
-bool SocketWrapper::ConnectSSL()
-{
-    SSL_set_fd(ssl_,fd_);
+bool SocketWrapper::ConnectSSL() {
+    SSL_set_fd(ssl_, fd_);
     int rtn = SSL_connect(ssl_);
-    if(rtn == 1)
+    if (rtn == 1)
         return true;
 
     int err = SSL_get_error(ssl_, rtn);
-    if( err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE ){
+    if ( err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE ) {
         fd_set read_fds, write_fds;
         FD_ZERO(&read_fds); FD_ZERO(&write_fds);
-        if(err == SSL_ERROR_WANT_READ)  FD_SET(fd_, &read_fds);
-        if(err == SSL_ERROR_WANT_WRITE) FD_SET(fd_, &write_fds);
-        struct timeval tv = {1,1};
+        if (err == SSL_ERROR_WANT_READ)  FD_SET(fd_, &read_fds);
+        if (err == SSL_ERROR_WANT_WRITE) FD_SET(fd_, &write_fds);
+        struct timeval tv = {1, 1};
         select(fd_+1, &read_fds, &write_fds, NULL, &tv);
         return ConnectSSL();
     }
     return false;
 }
 
-SSL * SocketWrapper::getSSL(){
+SSL * SocketWrapper::getSSL() {
     return ssl_;
 }
 

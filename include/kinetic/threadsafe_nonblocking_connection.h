@@ -31,8 +31,7 @@ namespace kinetic {
 /// IO. Instead of constructing this class directly users should harness the
 /// KineticConnectionFactory
 class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnectionInterface {
-
-public:
+ public:
     explicit ThreadsafeNonblockingKineticConnection(unique_ptr<NonblockingKineticConnection> connection);
     ~ThreadsafeNonblockingKineticConnection();
     bool Run(fd_set *read_fds, fd_set *write_fds, int *nfds);
@@ -78,7 +77,8 @@ public:
     HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
     HandlerKey GetLog(const vector<Command_GetLog_Type>& types, const shared_ptr<GetLogCallbackInterface> callback);
 
-    HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
+            const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey SetClusterVersion(int64_t new_cluster_version, const shared_ptr<SimpleCallbackInterface> callback);
 
     HandlerKey InstantErase(const shared_ptr<string> pin, const shared_ptr<SimpleCallbackInterface> callback);
@@ -100,13 +100,13 @@ public:
     HandlerKey SetLockPIN(const string new_pin, const string current_pin,
       const shared_ptr<SimpleCallbackInterface> callback);
 
-    HandlerKey BatchStart (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id);
-    HandlerKey BatchPutKey (int batch_id, const shared_ptr<const string> key,
+    HandlerKey BatchStart(const shared_ptr<SimpleCallbackInterface> callback, int * batch_id);
+    HandlerKey BatchPutKey(int batch_id, const shared_ptr<const string> key,
       const shared_ptr<const string> current_version, WriteMode mode,
       const shared_ptr<const KineticRecord> record,
       const shared_ptr<PutCallbackInterface> callback,
       PersistMode persistMode);
-    HandlerKey BatchPutKey (int batch_id, const string key,
+    HandlerKey BatchPutKey(int batch_id, const string key,
       const string current_version, WriteMode mode,
       const shared_ptr<const KineticRecord> record,
       const shared_ptr<PutCallbackInterface> callback,
@@ -120,7 +120,7 @@ public:
        const shared_ptr<SimpleCallbackInterface> callback,
        PersistMode persistMode);
     HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
-    HandlerKey BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
+    HandlerKey BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
 
     private:
     std::recursive_mutex mutex_;

@@ -24,18 +24,18 @@
 namespace kinetic {
 
 class FireAndForget : public SimpleCallbackInterface, public PutCallbackInterface {
-    public:
+ public:
     void Success() {}
-    void Failure(KineticStatus error){}
+    void Failure(KineticStatus error) {}
 };
 
 class ResultCallback : public SimpleCallbackInterface {
-private:
+ private:
     KineticStatus result;
     bool done;
 
-public:
-    ResultCallback(): result(KineticStatus(StatusCode::CLIENT_IO_ERROR, "No Result")), done(false) {};
+ public:
+    ResultCallback(): result(KineticStatus(StatusCode::CLIENT_IO_ERROR, "No Result")), done(false) {}
     void Success() {
         result = KineticStatus(StatusCode::OK, "");
         done = true;
@@ -44,48 +44,53 @@ public:
         result = error;
         done = true;
     }
-    bool Finished(){
+    bool Finished() {
         return done;
     }
-    KineticStatus getResult(){
+    KineticStatus getResult() {
         return result;
     }
 };
 
-BatchOperation::BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection, PersistMode mode):
-        batch_id(0), persistMode(mode), con(connection){
+BatchOperation::BatchOperation(std::shared_ptr<NonblockingKineticConnectionInterface> connection, PersistMode mode)
+:batch_id(0), persistMode(mode), con(connection), invalid(KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR,
+        "This Batch Operation is invalid.")) {
     con->BatchStart(std::make_shared<FireAndForget>(), &batch_id);
 }
 
-BatchOperation::~BatchOperation(){
-    if(batch_id) Abort();
+BatchOperation::~BatchOperation() {
+    if (batch_id) Abort();
 }
 
-KineticStatus BatchOperation::Put(const string key, const string current_version, WriteMode mode, const shared_ptr<const KineticRecord> record){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Put(const string key, const string current_version,
+        WriteMode mode, const shared_ptr<const KineticRecord> record) {
+    if (batch_id == 0) return invalid;
     con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>(), persistMode);
     return KineticStatus(StatusCode::OK, "");
 }
 
-KineticStatus BatchOperation::Put(const shared_ptr<const string> key, const shared_ptr<const string> current_version, WriteMode mode, const shared_ptr<const KineticRecord> record){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Put(const shared_ptr<const string> key, const shared_ptr<const string> current_version,
+        WriteMode mode, const shared_ptr<const KineticRecord> record) {
+    if (batch_id == 0) return invalid;
     con->BatchPutKey(batch_id, key, current_version, mode, record, std::make_shared<FireAndForget>(), persistMode);
     return KineticStatus(StatusCode::OK, "");
 }
 
-KineticStatus BatchOperation::Delete(const string key, const string version, WriteMode mode){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Delete(const string key,
+        const string version, WriteMode mode) {
+    if (batch_id == 0) return invalid;
     con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>(), persistMode);
     return KineticStatus(StatusCode::OK, "");
 }
 
-KineticStatus BatchOperation::Delete(const shared_ptr<const string> key, const shared_ptr<const string> version, WriteMode mode){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Delete(const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode) {
+    if (batch_id == 0) return invalid;
     con->BatchDeleteKey(batch_id, key, version, mode, std::make_shared<FireAndForget>(), persistMode);
     return KineticStatus(StatusCode::OK, "");
 }
 
-KineticStatus BatchOperation::getResult(const shared_ptr<SimpleCallbackInterface> callback){
+KineticStatus BatchOperation::getResult(const shared_ptr<SimpleCallbackInterface> callback) {
     auto cb = std::dynamic_pointer_cast<ResultCallback>(callback);
 
     fd_set read_fds, write_fds;
@@ -93,35 +98,35 @@ KineticStatus BatchOperation::getResult(const shared_ptr<SimpleCallbackInterface
 
     con->Run(&read_fds, &write_fds, &num_fds);
 
-    while(cb->Finished() == false){
+    while (cb->Finished() == false) {
         struct timeval tv;
         tv.tv_sec = 20;
         tv.tv_usec = 0;
 
-        if(select(num_fds, &read_fds, &write_fds, NULL, &tv) <= 0)
+        if (select(num_fds, &read_fds, &write_fds, NULL, &tv) <= 0)
             return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Timeout");
-        if(con->Run(&read_fds, &write_fds, &num_fds) == false)
+        if (con->Run(&read_fds, &write_fds, &num_fds) == false)
             return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Connection failed");
     }
     return cb->getResult();
 }
 
-KineticStatus BatchOperation::Commit(const shared_ptr<SimpleCallbackInterface> cb){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Commit(const shared_ptr<SimpleCallbackInterface> cb) {
+    if (batch_id == 0) return invalid;
     auto rcb = std::make_shared<ResultCallback>();
     con->BatchCommit(batch_id, cb ? cb : rcb);
     batch_id = 0;
-    if(cb) return KineticStatus(StatusCode::OK, "");
+    if (cb) return KineticStatus(StatusCode::OK, "");
     return this->getResult(rcb);
 }
 
-KineticStatus BatchOperation::Abort(const shared_ptr<SimpleCallbackInterface> cb){
-    if(batch_id==0) return KineticStatus(StatusCode::CLIENT_INTERNAL_ERROR, "This Batch Operation is invalid.");
+KineticStatus BatchOperation::Abort(const shared_ptr<SimpleCallbackInterface> cb) {
+    if (batch_id == 0) return invalid;
     auto rcb = std::make_shared<ResultCallback>();
     con->BatchAbort(batch_id, cb ? cb : rcb);
     batch_id = 0;
-    if(cb) return KineticStatus(StatusCode::OK, "");
+    if (cb) return KineticStatus(StatusCode::OK, "");
     return this->getResult(rcb);
 }
 
-}
+} // namespace kinetic

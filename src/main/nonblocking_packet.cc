@@ -33,8 +33,8 @@ namespace kinetic {
 using std::make_shared;
 using std::string;
 
-NonblockingPacketWriter::NonblockingPacketWriter(shared_ptr<SocketWrapperInterface> socket_wrapper, unique_ptr<const Message> message,
-    const shared_ptr<const string> value)
+NonblockingPacketWriter::NonblockingPacketWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
+        unique_ptr<const Message> message, const shared_ptr<const string> value)
     : socket_wrapper_(socket_wrapper), message_(move(message)), value_(value), state_(kMagic),
     writer_(new NonblockingStringWriter(socket_wrapper_, make_shared<string>("F"))) {}
 

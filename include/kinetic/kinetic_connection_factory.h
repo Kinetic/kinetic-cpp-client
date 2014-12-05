@@ -39,7 +39,7 @@ using std::unique_ptr;
 class KineticConnectionFactory {
     public:
     explicit KineticConnectionFactory(HmacProvider hmac_provider);
-    virtual ~KineticConnectionFactory(){};
+    virtual ~KineticConnectionFactory() {}
 
     /// Creates and opens a new nonblocking connection using the given options. If the returned
     /// Status indicates success then the connection is ready to perform

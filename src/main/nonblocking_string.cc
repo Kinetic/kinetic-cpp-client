@@ -34,7 +34,8 @@ using std::string;
 using std::unique_ptr;
 using std::move;
 
-NonblockingStringReader::NonblockingStringReader(shared_ptr<SocketWrapperInterface> socket_wrapper, size_t size, unique_ptr<const string> &s)
+NonblockingStringReader::NonblockingStringReader(shared_ptr<SocketWrapperInterface> socket_wrapper,
+        size_t size, unique_ptr<const string> &s)
         : socket_wrapper_(socket_wrapper), size_(size), s_(s), buf_(new char[size]), bytes_read_(0) {}
 
 NonblockingStringReader::~NonblockingStringReader() {
@@ -44,10 +45,11 @@ NonblockingStringReader::~NonblockingStringReader() {
 NonblockingStringStatus NonblockingStringReader::Read() {
     while (bytes_read_ < size_) {
         int status = 0;
-        if(socket_wrapper_->getSSL()){
+        if (socket_wrapper_->getSSL()) {
              status = SSL_read(socket_wrapper_->getSSL(), buf_ + bytes_read_, size_ - bytes_read_);
+        } else {
+            status = read(socket_wrapper_->fd(), buf_ + bytes_read_, size_ - bytes_read_);
         }
-        else status = read(socket_wrapper_->fd(), buf_ + bytes_read_, size_ - bytes_read_);
         if (status == 0) {
             // Unexpected EOF
             return kFailed;
@@ -72,7 +74,8 @@ NonblockingStringStatus NonblockingStringReader::Read() {
     return kDone;
 }
 
-NonblockingStringWriter::NonblockingStringWriter(shared_ptr<SocketWrapperInterface> socket_wrapper, const shared_ptr<const string> s)
+NonblockingStringWriter::NonblockingStringWriter(shared_ptr<SocketWrapperInterface> socket_wrapper,
+        const shared_ptr<const string> s)
     : socket_wrapper_(socket_wrapper), s_(s), bytes_written_(0) {}
 
 NonblockingStringStatus NonblockingStringWriter::Write() {
@@ -94,7 +97,7 @@ NonblockingStringStatus NonblockingStringWriter::Write() {
         }
         int status;
         if (S_ISSOCK(statbuf.st_mode)) {
-            if(socket_wrapper_->getSSL())
+            if (socket_wrapper_->getSSL())
                 status = SSL_write(socket_wrapper_->getSSL(), s_->data() + bytes_written_, s_->size() - bytes_written_);
             else
             status = send(
@@ -103,7 +106,7 @@ NonblockingStringStatus NonblockingStringWriter::Write() {
                 s_->size() - bytes_written_,
                 flags);
         } else {
-            if(socket_wrapper_->getSSL())
+            if (socket_wrapper_->getSSL())
                 status = SSL_write(socket_wrapper_->getSSL(), s_->data() + bytes_written_, s_->size() - bytes_written_);
             else
                 status = write(socket_wrapper_->fd(), s_->data() + bytes_written_, s_->size() - bytes_written_);

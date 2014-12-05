@@ -41,7 +41,8 @@ enum NonblockingStringStatus {
 
 class NonblockingStringReader {
     public:
-    NonblockingStringReader(shared_ptr<SocketWrapperInterface> socket_wrapper, size_t size, unique_ptr<const string> &s);
+    NonblockingStringReader(shared_ptr<SocketWrapperInterface> socket_wrapper,
+            size_t size, unique_ptr<const string> &s);
     ~NonblockingStringReader();
     NonblockingStringStatus Read();
 

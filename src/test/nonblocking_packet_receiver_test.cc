@@ -75,7 +75,7 @@ class NonblockingReceiverTest : public ::testing::Test {
     // Write a packet into the pipe
     void WritePacket(Message &message, const Command &command, const std::string &value) {
         message.set_commandbytes(command.SerializeAsString());
-        if(!message.has_authtype()){
+        if (!message.has_authtype()) {
             message.set_authtype(Message_AuthType_HMACAUTH);
             message.mutable_hmacauth()->set_identity(3);
             message.mutable_hmacauth()->set_hmac(hmac_provider_.ComputeHmac(message, "key"));

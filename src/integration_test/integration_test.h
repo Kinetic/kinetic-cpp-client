@@ -61,9 +61,7 @@ class IntegrationTest : public ::testing::Test {
                         pid_(0), done_(false),
                         nonblocking_connection_(nullptr),
                         blocking_connection_(nullptr),
-                        blocking_ssl_connection_(nullptr){
-          //google::LogToStderr();
-    }
+                        blocking_ssl_connection_(nullptr) {}
 
     void SetUp() {
         const char *kinetic_path = getenv("KINETIC_PATH");

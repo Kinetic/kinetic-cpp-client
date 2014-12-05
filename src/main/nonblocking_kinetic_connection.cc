@@ -353,7 +353,7 @@ HandlerKey NonblockingKineticConnection::doPut(const shared_ptr<const string> ke
     const shared_ptr<const string> current_version, WriteMode mode,
     const shared_ptr<const KineticRecord> record,
     const shared_ptr<PutCallbackInterface> callback,
-    PersistMode persistMode, int batch_id){
+    PersistMode persistMode, int batch_id) {
 
     unique_ptr<PutHandler> handler(new PutHandler(callback));
 
@@ -483,7 +483,7 @@ HandlerKey NonblockingKineticConnection::SecureErase(const shared_ptr<string> pi
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_SECURE_ERASE_PINOP);
@@ -502,7 +502,7 @@ HandlerKey NonblockingKineticConnection::InstantErase(const shared_ptr<string> p
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_ERASE_PINOP);
@@ -516,34 +516,30 @@ HandlerKey NonblockingKineticConnection::InstantErase(const string pin,
 }
 
 HandlerKey NonblockingKineticConnection::LockDevice(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
-   unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
-
-   unique_ptr<Message> msg(new Message());
-   msg->set_authtype(Message_AuthType_PINAUTH);
-   if(pin) msg->mutable_pinauth()->set_pin(*pin);
-
-   unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
-   request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_LOCK_PINOP);
-   return service_->Submit(move(msg), move(request), empty_str_, move(handler));
-
-
-}
-HandlerKey NonblockingKineticConnection::LockDevice(const string pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
-    return this->LockDevice(make_shared<string>(pin), callback);
-}
-
-HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+        const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
+    request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_LOCK_PINOP);
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::LockDevice(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
+    return this->LockDevice(make_shared<string>(pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_PINAUTH);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_UNLOCK_PINOP);
@@ -551,8 +547,7 @@ HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> p
 }
 
 HandlerKey NonblockingKineticConnection::UnlockDevice(const string pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+        const shared_ptr<SimpleCallbackInterface> callback) {
     return this->UnlockDevice(make_shared<string>(pin), callback);
 }
 
@@ -597,12 +592,11 @@ HandlerKey NonblockingKineticConnection::GetLog(
 
 HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types,
         const shared_ptr<GetLogCallbackInterface> callback) {
-
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
 
-    for(auto type : types){
+    for (auto type : types) {
         auto mutable_getlog = request->mutable_body()->mutable_getlog();
         mutable_getlog->add_types(type);
     }
@@ -614,7 +608,6 @@ HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type
 HandlerKey NonblockingKineticConnection::UpdateFirmware(
         const shared_ptr<const string> new_firmware,
         const shared_ptr<SimpleCallbackInterface> callback) {
-
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_SETUP);
@@ -627,11 +620,9 @@ HandlerKey NonblockingKineticConnection::UpdateFirmware(
 
 HandlerKey NonblockingKineticConnection::SetACLs(const shared_ptr<const list<ACL>> acls,
         const shared_ptr<SimpleCallbackInterface> callback) {
-
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-
 
     for (auto it = acls->begin(); it != acls->end(); ++it) {
         Command_Security_ACL *acl =
@@ -679,44 +670,42 @@ HandlerKey NonblockingKineticConnection::SetACLs(const shared_ptr<const list<ACL
             }
         }
     }
-
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+HandlerKey NonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
+        const shared_ptr<const string> current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-    if(current_pin)
+    if (current_pin)
         request->mutable_body()->mutable_security()->set_oldlockpin(*current_pin);
-    if(new_pin)
+    if (new_pin)
         request->mutable_body()->mutable_security()->set_newlockpin(*new_pin);
 
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetLockPIN(const string new_pin, const string current_pin,
-    const shared_ptr<SimpleCallbackInterface> callback)
-{
+HandlerKey NonblockingKineticConnection::SetLockPIN(const string new_pin,
+        const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     return this->SetLockPIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
-    const shared_ptr<const string> current_pin,
-    const shared_ptr<SimpleCallbackInterface> callback)
-{
+        const shared_ptr<const string> current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-    if(current_pin)
+    if (current_pin)
         request->mutable_body()->mutable_security()->set_olderasepin(*current_pin);
-    if(new_pin)
+    if (new_pin)
         request->mutable_body()->mutable_security()->set_newerasepin(*new_pin);
 
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
@@ -758,7 +747,6 @@ void NonblockingKineticConnection::PopulateP2PMessage(
 HandlerKey NonblockingKineticConnection::P2PPush(
         const shared_ptr<const P2PPushRequest> push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) {
-
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_PEER2PEERPUSH);
@@ -790,8 +778,9 @@ Command_Synchronization NonblockingKineticConnection::GetSynchronizationForPersi
     return sync_option;
 }
 
-HandlerKey NonblockingKineticConnection::BatchStart (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id) {
-    int id = ++ batch_id_counter_;
+HandlerKey NonblockingKineticConnection::BatchStart(const shared_ptr<SimpleCallbackInterface> callback,
+        int * batch_id) {
+    int id = ++batch_id_counter_;
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
@@ -800,42 +789,37 @@ HandlerKey NonblockingKineticConnection::BatchStart (const shared_ptr<SimpleCall
     request->mutable_header()->set_batchid(id);
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
-    if(batch_id) *batch_id = id;
+    if (batch_id) *batch_id = id;
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::BatchPutKey (int batch_id, const shared_ptr<const string> key,
-       const shared_ptr<const string> current_version, WriteMode mode,
-       const shared_ptr<const KineticRecord> record,
-       const shared_ptr<PutCallbackInterface> callback,
-       PersistMode persistMode) {
+HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback, PersistMode persistMode) {
     return doPut(key, current_version, mode, record, callback, persistMode, batch_id);
 }
 
-HandlerKey NonblockingKineticConnection::BatchPutKey (int batch_id, const string key,
-   const string current_version, WriteMode mode,
-   const shared_ptr<const KineticRecord> record,
-   const shared_ptr<PutCallbackInterface> callback,
-   PersistMode persistMode) {
+HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const string key,
+        const string current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback, PersistMode persistMode) {
     return BatchPutKey(batch_id, make_shared<string>(key), make_shared<string>(current_version),
            mode, record, callback, persistMode);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-   const shared_ptr<const string> version, WriteMode mode,
-   const shared_ptr<SimpleCallbackInterface> callback,
-   PersistMode persistMode) {
-    return doDelete(key,version,mode,callback,persistMode,batch_id);
+        const shared_ptr<const string> version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
+    return doDelete(key, version, mode, callback, persistMode, batch_id);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
-    const string version, WriteMode mode,
-    const shared_ptr<SimpleCallbackInterface> callback,
-    PersistMode persistMode) {
-    return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version), mode, callback, persistMode);
+        const string version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
+    return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version),
+            mode, callback, persistMode);
 }
 
-HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
@@ -845,7 +829,7 @@ HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey NonblockingKineticConnection::BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 

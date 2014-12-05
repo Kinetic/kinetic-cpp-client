@@ -75,7 +75,8 @@ class NonblockingPacketWriter : public NonblockingPacketWriterInterface {
 
 class NonblockingPacketReader {
     public:
-    NonblockingPacketReader(shared_ptr<SocketWrapperInterface> socket_wrapper, Message* response, unique_ptr<const string>& value);
+    NonblockingPacketReader(shared_ptr<SocketWrapperInterface> socket_wrapper,
+            Message* response, unique_ptr<const string>& value);
     ~NonblockingPacketReader();
     NonblockingStringStatus Read();
 

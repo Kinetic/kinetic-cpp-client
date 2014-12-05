@@ -33,7 +33,7 @@ using std::string;
 using std::make_shared;
 using std::move;
 
-BlockingKineticConnection::BlockingKineticConnection( unique_ptr<NonblockingKineticConnection> nonblocking_connection,
+BlockingKineticConnection::BlockingKineticConnection(unique_ptr<NonblockingKineticConnection> nonblocking_connection,
         unsigned int network_timeout_seconds)
     : network_timeout_seconds_(network_timeout_seconds) {
     nonblocking_connection_ = std::move(nonblocking_connection);
@@ -253,15 +253,16 @@ KineticStatus BlockingKineticConnection::InstantErase(const shared_ptr<string> p
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->InstantErase(pin, callback));
 }
+
 KineticStatus BlockingKineticConnection::InstantErase(const string& pin) {
     return this->InstantErase(make_shared<string>(pin));
 }
 
-KineticStatus BlockingKineticConnection::SecureErase(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::SecureErase(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SecureErase(pin, callback));
 }
-KineticStatus BlockingKineticConnection::SecureErase(const string& pin){
+KineticStatus BlockingKineticConnection::SecureErase(const string& pin) {
     return this->SecureErase(make_shared<string>(pin));
 }
 
@@ -292,7 +293,8 @@ KineticStatus BlockingKineticConnection::GetLog(unique_ptr<DriveLog>& drive_log)
     return RunOperation(callback, nonblocking_connection_->GetLog(callback));
 }
 
-KineticStatus BlockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log) {
+KineticStatus BlockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types,
+        unique_ptr<DriveLog>& drive_log) {
     auto callback = make_shared<GetLogCallback>(drive_log);
     return RunOperation(callback, nonblocking_connection_->GetLog(types, callback));
 }
@@ -309,36 +311,36 @@ KineticStatus BlockingKineticConnection::SetACLs(const shared_ptr<const list<ACL
 }
 
 KineticStatus BlockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
-        const shared_ptr<const string> current_pin){
+        const shared_ptr<const string> current_pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SetErasePIN(new_pin, current_pin, callback));
 }
-KineticStatus BlockingKineticConnection::SetErasePIN(const string& new_pin, const string& current_pin){
-    return this->SetErasePIN(make_shared<string>(new_pin),make_shared<string>(current_pin));
+KineticStatus BlockingKineticConnection::SetErasePIN(const string& new_pin, const string& current_pin) {
+    return this->SetErasePIN(make_shared<string>(new_pin), make_shared<string>(current_pin));
 }
 
 KineticStatus BlockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
-        const shared_ptr<const string> current_pin){
+        const shared_ptr<const string> current_pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SetLockPIN(new_pin, current_pin, callback));
 }
-KineticStatus BlockingKineticConnection::SetLockPIN(const string& new_pin, const string& current_pin){
-    return this->SetLockPIN(make_shared<string>(new_pin),make_shared<string>(current_pin));
+KineticStatus BlockingKineticConnection::SetLockPIN(const string& new_pin, const string& current_pin) {
+    return this->SetLockPIN(make_shared<string>(new_pin), make_shared<string>(current_pin));
 }
 
-KineticStatus BlockingKineticConnection::LockDevice(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::LockDevice(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->LockDevice(pin, callback));
 }
-KineticStatus BlockingKineticConnection::LockDevice(const string& pin){
+KineticStatus BlockingKineticConnection::LockDevice(const string& pin) {
     return this->LockDevice(make_shared<string>(pin));
 }
 
-KineticStatus BlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->UnlockDevice(pin, callback));
 }
-KineticStatus BlockingKineticConnection::UnlockDevice(const string& pin){
+KineticStatus BlockingKineticConnection::UnlockDevice(const string& pin) {
     return this->UnlockDevice(make_shared<string>(pin));
 }
 

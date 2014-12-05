@@ -47,7 +47,7 @@ void NonblockingSender::Enqueue(unique_ptr<Message> message, unique_ptr<Command>
     /* COMMAND PART OF MESSAGE IS FINALIZED */
     message->set_commandbytes(command->SerializeAsString());
 
-    if(message->authtype() == com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH){
+    if (message->authtype() == com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH) {
         message->mutable_hmacauth()->set_identity(connection_options_.user_id);
         message->mutable_hmacauth()->set_hmac(hmac_provider_.ComputeHmac(*message, connection_options_.hmac_key));
     }

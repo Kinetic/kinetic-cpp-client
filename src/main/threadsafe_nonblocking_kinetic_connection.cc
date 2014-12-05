@@ -54,18 +54,21 @@ HandlerKey ThreadsafeNonblockingKineticConnection::NoOp(const shared_ptr<SimpleC
     return connection_->NoOp(callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::Get(const shared_ptr<const string> key, const shared_ptr<GetCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::Get(const shared_ptr<const string> key,
+        const shared_ptr<GetCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Get(key, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::Get(const string key, const shared_ptr<GetCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::Get(const string key,
+        const shared_ptr<GetCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Get(key, callback);
 }
 
 
-HandlerKey ThreadsafeNonblockingKineticConnection::GetNext(const string key, const shared_ptr<GetCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::GetNext(const string key,
+        const shared_ptr<GetCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetNext(key, callback);
 }
@@ -82,12 +85,14 @@ HandlerKey ThreadsafeNonblockingKineticConnection::GetPrevious(const shared_ptr<
     return connection_->GetPrevious(key, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::GetPrevious(const string key, const shared_ptr<GetCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::GetPrevious(const string key,
+        const shared_ptr<GetCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetPrevious(key, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::GetVersion(const string key, const shared_ptr<GetVersionCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::GetVersion(const string key,
+        const shared_ptr<GetVersionCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetVersion(key, callback);
 }
@@ -113,57 +118,62 @@ HandlerKey ThreadsafeNonblockingKineticConnection::GetKeyRange(
 
 HandlerKey ThreadsafeNonblockingKineticConnection::GetKeyRange(const string start_key, bool start_key_inclusive,
       const string end_key, bool end_key_inclusive,
-      bool reverse_results, int32_t max_results, const shared_ptr<GetKeyRangeCallbackInterface> callback){
+      bool reverse_results, int32_t max_results, const shared_ptr<GetKeyRangeCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetKeyRange(start_key, start_key_inclusive, end_key,
         end_key_inclusive, reverse_results, max_results, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::Put(const shared_ptr<const string> key, const shared_ptr<const string> current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Put(key, current_version, mode, record, callback);
 }
 HandlerKey ThreadsafeNonblockingKineticConnection::Put(const string key, const string current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback){
+        const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Put(key, current_version, mode, record, callback);
 }
-HandlerKey ThreadsafeNonblockingKineticConnection::Put(const shared_ptr<const string> key, const shared_ptr<const string> current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback,
-      PersistMode persistMode){
+HandlerKey ThreadsafeNonblockingKineticConnection::Put(const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback,
+      PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Put(key, current_version, mode, record, callback, persistMode);
 }
 HandlerKey ThreadsafeNonblockingKineticConnection::Put(const string key, const string current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback,
-      PersistMode persistMode){
+        const shared_ptr<const KineticRecord> record, const shared_ptr<PutCallbackInterface> callback,
+        PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Put(key, current_version, mode, record, callback, persistMode);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const shared_ptr<const string> key, const shared_ptr<const string> version, WriteMode mode,
-          const shared_ptr<SimpleCallbackInterface> callback, PersistMode persistMode){
+HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Delete(key, version, mode, callback, persistMode);
 }
 HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const string key, const string version, WriteMode mode,
-          const shared_ptr<SimpleCallbackInterface> callback, PersistMode persistMode){
+        const shared_ptr<SimpleCallbackInterface> callback, PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Delete(key, version, mode, callback, persistMode);
 }
-HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const shared_ptr<const string> key, const shared_ptr<const string> version, WriteMode mode,
-          const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Delete(key, version, mode, callback);
 }
 HandlerKey ThreadsafeNonblockingKineticConnection::Delete(const string key, const string version, WriteMode mode,
-      const shared_ptr<SimpleCallbackInterface> callback){
+      const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->Delete(key, version, mode, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::InstantErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::InstantErase(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->InstantErase(pin, callback);
 }
@@ -173,7 +183,8 @@ HandlerKey ThreadsafeNonblockingKineticConnection::InstantErase(const shared_ptr
     return connection_->InstantErase(pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::SecureErase(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::SecureErase(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->SecureErase(pin, callback);
 }
@@ -220,12 +231,14 @@ HandlerKey ThreadsafeNonblockingKineticConnection::SetErasePIN(const shared_ptr<
     return connection_->SetErasePIN(new_pin, current_pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::SetErasePIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::SetErasePIN(const string new_pin, const string current_pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->SetErasePIN(new_pin, current_pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::LockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::LockDevice(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->LockDevice(pin, callback);
 }
@@ -235,7 +248,8 @@ HandlerKey ThreadsafeNonblockingKineticConnection::LockDevice(const shared_ptr<s
     return connection_->LockDevice(pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::UnlockDevice(const string pin, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::UnlockDevice(const string pin,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->UnlockDevice(pin, callback);
 }
@@ -252,7 +266,8 @@ HandlerKey ThreadsafeNonblockingKineticConnection::SetLockPIN(const shared_ptr<c
     return connection_->SetLockPIN(new_pin, current_pin, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::SetLockPIN(const string new_pin, const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::SetLockPIN(const string new_pin,
+        const string current_pin, const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->SetLockPIN(new_pin, current_pin, callback);
 }
@@ -270,51 +285,54 @@ HandlerKey ThreadsafeNonblockingKineticConnection::P2PPush(const P2PPushRequest&
     return connection_->P2PPush(push_request, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::BatchStart (const shared_ptr<SimpleCallbackInterface> callback, int * batch_id){
+HandlerKey ThreadsafeNonblockingKineticConnection::BatchStart(const shared_ptr<SimpleCallbackInterface> callback,
+        int * batch_id) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchStart(callback, batch_id);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey (int batch_id, const shared_ptr<const string> key,
+HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
   const shared_ptr<const string> current_version, WriteMode mode,
   const shared_ptr<const KineticRecord> record,
   const shared_ptr<PutCallbackInterface> callback,
-  PersistMode persistMode){
+  PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchPutKey(batch_id, key, current_version, mode, record, callback, persistMode);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey (int batch_id, const string key,
-  const string current_version, WriteMode mode,
-  const shared_ptr<const KineticRecord> record,
-  const shared_ptr<PutCallbackInterface> callback,
-  PersistMode persistMode){
+HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey(int batch_id, const string key,
+        const string current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record,
+        const shared_ptr<PutCallbackInterface> callback,
+        PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchPutKey(batch_id, key, current_version, mode, record, callback, persistMode);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-  const shared_ptr<const string> version, WriteMode mode,
-  const shared_ptr<SimpleCallbackInterface> callback,
-  PersistMode persistMode){
+        const shared_ptr<const string> version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchDeleteKey(batch_id, key, version, mode, callback, persistMode);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
-   const string version, WriteMode mode,
-   const shared_ptr<SimpleCallbackInterface> callback,
-   PersistMode persistMode){
-   std::lock_guard<std::recursive_mutex> guard(mutex_);
-   return connection_->BatchDeleteKey(batch_id, key, version, mode, callback, persistMode);
+        const string version, WriteMode mode,
+        const shared_ptr<SimpleCallbackInterface> callback,
+        PersistMode persistMode) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->BatchDeleteKey(batch_id, key, version, mode, callback, persistMode);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::BatchCommit(int batch_id,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchCommit(batch_id, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::BatchAbort (int batch_id, const shared_ptr<SimpleCallbackInterface> callback){
+HandlerKey ThreadsafeNonblockingKineticConnection::BatchAbort(int batch_id,
+        const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchAbort(batch_id, callback);
 }
