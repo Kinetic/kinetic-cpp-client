@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(kinetic_cpp_client CXX C)
 
+#
+# Add a coverage mode build type
+#
+set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_COVERAGE "${CMAKE_C_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE string
+    "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel Coverage"
+    FORCE)
+
 find_package (Threads)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
