@@ -167,7 +167,7 @@ void BlockingKineticConnection::SetClientClusterVersion(int64_t cluster_version)
 
 KineticStatus BlockingKineticConnection::Get(const shared_ptr<const string> key,
     unique_ptr<KineticRecord>& record) {
-    unique_ptr<string> actual_key(nullptr);
+    unique_ptr<string> actual_key;
     auto handler = make_shared<BlockingGetCallback>(actual_key, record, false);
     return RunOperation(handler, nonblocking_connection_->Get(key, handler));
 }

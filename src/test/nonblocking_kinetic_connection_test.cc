@@ -144,7 +144,7 @@ TEST_F(NonblockingKineticConnectionTest, GetPreviousWorks) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.GetPrevious("key", NULL);
+    connection_.GetPrevious("key", shared_ptr<GetCallbackInterface>());
 
     ASSERT_EQ(Command_MessageType_GETPREVIOUS, message.header().messagetype());
     ASSERT_EQ("key", message.body().keyvalue().key());
@@ -154,7 +154,7 @@ TEST_F(NonblockingKineticConnectionTest, GetVersionWorks) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.GetVersion("key", NULL);
+    connection_.GetVersion("key", shared_ptr<GetVersionCallbackInterface>());
 
     ASSERT_EQ(Command_MessageType_GETVERSION, message.header().messagetype());
     ASSERT_EQ("key", message.body().keyvalue().key());
@@ -164,7 +164,7 @@ TEST_F(NonblockingKineticConnectionTest, DeleteWorks) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.Delete("key", "version", WriteMode::IGNORE_VERSION, NULL);
+    connection_.Delete("key", "version", WriteMode::IGNORE_VERSION, shared_ptr<SimpleCallbackInterface>());
 
     ASSERT_EQ(Command_MessageType_DELETE, message.header().messagetype());
     ASSERT_EQ("key", message.body().keyvalue().key());
@@ -196,7 +196,7 @@ TEST_F(NonblockingKineticConnectionTest, GetKeyRangeWorks) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.GetKeyRange("first", true, "last", false, true, 1234, NULL);
+    connection_.GetKeyRange("first", true, "last", false, true, 1234, shared_ptr<GetKeyRangeCallbackInterface>());
 
     ASSERT_EQ(Command_MessageType_GETKEYRANGE, message.header().messagetype());
     ASSERT_EQ("first", message.body().range().startkey());
@@ -231,8 +231,8 @@ TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNullPin) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    shared_ptr<string> null_ptr(nullptr);
-    shared_ptr<MockSimpleCallback> null_callback(nullptr);
+    shared_ptr<string> null_ptr;
+    shared_ptr<MockSimpleCallback> null_callback;
     connection_.InstantErase(null_ptr, null_callback);
 
     ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
@@ -244,8 +244,8 @@ TEST_F(NonblockingKineticConnectionTest, InstantEraseWorksWithNonNullPin) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    connection_.InstantErase(pin, nullptr);
+    shared_ptr<MockSimpleCallback> null_callback;
+    connection_.InstantErase(pin, shared_ptr<SimpleCallbackInterface>());
 
     ASSERT_EQ(Command_MessageType_PINOP, message.header().messagetype());
     ASSERT_EQ(Command_PinOperation_PinOpType_ERASE_PINOP, message.body().pinop().pinoptype());
@@ -255,7 +255,7 @@ TEST_F(NonblockingKineticConnectionTest, SetClusterVersionSendsCorrectVersion) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.SetClusterVersion(1234, NULL);
+    connection_.SetClusterVersion(1234, shared_ptr<SimpleCallbackInterface>());
 
     EXPECT_EQ(Command_MessageType_SETUP, message.header().messagetype());
     EXPECT_EQ(1234, message.body().setup().newclusterversion());
@@ -278,7 +278,7 @@ TEST_F(NonblockingKineticConnectionTest, GetLogBuildsCorrectMessage) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.GetLog(NULL);
+    connection_.GetLog(shared_ptr<GetLogCallbackInterface>());
 
     EXPECT_EQ(Command_MessageType_GETLOG, message.header().messagetype());
     EXPECT_EQ(7, message.body().getlog().types_size());
@@ -378,7 +378,7 @@ TEST_F(NonblockingKineticConnectionTest, FirmwareUpdateSendsFirmwareContents) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq("the new firmware"), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    connection_.UpdateFirmware(make_shared<string>("the new firmware"), NULL);
+    connection_.UpdateFirmware(make_shared<string>("the new firmware"), shared_ptr<SimpleCallbackInterface>());
 
     EXPECT_EQ(Command_MessageType_SETUP, message.header().messagetype());
     EXPECT_EQ(true, message.body().setup().firmwaredownload());
@@ -416,7 +416,7 @@ TEST_F(NonblockingKineticConnectionTest, SetACLsBuildsCorrectMessage) {
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    shared_ptr<MockSimpleCallback> null_callback(nullptr);
+    shared_ptr<MockSimpleCallback> null_callback;
     connection_.SetACLs(acls, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
@@ -464,8 +464,8 @@ TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageForNoCur
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    shared_ptr<MockSimpleCallback> null_callback(nullptr);
-    shared_ptr<string> null_str(nullptr);
+    shared_ptr<MockSimpleCallback> null_callback;
+    shared_ptr<string> null_str;
     connection_.SetErasePIN(make_shared<string>("newnewnew"), null_str, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
@@ -478,7 +478,7 @@ TEST_F(NonblockingKineticConnectionTest, SetErasePinBuildsCorrectMessageIfCurren
     Command message;
     EXPECT_CALL(*packet_service_, Submit_(_, _, StringSharedPtrEq(""), _)).WillOnce(
             DoAll(SaveArg<1>(&message), Return(0)));
-    shared_ptr<MockSimpleCallback> null_callback(nullptr);
+    shared_ptr<MockSimpleCallback> null_callback;
     connection_.SetErasePIN("newnewnew", oldpin, null_callback);
 
     EXPECT_EQ(Command_MessageType_SECURITY, message.header().messagetype());
@@ -529,7 +529,7 @@ TEST_F(NonblockingKineticConnectionTest, P2PPushBuildsCorrectMessage) {
     op3.newKey = "otherkey";
     request.operations.push_back(op3);
 
-    connection_.P2PPush(request, NULL);
+    connection_.P2PPush(request, shared_ptr<P2PPushCallbackInterface>());
 
     EXPECT_EQ(Command_MessageType_PEER2PEERPUSH, message.header().messagetype());
 

@@ -24,6 +24,7 @@
 #include <exception>
 #include <stdexcept>
 
+
 namespace kinetic {
 
 KineticConnectionFactory NewKineticConnectionFactory() {
@@ -45,7 +46,7 @@ Status KineticConnectionFactory::NewNonblockingConnection(
 Status KineticConnectionFactory::NewNonblockingConnection(
         const ConnectionOptions& options,
         shared_ptr<NonblockingKineticConnection>& connection) {
-    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    unique_ptr<NonblockingKineticConnection> nbc;
     Status status = doNewConnection(options, nbc);
     if (status.ok())
         connection.reset(nbc.release());
@@ -55,7 +56,7 @@ Status KineticConnectionFactory::NewNonblockingConnection(
 Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
         const ConnectionOptions& options,
         unique_ptr<ThreadsafeNonblockingKineticConnection>& connection) {
-    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    unique_ptr<NonblockingKineticConnection> nbc;
     Status status = doNewConnection(options, nbc);
     if(status.ok())
         connection.reset(new ThreadsafeNonblockingKineticConnection(std::move(nbc)));
@@ -65,7 +66,7 @@ Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
 Status KineticConnectionFactory::NewThreadsafeNonblockingConnection(
         const ConnectionOptions& options,
         shared_ptr<ThreadsafeNonblockingKineticConnection>& connection) {
-    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    unique_ptr<NonblockingKineticConnection> nbc;
     Status status = doNewConnection(options, nbc);
     if(status.ok())
         connection.reset(new ThreadsafeNonblockingKineticConnection(std::move(nbc)));
@@ -76,7 +77,7 @@ Status KineticConnectionFactory::NewBlockingConnection(
         const ConnectionOptions& options,
         unique_ptr<BlockingKineticConnection>& connection,
         unsigned int network_timeout_seconds) {
-    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    unique_ptr<NonblockingKineticConnection> nbc;
     Status status = doNewConnection(options, nbc);
     if(status.ok())
        connection.reset(new BlockingKineticConnection(std::move(nbc), network_timeout_seconds));
@@ -87,7 +88,7 @@ Status KineticConnectionFactory::NewBlockingConnection(
         const ConnectionOptions& options,
         shared_ptr<BlockingKineticConnection>& connection,
         unsigned int network_timeout_seconds) {
-    unique_ptr<NonblockingKineticConnection> nbc(nullptr);
+    unique_ptr<NonblockingKineticConnection> nbc;
     Status status = doNewConnection(options, nbc);
     if(status.ok())
        connection.reset(new BlockingKineticConnection(std::move(nbc), network_timeout_seconds));
@@ -98,7 +99,7 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
         const ConnectionOptions& options,
         unique_ptr<ThreadsafeBlockingKineticConnection>& connection,
         unsigned int network_timeout_seconds) {
-    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    unique_ptr<BlockingKineticConnection> bc;
     Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
     if(status.ok())
        connection.reset(new ThreadsafeBlockingKineticConnection(std::move(bc)));
@@ -109,7 +110,7 @@ Status KineticConnectionFactory::NewThreadsafeBlockingConnection(
         const ConnectionOptions& options,
         shared_ptr<ThreadsafeBlockingKineticConnection>& connection,
         unsigned int network_timeout_seconds) {
-    unique_ptr<BlockingKineticConnection> bc(nullptr);
+    unique_ptr<BlockingKineticConnection> bc;
     Status status = NewBlockingConnection(options, bc, network_timeout_seconds);
     if(status.ok())
        connection.reset(new ThreadsafeBlockingKineticConnection(std::move(bc)));
@@ -128,9 +129,12 @@ Status KineticConnectionFactory::doNewConnection(
         receiver = shared_ptr<NonblockingReceiverInterface>(new NonblockingReceiver(socket_wrapper, hmac_provider_, options));
 
         auto writer_factory =
-            unique_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
+            shared_ptr<NonblockingPacketWriterFactoryInterface>(new NonblockingPacketWriterFactory());
         auto sender = unique_ptr<NonblockingSenderInterface>(new NonblockingSender(socket_wrapper,
-            receiver, move(writer_factory), hmac_provider_, options));
+                                                                                   receiver,
+                                                                                   writer_factory,
+                                                                                   hmac_provider_,
+                                                                                   options));
 
         NonblockingPacketService *service = new NonblockingPacketService(socket_wrapper, move(sender), receiver);
         connection.reset(new NonblockingKineticConnection(service));

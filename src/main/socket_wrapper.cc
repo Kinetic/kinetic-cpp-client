@@ -36,7 +36,7 @@ namespace kinetic {
 using std::string;
 
 SocketWrapper::SocketWrapper(const std::string& host, int port, bool use_ssl, bool nonblocking)
-        : ctx_(nullptr), ssl_(nullptr), host_(host), port_(port), nonblocking_(nonblocking), fd_(-1) {
+        : ctx_(NULL), ssl_(NULL), host_(host), port_(port), nonblocking_(nonblocking), fd_(-1) {
     if(!use_ssl) return;
 
     SSL_library_init();
@@ -75,7 +75,7 @@ bool SocketWrapper::Connect() {
 
     struct addrinfo* result;
 
-    string port_str = std::to_string(port_);
+    string port_str = std::to_string(static_cast<long long>(port_));
 
     if (int res = getaddrinfo(host_.c_str(), port_str.c_str(), &hints, &result) != 0) {
         LOG(ERROR) << "Could not resolve host " << host_ << " port " << port_ << ": "

@@ -363,7 +363,7 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
             *current_version);
     request->mutable_body()->mutable_keyvalue()->set_force(force);
 
-    if (record->version().get() != nullptr) {
+    if (record->version().get() != NULL) {
         request->mutable_body()->mutable_keyvalue()->set_newversion(
             *(record->version()));
     }
@@ -572,9 +572,9 @@ HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
 
-    for(auto type : types){
+    for(auto iter = types.begin(); iter != types.end(); ++iter){
         auto mutable_getlog = request->mutable_body()->mutable_getlog();
-        mutable_getlog->add_types(type);
+        mutable_getlog->add_types(*iter);
     }
 
     unique_ptr<GetLogHandler> handler(new GetLogHandler(callback));
@@ -718,7 +718,7 @@ void NonblockingKineticConnection::PopulateP2PMessage(
         }
         op->set_force(it->force);
 
-        if (it->request != nullptr) {
+        if (it->request != NULL) {
             auto req = op->mutable_p2pop();
             PopulateP2PMessage(req, it->request);
         }

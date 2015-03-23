@@ -62,7 +62,7 @@ class NonblockingSenderTest : public ::testing::Test {
     int fds_[2];
     bool closed_read_end_;
     HmacProvider hmac_provider_;
-    unique_ptr<NonblockingPacketWriterFactoryInterface> writer_factory_;
+    shared_ptr<NonblockingPacketWriterFactoryInterface> writer_factory_;
 };
 
 TEST_F(NonblockingSenderTest, SimpleMessageAndValue) {
@@ -79,8 +79,8 @@ TEST_F(NonblockingSenderTest, SimpleMessageAndValue) {
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(true));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
-    NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
+    NonblockingSender sender(socket_wrapper, receiver, writer_factory_, hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
     unique_ptr<Command> command(new Command());
@@ -124,11 +124,11 @@ TEST_F(NonblockingSenderTest, CallsErrorWhenCannotEnqueueHandler) {
     unique_ptr<MockHandler> handler(new MockHandler());
     auto receiver = make_shared<MockNonblockingReceiver>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_INTERNAL_ERROR,
-        "Could not enqueue handler"), nullptr));
+        "Could not enqueue handler"), NULL));
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(false));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -148,7 +148,7 @@ TEST_F(NonblockingSenderTest, UsesCorrectConnectionId) {
     auto receiver = make_shared<MockNonblockingReceiver>();
     EXPECT_CALL(*receiver, Enqueue_(handler.get(), 0, 0)).WillOnce(Return(true));
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(42));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
     unique_ptr<Message> message(new Message());
@@ -192,13 +192,13 @@ TEST_F(NonblockingSenderTest, HandlesWriteError) {
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
     unique_ptr<MockHandler> handler(new MockHandler());
     EXPECT_CALL(*handler, Error(KineticStatusEq(
-            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), NULL));
     unique_ptr<Message> message(new Message());
     unique_ptr<Command> command(new Command());
     sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler), 0);
@@ -246,9 +246,9 @@ TEST_F(NonblockingSenderTest, MaintainsCorrectHandlerKeyWhenWriteDoesntCompleteO
         .WillOnce(Return(mock_writer2))
         .WillOnce(Return(mock_writer3));
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
     NonblockingSender sender(socket_wrapper, receiver,
-        unique_ptr<NonblockingPacketWriterFactoryInterface>(mock_factory), hmac_provider_,
+        shared_ptr<NonblockingPacketWriterFactoryInterface>(mock_factory), hmac_provider_,
         options);
     sender.Enqueue(move(unique_ptr<Message>(new Message())), move(unique_ptr<Command>(new Command())), value, move(handler1), 0);
     ASSERT_EQ(kIoWait, sender.Send());
@@ -273,16 +273,16 @@ TEST_F(NonblockingSenderTest, ErrorCausesAllEnqueuedRequestsToFail) {
     options.user_id = 3;
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
     unique_ptr<MockHandler> handler1(new MockHandler());
     unique_ptr<MockHandler> handler2(new MockHandler());
     EXPECT_CALL(*handler1, Error(KineticStatusEq(
-            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), NULL));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(
-            StatusCode::CLIENT_IO_ERROR, "I/O write error"), nullptr));
+            StatusCode::CLIENT_IO_ERROR, "I/O write error"), NULL));
     unique_ptr<Message> message(new Message());
     unique_ptr<Command> command(new Command());
     sender.Enqueue(move(message), move(command), make_shared<string>(""), move(handler1), 0);
@@ -299,16 +299,16 @@ TEST_F(NonblockingSenderTest, DestructorDeletesOutstandingRequests) {
     options.user_id = 3;
     options.hmac_key = "key";
     auto receiver = make_shared<NiceMock<MockNonblockingReceiver>>();
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
     NonblockingSender *sender = new NonblockingSender(socket_wrapper, receiver,
         move(writer_factory_), hmac_provider_, options);
 
     unique_ptr<MockHandler> handler1(new MockHandler());
     unique_ptr<MockHandler> handler2(new MockHandler());
     EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Sender shutdown"), nullptr));
+        "Sender shutdown"), NULL));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Sender shutdown"), nullptr));
+        "Sender shutdown"), NULL));
     unique_ptr<Message> message(new Message());
     unique_ptr<Command> command(new Command());
     sender->Enqueue(move(message), move(command), make_shared<string>(""), move(handler1), 0);
@@ -328,7 +328,7 @@ TEST_F(NonblockingSenderTest, EnqueueAndRemoveDoesntInvoke) {
     auto receiver = make_shared<StrictMock<MockNonblockingReceiver>>();
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
@@ -360,7 +360,7 @@ TEST_F(NonblockingSenderTest, RemoveInvalidKeyReturnsFalse) {
     auto receiver = make_shared<StrictMock<MockNonblockingReceiver>>();
     EXPECT_CALL(*receiver, connection_id()).WillRepeatedly(Return(1));
 
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*)0));
     NonblockingSender sender(socket_wrapper, receiver, move(writer_factory_), hmac_provider_,
         options);
 
