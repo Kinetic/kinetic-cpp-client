@@ -45,7 +45,7 @@ set(TEST_LIBRARIES
     openssl
 )
 
-set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
+set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_BINARY_DIR}/src/main/generated)
 
 set(PREFIX "${CMAKE_BINARY_DIR}/vendor")
 set(EXTERNAL_PREFIX "${kinetic_cpp_client_BINARY_DIR}/vendor")
@@ -152,12 +152,12 @@ set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${GENERATED_SOUR
 
 include_directories(
     include
-    src/main/generated
     src/main
 
     src/test/mock
     src/test
 
+    ${GENERATED_SOURCES_PATH}
     ${EXTERNAL_PREFIX}/include
     ${EXTERNAL_PREFIX}/src/gmock/include
     ${EXTERNAL_PREFIX}/src/gtest/include
@@ -187,7 +187,7 @@ if(LIBUNWIND)
 endif()
 
 add_library(kinetic_client
-    src/main/generated/kinetic_client.pb.cc
+    ${GENERATED_SOURCES_PATH}/kinetic_client.pb.cc
     src/main/hmac_provider.cc
     src/main/kinetic_connection_factory.cc
     src/main/nonblocking_kinetic_connection.cc
@@ -258,16 +258,18 @@ add_custom_target(integration_test_valgrind
 )
 
 # Rule for generating docs
+configure_file(${kinetic_cpp_client_SOURCE_DIR}/Doxyfile ${kinetic_cpp_client_BINARY_DIR}/Doxyfile)
 add_custom_target(doc
-    doxygen ${kinetic_cpp_client_SOURCE_DIR}/Doxyfile
-    WORKING_DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}
+    doxygen ${kinetic_cpp_client_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${kinetic_cpp_client_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES docs)
 
 # Rule for linting
+configure_file(${kinetic_cpp_client_SOURCE_DIR}/bin/lint.sh ${kinetic_cpp_client_BINARY_DIR}/bin/lint.sh @ONLY)
 add_custom_target(lint
-    ./bin/lint.sh
-    WORKING_DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}
+    ${kinetic_cpp_client_BINARY_DIR}/bin/lint.sh
+    WORKING_DIRECTORY ${kinetic_cpp_client_BINARY_DIR}
     COMMENT "Running style checker" VERBATIM
 )
