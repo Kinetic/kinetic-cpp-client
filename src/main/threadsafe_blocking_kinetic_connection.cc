@@ -213,14 +213,14 @@ KineticStatus ThreadsafeBlockingKineticConnection::GetNext( const string& key, u
 KineticStatus ThreadsafeBlockingKineticConnection::GetPrevious(const shared_ptr<const string> key,
         unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->GetNext(key, actual_key, record);
+    return connection_->GetPrevious(key, actual_key, record);
 }
 
 KineticStatus ThreadsafeBlockingKineticConnection::GetPrevious(const string& key,
         unique_ptr<string>& actual_key,
         unique_ptr<KineticRecord>& record) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->GetNext(key, actual_key, record);
+    return connection_->GetPrevious(key, actual_key, record);
 }
 
 KineticStatus ThreadsafeBlockingKineticConnection::GetVersion(const shared_ptr<const string> key,
