@@ -124,7 +124,7 @@ TEST_F(IntegrationTest, UpdateWithWrongVersion) {
 TEST_F(IntegrationTest, InsertWithNullVersion) {
     // Write a new key-value pair
     auto write_callback = make_shared<StrictMock<MockPutCallback>>();
-    shared_ptr<string> version(nullptr);
+    shared_ptr<string> version;
 
     auto initial_record = make_shared<KineticRecord>(make_shared<string>("value"),
         version, make_shared<string>("tag"), Command_Algorithm_SHA1);

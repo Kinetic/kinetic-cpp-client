@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(kinetic_cpp_client CXX C)
 
+#
+# Add a coverage mode build type
+#
+set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+set(CMAKE_C_FLAGS_COVERAGE "${CMAKE_C_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
+set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE string
+    "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel Coverage"
+    FORCE)
+
 find_package (Threads)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -45,7 +54,7 @@ set(TEST_LIBRARIES
     openssl
 )
 
-set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
+set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_BINARY_DIR}/src/main/generated)
 
 set(PREFIX "${CMAKE_BINARY_DIR}/vendor")
 set(EXTERNAL_PREFIX "${kinetic_cpp_client_BINARY_DIR}/vendor")
@@ -58,7 +67,8 @@ set(KINETIC_PROTO_MD5 "85ca027b870811a297c1f6d792498934")
 ExternalProject_add(
     kinetic-proto
     PREFIX ${PREFIX}
-    DOWNLOAD_COMMAND curl -L https://github.com/Seagate/kinetic-protocol/archive/${KINETIC_PROTO_VERSION}.tar.gz -o kinetic-proto.tar.gz && openssl md5 kinetic-proto.tar.gz | grep -q ${KINETIC_PROTO_MD5} && rm -rf kinetic-proto && mkdir -p kinetic-proto && tar -xz --strip-components 1 -C kinetic-proto -f kinetic-proto.tar.gz
+    URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/kinetic-protocol-${KINETIC_PROTO_VERSION}.tar.gz"
+    URL_MD5 ${KINETIC_PROTO_MD5}
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -152,12 +162,12 @@ set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${GENERATED_SOUR
 
 include_directories(
     include
-    src/main/generated
     src/main
 
     src/test/mock
     src/test
 
+    ${GENERATED_SOURCES_PATH}
     ${EXTERNAL_PREFIX}/include
     ${EXTERNAL_PREFIX}/src/gmock/include
     ${EXTERNAL_PREFIX}/src/gtest/include
@@ -187,7 +197,7 @@ if(LIBUNWIND)
 endif()
 
 add_library(kinetic_client
-    src/main/generated/kinetic_client.pb.cc
+    ${GENERATED_SOURCES_PATH}/kinetic_client.pb.cc
     src/main/hmac_provider.cc
     src/main/kinetic_connection_factory.cc
     src/main/nonblocking_kinetic_connection.cc
@@ -258,16 +268,18 @@ add_custom_target(integration_test_valgrind
 )
 
 # Rule for generating docs
+configure_file(${kinetic_cpp_client_SOURCE_DIR}/Doxyfile ${kinetic_cpp_client_BINARY_DIR}/Doxyfile)
 add_custom_target(doc
-    doxygen ${kinetic_cpp_client_SOURCE_DIR}/Doxyfile
-    WORKING_DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}
+    doxygen ${kinetic_cpp_client_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${kinetic_cpp_client_BINARY_DIR}
     COMMENT "Generating API documentation with Doxygen" VERBATIM
 )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES docs)
 
 # Rule for linting
+configure_file(${kinetic_cpp_client_SOURCE_DIR}/bin/lint.sh ${kinetic_cpp_client_BINARY_DIR}/bin/lint.sh @ONLY)
 add_custom_target(lint
-    ./bin/lint.sh
-    WORKING_DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}
+    ${kinetic_cpp_client_BINARY_DIR}/bin/lint.sh
+    WORKING_DIRECTORY ${kinetic_cpp_client_BINARY_DIR}
     COMMENT "Running style checker" VERBATIM
 )

@@ -97,7 +97,7 @@ NonblockingReceiver::NonblockingReceiver(shared_ptr<SocketWrapperInterface> sock
     HmacProvider hmac_provider, const ConnectionOptions &connection_options)
 : socket_wrapper_(socket_wrapper), hmac_provider_(hmac_provider),
 connection_options_(connection_options), nonblocking_response_(NULL),
-connection_id_(0), handler_(NULL) {
+connection_id_(0), handler_() {
 
     shared_ptr<HandshakeHandler> hh = std::make_shared<HandshakeHandler>();
     map_.insert(make_pair(-1,make_pair(hh,-1)));
@@ -232,7 +232,7 @@ int64_t NonblockingReceiver::connection_id() {
 
 void NonblockingReceiver::CallAllErrorHandlers(KineticStatus error) {
     if (handler_) {
-        handler_->Error(error, nullptr);
+        handler_->Error(error, NULL);
         handler_.reset();
     }
 
@@ -245,7 +245,7 @@ void NonblockingReceiver::CallAllErrorHandlers(KineticStatus error) {
         CHECK_EQ((size_t) 1, handler_to_message_seq_map_.erase(handler_key))
                 << "Couldn't delete handler to sequence entry for handler_key " << handler_key;
 
-        handler->Error(error, nullptr);
+        handler->Error(error, NULL);
         handler.reset();
         iter++;
     }

@@ -104,7 +104,7 @@ class NonblockingReceiverTest : public ::testing::Test {
         Message message;
         WritePacket(message, command, "value");
         EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-        EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+        EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
         options.user_id = 3;
         options.hmac_key = "key";
     }
@@ -119,7 +119,7 @@ TEST_F(NonblockingReceiverTest, SimpleMessageAndValue) {
 
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
 
     ConnectionOptions options;
     options.user_id = 3;
@@ -145,7 +145,7 @@ TEST_F(NonblockingReceiverTest, ReceiveResponsesOutOfOrder) {
 
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -167,7 +167,7 @@ TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
     WritePacket(message, command, "value");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -175,7 +175,7 @@ TEST_F(NonblockingReceiverTest, CallsErrorWhenNoAckSequence) {
 
     auto handler = make_shared<MockHandler>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::PROTOCOL_ERROR_RESPONSE_NO_ACKSEQUENCE,
-        "Response had no acksequence"), nullptr));
+        "Response had no acksequence"), NULL));
     ASSERT_TRUE(receiver.Enqueue(handler, 33, 0));
     ASSERT_EQ(kIdle, receiver.Receive());
 }
@@ -189,7 +189,7 @@ TEST_F(NonblockingReceiverTest, SetsConnectionId) {
     WritePacket(message, command, "");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -206,7 +206,7 @@ TEST_F(NonblockingReceiverTest, HandlesReadError) {
     ASSERT_EQ(static_cast<ssize_t>(sizeof(header)), write(fds_[1], header, sizeof(header)));
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -214,7 +214,7 @@ TEST_F(NonblockingReceiverTest, HandlesReadError) {
 
     auto handler = make_shared<MockHandler>();
     EXPECT_CALL(*handler, Error(
-            KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
+            KineticStatusEq(StatusCode::CLIENT_IO_ERROR, "I/O read error"), NULL));
     ASSERT_TRUE(receiver.Enqueue(handler, 0, 0));
     ASSERT_EQ(kError, receiver.Receive());
 }
@@ -233,12 +233,12 @@ TEST_F(NonblockingReceiverTest, HandlesHmacError) {
     WritePacket(message, command,  "");
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     NonblockingReceiver receiver(socket_wrapper, hmac_provider_, options);
 
     auto handler = make_shared<MockHandler>();
     EXPECT_CALL(*handler, Error(KineticStatusEq(StatusCode::CLIENT_RESPONSE_HMAC_VERIFICATION_ERROR,
-        "Response HMAC mismatch"), nullptr));
+        "Response HMAC mismatch"), NULL));
     ASSERT_TRUE(receiver.Enqueue(handler, 0, 0));
     ASSERT_EQ(kIdle, receiver.Receive());
 }
@@ -251,7 +251,7 @@ TEST_F(NonblockingReceiverTest, ErrorCausesAllEnqueuedRequestsToFail) {
     ASSERT_EQ(static_cast<ssize_t>(sizeof(header)), write(fds_[1], header, sizeof(header)));
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -260,9 +260,9 @@ TEST_F(NonblockingReceiverTest, ErrorCausesAllEnqueuedRequestsToFail) {
     auto handler1 = make_shared<MockHandler>();
     auto handler2 = make_shared<MockHandler>();
     EXPECT_CALL(*handler1, Error(KineticStatusEq(
-            StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
+            StatusCode::CLIENT_IO_ERROR, "I/O read error"), NULL));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(
-            StatusCode::CLIENT_IO_ERROR, "I/O read error"), nullptr));
+            StatusCode::CLIENT_IO_ERROR, "I/O read error"), NULL));
     ASSERT_TRUE(receiver.Enqueue(handler1, 0, 0));
     ASSERT_TRUE(receiver.Enqueue(handler2, 1, 1));
     ASSERT_EQ(kError, receiver.Receive());
@@ -273,7 +273,7 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
     // callback on any outstanding requests and also delete their handlers.
     auto socket_wrapper = make_shared<MockSocketWrapperInterface>();
     EXPECT_CALL(*socket_wrapper, fd()).WillRepeatedly(Return(fds_[0]));
-    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*socket_wrapper, getSSL()).WillRepeatedly(Return((SSL*) 0));
     ConnectionOptions options;
     options.user_id = 3;
     options.hmac_key = "key";
@@ -283,9 +283,9 @@ TEST_F(NonblockingReceiverTest, DestructorDeletesOutstandingRequests) {
     auto handler1 = make_shared<MockHandler>();
     auto handler2 = make_shared<MockHandler>();
     EXPECT_CALL(*handler1, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Receiver shutdown"), nullptr));
+        "Receiver shutdown"), NULL));
     EXPECT_CALL(*handler2, Error(KineticStatusEq(StatusCode::CLIENT_SHUTDOWN,
-        "Receiver shutdown"), nullptr));
+        "Receiver shutdown"), NULL));
     ASSERT_TRUE(receiver->Enqueue(handler1, 0, 0));
     ASSERT_TRUE(receiver->Enqueue(handler2, 1, 1));
     delete receiver;

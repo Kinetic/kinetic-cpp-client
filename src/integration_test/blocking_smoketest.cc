@@ -65,7 +65,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     EXPECT_EQ("t2", *(result_record->tag()));
     EXPECT_EQ(Command_Algorithm_SHA1, result_record->algorithm());
 
-    unique_ptr<string> result_key(nullptr);
+    unique_ptr<string> result_key;
     ASSERT_TRUE(blocking_connection_->GetNext("key1", result_key, result_record).ok());
     EXPECT_EQ("key2", *result_key);
     EXPECT_EQ("value2", *(result_record->value()));
@@ -80,7 +80,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     EXPECT_EQ("t2", *(result_record->tag()));
     EXPECT_EQ(Command_Algorithm_SHA1, result_record->algorithm());
 
-    unique_ptr<string> result_version(nullptr);
+    unique_ptr<string> result_version;
     ASSERT_TRUE(blocking_connection_->GetVersion("key3", result_version).ok());
     EXPECT_EQ("v3", *result_version);
 

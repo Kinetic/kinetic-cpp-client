@@ -58,8 +58,8 @@ class IntegrationTest : public ::testing::Test {
     protected:
     IntegrationTest() : use_external_(false),
                         pid_(0), done_(false),
-                        nonblocking_connection_(nullptr),
-                        blocking_connection_(nullptr) {
+                        nonblocking_connection_(),
+                        blocking_connection_() {
           //google::LogToStderr();
     }
 
@@ -84,7 +84,7 @@ class IntegrationTest : public ::testing::Test {
         ASSERT_TRUE(connection_factory.NewNonblockingConnection(options, nonblocking_connection_).ok());
         ASSERT_TRUE(connection_factory.NewBlockingConnection(options,blocking_connection_, 10).ok());
 
-        shared_ptr<string> null_ptr(nullptr);
+        shared_ptr<string> null_ptr;
         ASSERT_TRUE(blocking_connection_->InstantErase(null_ptr).ok());
     }
 
