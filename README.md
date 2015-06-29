@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/Seagate/kinetic-cpp-client.svg?branch=master)](https://travis-ci.org/Seagate/kinetic-cpp-client)
 Introduction
 ============
-This repo contains code for producing C and C++ kinetic clients.
+This repo contains code for producing C and C++ kinetic clients. The C++ library currently does not support Windows at this time because of existing library requirements.
 
 
 Protocol Version
@@ -14,6 +14,7 @@ Dependencies
 * CMake
 * Valgrind for memory tests
 * Doxygen/graphviz for generating documentation
+* curl
 
 Initial Setup
 =============
