@@ -271,6 +271,28 @@ HandlerKey ThreadsafeNonblockingKineticConnection::P2PPush(const P2PPushRequest&
     return connection_->P2PPush(push_request, callback);
 }
 
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaScan(media_scan_request, callback);
+}
 
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaScan(media_scan_request, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->MediaOptimize(media_optimize_request, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->MediaOptimize(media_optimize_request, callback);
+}
 
 } // namespace kinetic

@@ -469,6 +469,24 @@ KineticStatus BlockingKineticConnection::P2PPush(
             nonblocking_connection_->P2PPush(push_request, callback));
 }
 
+KineticStatus BlockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request){
+	auto callback = make_shared<SimpleCallback>();
+	return RunOperation(callback, nonblocking_connection_->MediaScan(media_scan_request, callback));
+}
+
+KineticStatus BlockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request){
+	return this->MediaScan(make_shared<MediaScanRequest>(media_scan_request));
+}
+
+KineticStatus BlockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request){
+	auto callback = make_shared<SimpleCallback>();
+    return RunOperation(callback, nonblocking_connection_->MediaOptimize(media_optimize_request, callback));
+}
+
+KineticStatus BlockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request){
+	return this->MediaOptimize(make_shared<MediaScanRequest>(media_optimize_request));
+}
+
 KineticStatus BlockingKineticConnection::RunOperation(
         shared_ptr<BlockingCallbackState> callback,
         HandlerKey handler_key) {

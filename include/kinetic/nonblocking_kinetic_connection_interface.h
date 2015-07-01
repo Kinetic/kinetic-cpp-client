@@ -38,6 +38,8 @@ using com::seagate::kinetic::client::proto::Command_MessageType;
 using com::seagate::kinetic::client::proto::Command_P2POperation;
 using com::seagate::kinetic::client::proto::Command_Synchronization;
 using com::seagate::kinetic::client::proto::Command_GetLog_Type;
+using com::seagate::kinetic::client::proto::Command_Priority;
+using com::seagate::kinetic::client::proto::Command_Range;
 
 using std::shared_ptr;
 using std::unique_ptr;
@@ -45,6 +47,9 @@ using std::string;
 using std::make_shared;
 using std::list;
 using std::vector;
+
+#define MediaScanRequest MediaRequest
+#define MediaOptimizeRequest  MediaRequest
 
 // SimpleCallbackInterface is used for operations that return success or an
 // error but do not otherwise return a result.
@@ -126,7 +131,6 @@ class PutCallbackInterface {
     virtual void Success() = 0;
     virtual void Failure(KineticStatus error) = 0;
 };
-
 
 class PutHandler : public HandlerInterface {
     public:
@@ -212,6 +216,11 @@ struct P2PPushRequest {
     vector<P2PPushOperation> operations;
 };
 
+struct MediaRequest {
+	Command_Range* range;
+	Command_Priority priority;
+};
+
 class NonblockingKineticConnectionInterface {
 
 public:
@@ -282,6 +291,15 @@ public:
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
     virtual HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaScan(const MediaScanRequest& media_scan_reques,
+    		const shared_ptr<SimpleCallbackInterface> callbackt) = 0;
+    virtual HandlerKey MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
+
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;
     virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
             const shared_ptr<GetLogCallbackInterface> callback) = 0;

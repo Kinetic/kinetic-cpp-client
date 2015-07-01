@@ -118,7 +118,10 @@ class BlockingKineticConnectionInterface {
     virtual KineticStatus P2PPush(const shared_ptr<const P2PPushRequest> push_request,
             unique_ptr<vector<KineticStatus>>& operation_statuses) = 0;
     virtual KineticStatus Flush() = 0;
-
+    virtual KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request) = 0;
+    virtual KineticStatus MediaScan(const MediaScanRequest& media_scan_request) = 0;
+    virtual KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request) = 0;
+    virtual KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request) = 0;
     virtual KineticStatus SetClusterVersion(int64_t cluster_version) = 0;
     virtual KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware) = 0;
     virtual KineticStatus SetACLs(const shared_ptr<const list<ACL>> acls) = 0;

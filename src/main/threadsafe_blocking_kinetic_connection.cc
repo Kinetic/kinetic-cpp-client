@@ -309,4 +309,24 @@ KineticStatus ThreadsafeBlockingKineticConnection::P2PPush(const P2PPushRequest&
     return connection_->P2PPush(push_request, operation_statuses);
 }
 
-} // namespace kinetic
+KineticStatus ThreadsafeBlockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaScan(media_scan_request);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaScan(media_scan_request);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->MediaOptimize(media_optimize_request);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->MediaOptimize(media_optimize_request);
+}
+
+}// namespace kinetic

@@ -166,7 +166,7 @@ set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
 ExternalProject_add(kinetic-proto
         PREFIX proto
         GIT_REPOSITORY https://github.com/Seagate/kinetic-protocol
-        GIT_TAG 3.0.0
+        GIT_TAG 3.0.5
         UPDATE_COMMAND mkdir -p ${GENERATED_SOURCES_PATH}
         CONFIGURE_COMMAND ""
         BUILD_IN_SOURCE 1

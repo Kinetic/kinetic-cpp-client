@@ -709,6 +709,42 @@ HandlerKey NonblockingKineticConnection::P2PPush(
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
+HandlerKey NonblockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+    unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIASCAN);
+
+    request->mutable_header()->set_priority(media_scan_request->priority);
+    request->mutable_body()->set_allocated_range(media_scan_request->range);
+
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_reques,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+	return this->MediaScan(make_shared<MediaScanRequest>(media_scan_reques), callback);
+}
+
+HandlerKey NonblockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+    unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIAOPTIMIZE);
+
+    request->mutable_header()->set_priority(media_optimize_request->priority);
+    request->mutable_body()->set_allocated_range(media_optimize_request->range);
+
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+		const shared_ptr<SimpleCallbackInterface> callback) {
+	return this->MediaOptimize(make_shared<MediaScanRequest>(media_optimize_request), callback);
+}
+
 bool NonblockingKineticConnection::RemoveHandler(HandlerKey handler_key) {
     return service_->Remove(handler_key);
 }

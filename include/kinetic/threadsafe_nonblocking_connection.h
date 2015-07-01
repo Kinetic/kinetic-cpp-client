@@ -72,6 +72,17 @@ public:
       HandlerKey P2PPush(const P2PPushRequest& push_request, const shared_ptr<P2PPushCallbackInterface> callback);
       HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
               const shared_ptr<P2PPushCallbackInterface> callback);
+
+      HandlerKey MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    		  const shared_ptr<SimpleCallbackInterface> callback);
+      HandlerKey MediaScan(const MediaScanRequest& media_scan_request,
+    		  const shared_ptr<SimpleCallbackInterface> callback);
+
+      HandlerKey MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+    		  const shared_ptr<SimpleCallbackInterface> callback);
+      HandlerKey MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+    		  const shared_ptr<SimpleCallbackInterface> callback);
+
       HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
       HandlerKey GetLog(const vector<Command_GetLog_Type>& types, const shared_ptr<GetLogCallbackInterface> callback);
       HandlerKey Flush(const shared_ptr<SimpleCallbackInterface> callback);

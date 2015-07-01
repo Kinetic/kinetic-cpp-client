@@ -136,6 +136,12 @@ class BlockingKineticConnection : public BlockingKineticConnectionInterface {
 
     KineticStatus Flush();
 
+    KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request);
+    KineticStatus MediaScan(const MediaScanRequest& media_scan_request);
+
+    KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request);
+    KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request);
+
     KineticStatus SetClusterVersion(int64_t cluster_version);
     KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);
     KineticStatus SetACLs(const shared_ptr<const list<ACL>> acls);
