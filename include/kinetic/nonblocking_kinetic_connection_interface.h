@@ -48,9 +48,6 @@ using std::make_shared;
 using std::list;
 using std::vector;
 
-#define MediaScanRequest MediaRequest
-#define MediaOptimizeRequest  MediaRequest
-
 // SimpleCallbackInterface is used for operations that return success or an
 // error but do not otherwise return a result.
 class SimpleCallbackInterface {
@@ -224,13 +221,13 @@ enum RequestPriority {
     Priority_HIGHEST
 };
 
-struct MediaRequest {
+typedef struct MediaRequest {
 	string start_key;
 	bool start_key_inclusive;
 	string end_key;
 	bool end_key_inclusive;
 	RequestPriority priority;
-};
+} MediaScanRequest, MediaOptimizeRequest;
 
 class NonblockingKineticConnectionInterface {
 
