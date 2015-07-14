@@ -216,9 +216,20 @@ struct P2PPushRequest {
     vector<P2PPushOperation> operations;
 };
 
+enum RequestPriority {
+    Priority_NORMAL,
+    Priority_LOWEST,
+    Priority_LOWER,
+    Priority_HIGHER,
+    Priority_HIGHEST
+};
+
 struct MediaRequest {
-	Command_Range* range;
-	Command_Priority priority;
+	string start_key;
+	bool start_key_inclusive;
+	string end_key;
+	bool end_key_inclusive;
+	RequestPriority priority;
 };
 
 class NonblockingKineticConnectionInterface {

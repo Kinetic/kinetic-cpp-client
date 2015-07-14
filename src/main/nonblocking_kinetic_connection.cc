@@ -709,6 +709,39 @@ HandlerKey NonblockingKineticConnection::P2PPush(
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
+void setPriority(Command_Priority &priority, const shared_ptr<const MediaRequest> media_request)
+{
+	switch(media_request->priority)
+    {
+    case Priority_NORMAL:
+    	priority = Command_Priority::Command_Priority_NORMAL;
+    	break;
+    case Priority_LOWEST:
+    	priority = Command_Priority::Command_Priority_LOWEST;
+    	break;
+    case Priority_LOWER:
+	    priority = Command_Priority::Command_Priority_LOWER;
+	    break;
+    case Priority_HIGHER:
+    	priority = Command_Priority::Command_Priority_HIGHER;
+    	break;
+    case Priority_HIGHEST:
+    	priority = Command_Priority::Command_Priority_HIGHEST;
+    	break;
+    default:
+    	priority = Command_Priority::Command_Priority_NORMAL;
+    	break;
+    }
+}
+
+void setCommandRange(Command_Range &range, const shared_ptr<const MediaRequest> media_request)
+{
+	range.set_startkeyinclusive(media_request->start_key_inclusive);
+    range.set_endkeyinclusive(media_request->end_key_inclusive);
+    range.set_startkey(media_request->start_key);
+    range.set_endkey(media_request->end_key);
+}
+
 HandlerKey NonblockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
     const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
@@ -716,8 +749,13 @@ HandlerKey NonblockingKineticConnection::MediaScan(const shared_ptr<const MediaS
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIASCAN);
 
-    request->mutable_header()->set_priority(media_scan_request->priority);
-    request->mutable_body()->set_allocated_range(media_scan_request->range);
+    Command_Priority priority;
+    setPriority(priority, media_scan_request);
+    request->mutable_header()->set_priority(priority);
+
+    Command_Range range;
+    setCommandRange(range, media_scan_request);
+    request->mutable_body()->set_allocated_range(&range);
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
@@ -734,8 +772,13 @@ HandlerKey NonblockingKineticConnection::MediaOptimize(const shared_ptr<const Me
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIAOPTIMIZE);
 
-    request->mutable_header()->set_priority(media_optimize_request->priority);
-    request->mutable_body()->set_allocated_range(media_optimize_request->range);
+    Command_Priority priority;
+    setPriority(priority, media_optimize_request);
+    request->mutable_header()->set_priority(priority);
+
+    Command_Range range;
+    setCommandRange(range, media_optimize_request);
+    request->mutable_body()->set_allocated_range(&range);
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
