@@ -68,12 +68,16 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
             const shared_ptr<P2PPushCallbackInterface> callback);
 
     HandlerKey MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey MediaScan(const MediaScanRequest& media_scan_reques,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback);
 
 

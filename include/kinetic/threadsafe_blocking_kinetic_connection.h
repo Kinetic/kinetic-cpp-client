@@ -135,11 +135,16 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnectionInte
               unique_ptr<vector<KineticStatus>>& operation_statuses);
 
       KineticStatus Flush();
-      KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request);
-      KineticStatus MediaScan(const MediaScanRequest& media_scan_request);
 
-      KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request);
-      KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request);
+      KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    		  RequestPriority request_priority);
+      KineticStatus MediaScan(const MediaScanRequest& media_scan_request,
+    		  RequestPriority request_priority);
+
+      KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+    		  RequestPriority request_priority);
+      KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+    		  RequestPriority request_priority);
 
 
       KineticStatus SetClusterVersion(int64_t cluster_version);

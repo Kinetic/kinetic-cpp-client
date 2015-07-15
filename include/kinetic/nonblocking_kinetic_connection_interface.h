@@ -300,12 +300,16 @@ public:
     virtual HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
     virtual HandlerKey MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback) = 0;
     virtual HandlerKey MediaScan(const MediaScanRequest& media_scan_reques,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callbackt) = 0;
     virtual HandlerKey MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback) = 0;
     virtual HandlerKey MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+    		RequestPriority request_priority,
     		const shared_ptr<SimpleCallbackInterface> callback) = 0;
 
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;

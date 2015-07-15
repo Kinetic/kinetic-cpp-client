@@ -272,27 +272,31 @@ HandlerKey ThreadsafeNonblockingKineticConnection::P2PPush(const P2PPushRequest&
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
+		RequestPriority request_priority,
 		const shared_ptr<SimpleCallbackInterface> callback) {
 	std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->MediaScan(media_scan_request, callback);
+    return connection_->MediaScan(media_scan_request, request_priority, callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request,
+		RequestPriority request_priority,
 		const shared_ptr<SimpleCallbackInterface> callback) {
 	std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->MediaScan(media_scan_request, callback);
+    return connection_->MediaScan(media_scan_request, request_priority, callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
+		RequestPriority request_priority,
 		const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-	return connection_->MediaOptimize(media_optimize_request, callback);
+	return connection_->MediaOptimize(media_optimize_request, request_priority, callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
+		RequestPriority request_priority,
 		const shared_ptr<SimpleCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-	return connection_->MediaOptimize(media_optimize_request, callback);
+	return connection_->MediaOptimize(media_optimize_request, request_priority, callback);
 }
 
 } // namespace kinetic
