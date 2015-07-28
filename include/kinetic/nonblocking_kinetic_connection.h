@@ -21,6 +21,7 @@
 #ifndef KINETIC_CPP_CLIENT_NONBLOCKING_KINETIC_CONNECTION_H_
 #define KINETIC_CPP_CLIENT_NONBLOCKING_KINETIC_CONNECTION_H_
 
+#include <atomic>
 #include "nonblocking_kinetic_connection_interface.h"
 
 namespace kinetic {
@@ -98,18 +99,14 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
     HandlerKey BatchStart(const shared_ptr<SimpleCallbackInterface> callback, int * batch_id);
     HandlerKey BatchPutKey(int batch_id, const shared_ptr<const string> key,
       const shared_ptr<const string> current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record,
-      const shared_ptr<PutCallbackInterface> callback);
+      const shared_ptr<const KineticRecord> record);
     HandlerKey BatchPutKey(int batch_id, const string key,
       const string current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record,
-      const shared_ptr<PutCallbackInterface> callback);
+      const shared_ptr<const KineticRecord> record);
     HandlerKey BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-      const shared_ptr<const string> version, WriteMode mode,
-      const shared_ptr<SimpleCallbackInterface> callback);
+      const shared_ptr<const string> version, WriteMode mode);
     HandlerKey BatchDeleteKey(int batch_id, const string key,
-       const string version, WriteMode mode,
-       const shared_ptr<SimpleCallbackInterface> callback);
+       const string version, WriteMode mode);
     HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
 
@@ -134,7 +131,7 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
     const shared_ptr<const string> empty_str_;
 
     int64_t cluster_version_;
-    int32_t batch_id_counter_;
+    std::atomic_int batch_id_counter_;
 
     DISALLOW_COPY_AND_ASSIGN(NonblockingKineticConnection);
 };

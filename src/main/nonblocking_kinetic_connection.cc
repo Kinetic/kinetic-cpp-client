@@ -128,22 +128,26 @@ PutHandler::PutHandler(const shared_ptr<PutCallbackInterface> callback)
     : callback_(callback) {}
 
 void PutHandler::Handle(const Command &response, unique_ptr<const string> value) {
-    callback_->Success();
+	if (callback_ != NULL)
+	    callback_->Success();
 }
 
 void PutHandler::Error(KineticStatus error, Command const * const response) {
-    callback_->Failure(error);
+	if (callback_ != NULL)
+	    callback_->Failure(error);
 }
 
 SimpleHandler::SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback)
     : callback_(callback) {}
 
 void SimpleHandler::Handle(const Command &response, unique_ptr<const string> value) {
-    callback_->Success();
+	if (callback_ != NULL)
+	    callback_->Success();
 }
 
 void SimpleHandler::Error(KineticStatus error, Command const * const response) {
-    callback_->Failure(error);
+    if (callback_ != NULL)
+	    callback_->Failure(error);
 }
 
 GetLogHandler::GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback)
@@ -780,7 +784,7 @@ Command_Synchronization NonblockingKineticConnection::GetSynchronizationForPersi
 
 HandlerKey NonblockingKineticConnection::BatchStart(const shared_ptr<SimpleCallbackInterface> callback,
         int * batch_id) {
-    int id = ++batch_id_counter_;
+    int id = batch_id_counter_.fetch_add(1, std::memory_order_relaxed) + 1;
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
@@ -794,28 +798,26 @@ HandlerKey NonblockingKineticConnection::BatchStart(const shared_ptr<SimpleCallb
 }
 
 HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
-        const shared_ptr<const string> current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) {
+        const shared_ptr<const string> current_version, WriteMode mode, const shared_ptr<const KineticRecord> record) {
     // persist mode not applicable to batch operations. just set arbitrary.
-    return doPut(key, current_version, mode, record, callback, PersistMode::WRITE_THROUGH, batch_id);
+    return doPut(key, current_version, mode, record, NULL, PersistMode::WRITE_THROUGH, batch_id);
 }
 
 HandlerKey NonblockingKineticConnection::BatchPutKey(int batch_id, const string key,
-        const string current_version, WriteMode mode, const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) {
+        const string current_version, WriteMode mode, const shared_ptr<const KineticRecord> record) {
     return BatchPutKey(batch_id, make_shared<string>(key), make_shared<string>(current_version),
-           mode, record, callback);
+           mode, record);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-        const shared_ptr<const string> version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
-    return doDelete(key, version, mode, callback, PersistMode::WRITE_THROUGH, batch_id);
+        const shared_ptr<const string> version, WriteMode mode) {
+    return doDelete(key, version, mode, NULL, PersistMode::WRITE_THROUGH, batch_id);
 }
 
 HandlerKey NonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
-        const string version, WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
+        const string version, WriteMode mode) {
     return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version),
-            mode, callback);
+            mode);
 }
 
 HandlerKey NonblockingKineticConnection::BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) {

@@ -156,6 +156,19 @@ class ThreadsafeBlockingKineticConnection : public BlockingKineticConnectionInte
       KineticStatus UnlockDevice(const shared_ptr<string> pin);
       KineticStatus UnlockDevice(const string& pin);
 
+      KineticStatus BatchStart(int * batch_id);
+      KineticStatus BatchPutKey(int batch_id, const shared_ptr<const string> key,
+          const shared_ptr<const string> current_version, WriteMode mode,
+          const shared_ptr<const KineticRecord> record);
+      KineticStatus BatchPutKey(int batch_id, const string key,
+          const string current_version, WriteMode mode,
+          const shared_ptr<const KineticRecord> record);
+      KineticStatus BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+          const shared_ptr<const string> version, WriteMode mode);
+      KineticStatus BatchDeleteKey(int batch_id, const string key,
+           const string version, WriteMode mode);
+      KineticStatus BatchCommit(int batch_id);
+      KineticStatus BatchAbort(int batch_id);
 
     private:
     std::recursive_mutex mutex_;

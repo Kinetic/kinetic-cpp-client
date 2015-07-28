@@ -46,6 +46,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* Command_Body_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Command_Body_reflection_ = NULL;
+const ::google::protobuf::Descriptor* Command_Batch_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  Command_Batch_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Command_Status_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Command_Status_reflection_ = NULL;
@@ -232,7 +235,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_Header));
   Command_Body_descriptor_ = Command_descriptor_->nested_type(1);
-  static const int Command_Body_offsets_[7] = {
+  static const int Command_Body_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, keyvalue_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, range_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, setup_),
@@ -240,6 +243,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, getlog_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, security_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, pinop_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Body, batch_),
   };
   Command_Body_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -252,7 +256,24 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_Body));
-  Command_Status_descriptor_ = Command_descriptor_->nested_type(2);
+  Command_Batch_descriptor_ = Command_descriptor_->nested_type(2);
+  static const int Command_Batch_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Batch, count_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Batch, sequence_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Batch, failedsequence_),
+  };
+  Command_Batch_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      Command_Batch_descriptor_,
+      Command_Batch::default_instance_,
+      Command_Batch_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Batch, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Batch, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(Command_Batch));
+  Command_Status_descriptor_ = Command_descriptor_->nested_type(3);
   static const int Command_Status_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Status, code_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Status, statusmessage_),
@@ -270,7 +291,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_Status));
   Command_Status_StatusCode_descriptor_ = Command_Status_descriptor_->enum_type(0);
-  Command_KeyValue_descriptor_ = Command_descriptor_->nested_type(3);
+  Command_KeyValue_descriptor_ = Command_descriptor_->nested_type(4);
   static const int Command_KeyValue_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_KeyValue, newversion_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_KeyValue, force_),
@@ -292,7 +313,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_KeyValue));
-  Command_Range_descriptor_ = Command_descriptor_->nested_type(4);
+  Command_Range_descriptor_ = Command_descriptor_->nested_type(5);
   static const int Command_Range_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Range, startkey_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Range, endkey_),
@@ -313,7 +334,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_Range));
-  Command_Setup_descriptor_ = Command_descriptor_->nested_type(5);
+  Command_Setup_descriptor_ = Command_descriptor_->nested_type(6);
   static const int Command_Setup_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Setup, newclusterversion_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Setup, firmwaredownload_),
@@ -329,7 +350,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_Setup));
-  Command_P2POperation_descriptor_ = Command_descriptor_->nested_type(6);
+  Command_P2POperation_descriptor_ = Command_descriptor_->nested_type(7);
   static const int Command_P2POperation_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_P2POperation, peer_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_P2POperation, operation_),
@@ -383,7 +404,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_P2POperation_Peer));
-  Command_GetLog_descriptor_ = Command_descriptor_->nested_type(7);
+  Command_GetLog_descriptor_ = Command_descriptor_->nested_type(8);
   static const int Command_GetLog_offsets_[9] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog, types_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog, utilizations_),
@@ -533,7 +554,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog_Limits, maxidentitycount_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog_Limits, maxpinsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog_Limits, maxoperationcountperbatch_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog_Limits, maxbatchcountperconnection_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_GetLog_Limits, maxbatchcountperdevice_),
   };
   Command_GetLog_Limits_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -562,7 +583,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Command_GetLog_Device));
   Command_GetLog_Type_descriptor_ = Command_GetLog_descriptor_->enum_type(0);
-  Command_Security_descriptor_ = Command_descriptor_->nested_type(8);
+  Command_Security_descriptor_ = Command_descriptor_->nested_type(9);
   static const int Command_Security_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Security, acl_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_Security, oldlockpin_),
@@ -620,7 +641,7 @@ void protobuf_AssignDesc_kinetic_5fclient_2eproto() {
       sizeof(Command_Security_ACL_Scope));
   Command_Security_ACL_HMACAlgorithm_descriptor_ = Command_Security_ACL_descriptor_->enum_type(0);
   Command_Security_ACL_Permission_descriptor_ = Command_Security_ACL_descriptor_->enum_type(1);
-  Command_PinOperation_descriptor_ = Command_descriptor_->nested_type(9);
+  Command_PinOperation_descriptor_ = Command_descriptor_->nested_type(10);
   static const int Command_PinOperation_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Command_PinOperation, pinoptype_),
   };
@@ -666,6 +687,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     Command_Header_descriptor_, &Command_Header::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Command_Body_descriptor_, &Command_Body::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    Command_Batch_descriptor_, &Command_Batch::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Command_Status_descriptor_, &Command_Status::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -726,6 +749,8 @@ void protobuf_ShutdownFile_kinetic_5fclient_2eproto() {
   delete Command_Header_reflection_;
   delete Command_Body::default_instance_;
   delete Command_Body_reflection_;
+  delete Command_Batch::default_instance_;
+  delete Command_Batch_reflection_;
   delete Command_Status::default_instance_;
   delete Command_Status_reflection_;
   delete Command_KeyValue::default_instance_;
@@ -787,7 +812,7 @@ void protobuf_AddDesc_kinetic_5fclient_2eproto() {
     "ity\030\001 \001(\003\022\014\n\004hmac\030\002 \001(\014\032\026\n\007PINauth\022\013\n\003pi"
     "n\030\001 \001(\014\"\\\n\010AuthType\022\036\n\021INVALID_AUTH_TYPE"
     "\020\377\377\377\377\377\377\377\377\377\001\022\014\n\010HMACAUTH\020\001\022\013\n\007PINAUTH\020\002\022\025"
-    "\n\021UNSOLICITEDSTATUS\020\003\"\3553\n\007Command\022@\n\006hea"
+    "\n\021UNSOLICITEDSTATUS\020\003\"\3574\n\007Command\022@\n\006hea"
     "der\030\001 \001(\01320.com.seagate.kinetic.client.p"
     "roto.Command.Header\022<\n\004body\030\002 \001(\0132..com."
     "seagate.kinetic.client.proto.Command.Bod"
@@ -800,7 +825,7 @@ void protobuf_AddDesc_kinetic_5fclient_2eproto() {
     "\017\n\007timeout\030\t \001(\003\022\021\n\tearlyExit\030\n \001(\010\022D\n\010p"
     "riority\030\014 \001(\01622.com.seagate.kinetic.clie"
     "nt.proto.Command.Priority\022\022\n\nTimeQuanta\030"
-    "\r \001(\003\022\017\n\007batchID\030\016 \001(\r\032\351\003\n\004Body\022D\n\010keyVa"
+    "\r \001(\003\022\017\n\007batchID\030\016 \001(\r\032\251\004\n\004Body\022D\n\010keyVa"
     "lue\030\001 \001(\01322.com.seagate.kinetic.client.p"
     "roto.Command.KeyValue\022>\n\005range\030\002 \001(\0132/.c"
     "om.seagate.kinetic.client.proto.Command."
@@ -812,148 +837,152 @@ void protobuf_AddDesc_kinetic_5fclient_2eproto() {
     "ommand.GetLog\022D\n\010security\030\007 \001(\01322.com.se"
     "agate.kinetic.client.proto.Command.Secur"
     "ity\022E\n\005pinOp\030\010 \001(\01326.com.seagate.kinetic"
-    ".client.proto.Command.PinOperation\032\370\004\n\006S"
-    "tatus\022I\n\004code\030\001 \001(\0162;.com.seagate.kineti"
-    "c.client.proto.Command.Status.StatusCode"
-    "\022\025\n\rstatusMessage\030\002 \001(\t\022\027\n\017detailedMessa"
-    "ge\030\003 \001(\014\"\362\003\n\nStatusCode\022 \n\023INVALID_STATU"
-    "S_CODE\020\377\377\377\377\377\377\377\377\377\001\022\021\n\rNOT_ATTEMPTED\020\000\022\013\n\007"
-    "SUCCESS\020\001\022\020\n\014HMAC_FAILURE\020\002\022\022\n\016NOT_AUTHO"
-    "RIZED\020\003\022\023\n\017VERSION_FAILURE\020\004\022\022\n\016INTERNAL"
-    "_ERROR\020\005\022\023\n\017HEADER_REQUIRED\020\006\022\r\n\tNOT_FOU"
-    "ND\020\007\022\024\n\020VERSION_MISMATCH\020\010\022\020\n\014SERVICE_BU"
-    "SY\020\t\022\013\n\007EXPIRED\020\n\022\016\n\nDATA_ERROR\020\013\022\023\n\017PER"
-    "M_DATA_ERROR\020\014\022\033\n\027REMOTE_CONNECTION_ERRO"
-    "R\020\r\022\014\n\010NO_SPACE\020\016\022\032\n\026NO_SUCH_HMAC_ALGORI"
-    "THM\020\017\022\023\n\017INVALID_REQUEST\020\020\022\033\n\027NESTED_OPE"
-    "RATION_ERRORS\020\021\022\021\n\rDEVICE_LOCKED\020\022\022\033\n\027DE"
-    "VICE_ALREADY_UNLOCKED\020\023\022\031\n\025CONNECTION_TE"
-    "RMINATED\020\024\022\021\n\rINVALID_BATCH\020\025\032\214\002\n\010KeyVal"
-    "ue\022\022\n\nnewVersion\030\002 \001(\014\022\r\n\005force\030\010 \001(\010\022\013\n"
-    "\003key\030\003 \001(\014\022\021\n\tdbVersion\030\004 \001(\014\022\013\n\003tag\030\005 \001"
-    "(\014\022F\n\talgorithm\030\006 \001(\01623.com.seagate.kine"
-    "tic.client.proto.Command.Algorithm\022\024\n\014me"
-    "tadataOnly\030\007 \001(\010\022R\n\017synchronization\030\t \001("
-    "\01629.com.seagate.kinetic.client.proto.Com"
-    "mand.Synchronization\032\221\001\n\005Range\022\020\n\010startK"
-    "ey\030\001 \001(\014\022\016\n\006endKey\030\002 \001(\014\022\031\n\021startKeyIncl"
-    "usive\030\003 \001(\010\022\027\n\017endKeyInclusive\030\004 \001(\010\022\023\n\013"
-    "maxReturned\030\005 \001(\005\022\017\n\007reverse\030\006 \001(\010\022\014\n\004ke"
-    "ys\030\010 \003(\014\032<\n\005Setup\022\031\n\021newClusterVersion\030\001"
-    " \001(\003\022\030\n\020firmwareDownload\030\005 \001(\010\032\334\003\n\014P2POp"
-    "eration\022I\n\004peer\030\001 \001(\0132;.com.seagate.kine"
-    "tic.client.proto.Command.P2POperation.Pe"
-    "er\022S\n\toperation\030\002 \003(\0132@.com.seagate.kine"
-    "tic.client.proto.Command.P2POperation.Op"
-    "eration\022#\n\033allChildOperationsSucceeded\030\003"
-    " \001(\010\032\321\001\n\tOperation\022\013\n\003key\030\003 \001(\014\022\017\n\007versi"
-    "on\030\004 \001(\014\022\016\n\006newKey\030\005 \001(\014\022\r\n\005force\030\006 \001(\010\022"
-    "@\n\006status\030\007 \001(\01320.com.seagate.kinetic.cl"
-    "ient.proto.Command.Status\022E\n\005p2pop\030\010 \001(\013"
-    "26.com.seagate.kinetic.client.proto.Comm"
-    "and.P2POperation\0323\n\004Peer\022\020\n\010hostname\030\001 \001"
-    "(\t\022\014\n\004port\030\002 \001(\005\022\013\n\003tls\030\003 \001(\010\032\266\017\n\006GetLog"
-    "\022D\n\005types\030\001 \003(\01625.com.seagate.kinetic.cl"
-    "ient.proto.Command.GetLog.Type\022R\n\014utiliz"
-    "ations\030\002 \003(\0132<.com.seagate.kinetic.clien"
-    "t.proto.Command.GetLog.Utilization\022R\n\014te"
-    "mperatures\030\003 \003(\0132<.com.seagate.kinetic.c"
-    "lient.proto.Command.GetLog.Temperature\022K"
-    "\n\010capacity\030\004 \001(\01329.com.seagate.kinetic.c"
-    "lient.proto.Command.GetLog.Capacity\022U\n\rc"
-    "onfiguration\030\005 \001(\0132>.com.seagate.kinetic"
-    ".client.proto.Command.GetLog.Configurati"
-    "on\022O\n\nstatistics\030\006 \003(\0132;.com.seagate.kin"
-    "etic.client.proto.Command.GetLog.Statist"
-    "ics\022\020\n\010messages\030\007 \001(\014\022G\n\006limits\030\010 \001(\01327."
-    "com.seagate.kinetic.client.proto.Command"
-    ".GetLog.Limits\022G\n\006device\030\t \001(\01327.com.sea"
+    ".client.proto.Command.PinOperation\022>\n\005ba"
+    "tch\030\t \001(\0132/.com.seagate.kinetic.client.p"
+    "roto.Command.Batch\032D\n\005Batch\022\r\n\005count\030\001 \001"
+    "(\005\022\024\n\010sequence\030\002 \003(\003B\002\020\001\022\026\n\016failedSequen"
+    "ce\030\003 \001(\003\032\370\004\n\006Status\022I\n\004code\030\001 \001(\0162;.com."
+    "seagate.kinetic.client.proto.Command.Sta"
+    "tus.StatusCode\022\025\n\rstatusMessage\030\002 \001(\t\022\027\n"
+    "\017detailedMessage\030\003 \001(\014\"\362\003\n\nStatusCode\022 \n"
+    "\023INVALID_STATUS_CODE\020\377\377\377\377\377\377\377\377\377\001\022\021\n\rNOT_A"
+    "TTEMPTED\020\000\022\013\n\007SUCCESS\020\001\022\020\n\014HMAC_FAILURE\020"
+    "\002\022\022\n\016NOT_AUTHORIZED\020\003\022\023\n\017VERSION_FAILURE"
+    "\020\004\022\022\n\016INTERNAL_ERROR\020\005\022\023\n\017HEADER_REQUIRE"
+    "D\020\006\022\r\n\tNOT_FOUND\020\007\022\024\n\020VERSION_MISMATCH\020\010"
+    "\022\020\n\014SERVICE_BUSY\020\t\022\013\n\007EXPIRED\020\n\022\016\n\nDATA_"
+    "ERROR\020\013\022\023\n\017PERM_DATA_ERROR\020\014\022\033\n\027REMOTE_C"
+    "ONNECTION_ERROR\020\r\022\014\n\010NO_SPACE\020\016\022\032\n\026NO_SU"
+    "CH_HMAC_ALGORITHM\020\017\022\023\n\017INVALID_REQUEST\020\020"
+    "\022\033\n\027NESTED_OPERATION_ERRORS\020\021\022\021\n\rDEVICE_"
+    "LOCKED\020\022\022\033\n\027DEVICE_ALREADY_UNLOCKED\020\023\022\031\n"
+    "\025CONNECTION_TERMINATED\020\024\022\021\n\rINVALID_BATC"
+    "H\020\025\032\214\002\n\010KeyValue\022\022\n\nnewVersion\030\002 \001(\014\022\r\n\005"
+    "force\030\010 \001(\010\022\013\n\003key\030\003 \001(\014\022\021\n\tdbVersion\030\004 "
+    "\001(\014\022\013\n\003tag\030\005 \001(\014\022F\n\talgorithm\030\006 \001(\01623.co"
+    "m.seagate.kinetic.client.proto.Command.A"
+    "lgorithm\022\024\n\014metadataOnly\030\007 \001(\010\022R\n\017synchr"
+    "onization\030\t \001(\01629.com.seagate.kinetic.cl"
+    "ient.proto.Command.Synchronization\032\221\001\n\005R"
+    "ange\022\020\n\010startKey\030\001 \001(\014\022\016\n\006endKey\030\002 \001(\014\022\031"
+    "\n\021startKeyInclusive\030\003 \001(\010\022\027\n\017endKeyInclu"
+    "sive\030\004 \001(\010\022\023\n\013maxReturned\030\005 \001(\005\022\017\n\007rever"
+    "se\030\006 \001(\010\022\014\n\004keys\030\010 \003(\014\032<\n\005Setup\022\031\n\021newCl"
+    "usterVersion\030\001 \001(\003\022\030\n\020firmwareDownload\030\005"
+    " \001(\010\032\334\003\n\014P2POperation\022I\n\004peer\030\001 \001(\0132;.co"
+    "m.seagate.kinetic.client.proto.Command.P"
+    "2POperation.Peer\022S\n\toperation\030\002 \003(\0132@.co"
+    "m.seagate.kinetic.client.proto.Command.P"
+    "2POperation.Operation\022#\n\033allChildOperati"
+    "onsSucceeded\030\003 \001(\010\032\321\001\n\tOperation\022\013\n\003key\030"
+    "\003 \001(\014\022\017\n\007version\030\004 \001(\014\022\016\n\006newKey\030\005 \001(\014\022\r"
+    "\n\005force\030\006 \001(\010\022@\n\006status\030\007 \001(\01320.com.seag"
+    "ate.kinetic.client.proto.Command.Status\022"
+    "E\n\005p2pop\030\010 \001(\01326.com.seagate.kinetic.cli"
+    "ent.proto.Command.P2POperation\0323\n\004Peer\022\020"
+    "\n\010hostname\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\022\013\n\003tls\030\003 "
+    "\001(\010\032\262\017\n\006GetLog\022D\n\005types\030\001 \003(\01625.com.seag"
+    "ate.kinetic.client.proto.Command.GetLog."
+    "Type\022R\n\014utilizations\030\002 \003(\0132<.com.seagate"
+    ".kinetic.client.proto.Command.GetLog.Uti"
+    "lization\022R\n\014temperatures\030\003 \003(\0132<.com.sea"
     "gate.kinetic.client.proto.Command.GetLog"
-    ".Device\032*\n\013Utilization\022\014\n\004name\030\001 \001(\t\022\r\n\005"
-    "value\030\002 \001(\002\032^\n\013Temperature\022\014\n\004name\030\001 \001(\t"
-    "\022\017\n\007current\030\002 \001(\002\022\017\n\007minimum\030\003 \001(\002\022\017\n\007ma"
-    "ximum\030\004 \001(\002\022\016\n\006target\030\005 \001(\002\032\?\n\010Capacity\022"
-    "\036\n\026nominalCapacityInBytes\030\004 \001(\004\022\023\n\013porti"
-    "onFull\030\005 \001(\002\032\275\003\n\rConfiguration\022\016\n\006vendor"
-    "\030\005 \001(\t\022\r\n\005model\030\006 \001(\t\022\024\n\014serialNumber\030\007 "
-    "\001(\014\022\025\n\rworldWideName\030\016 \001(\014\022\017\n\007version\030\010 "
-    "\001(\t\022\027\n\017compilationDate\030\014 \001(\t\022\022\n\nsourceHa"
-    "sh\030\r \001(\t\022\027\n\017protocolVersion\030\017 \001(\t\022\037\n\027pro"
-    "tocolCompilationDate\030\020 \001(\t\022\032\n\022protocolSo"
-    "urceHash\030\021 \001(\t\022[\n\tinterface\030\t \003(\0132H.com."
-    "seagate.kinetic.client.proto.Command.Get"
-    "Log.Configuration.Interface\022\014\n\004port\030\n \001("
-    "\005\022\017\n\007tlsPort\030\013 \001(\005\032P\n\tInterface\022\014\n\004name\030"
-    "\001 \001(\t\022\013\n\003MAC\030\002 \001(\014\022\023\n\013ipv4Address\030\003 \001(\014\022"
-    "\023\n\013ipv6Address\030\004 \001(\014\032v\n\nStatistics\022J\n\013me"
-    "ssageType\030\001 \001(\01625.com.seagate.kinetic.cl"
-    "ient.proto.Command.MessageType\022\r\n\005count\030"
-    "\004 \001(\004\022\r\n\005bytes\030\005 \001(\004\032\346\002\n\006Limits\022\022\n\nmaxKe"
-    "ySize\030\001 \001(\r\022\024\n\014maxValueSize\030\002 \001(\r\022\026\n\016max"
-    "VersionSize\030\003 \001(\r\022\022\n\nmaxTagSize\030\004 \001(\r\022\026\n"
-    "\016maxConnections\030\005 \001(\r\022\"\n\032maxOutstandingR"
-    "eadRequests\030\006 \001(\r\022#\n\033maxOutstandingWrite"
-    "Requests\030\007 \001(\r\022\026\n\016maxMessageSize\030\010 \001(\r\022\030"
-    "\n\020maxKeyRangeCount\030\t \001(\r\022\030\n\020maxIdentityC"
-    "ount\030\n \001(\r\022\022\n\nmaxPinSize\030\013 \001(\r\022!\n\031maxOpe"
-    "rationCountPerBatch\030\014 \001(\r\022\"\n\032maxBatchCou"
-    "ntPerConnection\030\r \001(\r\032\026\n\006Device\022\014\n\004name\030"
-    "\001 \001(\014\"\236\001\n\004Type\022\031\n\014INVALID_TYPE\020\377\377\377\377\377\377\377\377\377"
-    "\001\022\020\n\014UTILIZATIONS\020\000\022\020\n\014TEMPERATURES\020\001\022\016\n"
-    "\nCAPACITIES\020\002\022\021\n\rCONFIGURATION\020\003\022\016\n\nSTAT"
-    "ISTICS\020\004\022\014\n\010MESSAGES\020\005\022\n\n\006LIMITS\020\006\022\n\n\006DE"
-    "VICE\020\007\032\240\006\n\010Security\022C\n\003acl\030\002 \003(\01326.com.s"
-    "eagate.kinetic.client.proto.Command.Secu"
-    "rity.ACL\022\022\n\noldLockPIN\030\003 \001(\014\022\022\n\nnewLockP"
-    "IN\030\004 \001(\014\022\023\n\013oldErasePIN\030\005 \001(\014\022\023\n\013newEras"
-    "ePIN\030\006 \001(\014\032\374\004\n\003ACL\022\020\n\010identity\030\001 \001(\003\022\013\n\003"
-    "key\030\002 \001(\014\022[\n\rhmacAlgorithm\030\003 \001(\0162D.com.s"
-    "eagate.kinetic.client.proto.Command.Secu"
-    "rity.ACL.HMACAlgorithm\022K\n\005scope\030\004 \003(\0132<."
-    "com.seagate.kinetic.client.proto.Command"
-    ".Security.ACL.Scope\022G\n\013maxPriority\030\005 \001(\016"
-    "22.com.seagate.kinetic.client.proto.Comm"
-    "and.Priority\032\222\001\n\005Scope\022\016\n\006offset\030\001 \001(\003\022\r"
-    "\n\005value\030\002 \001(\014\022U\n\npermission\030\003 \003(\0162A.com."
-    "seagate.kinetic.client.proto.Command.Sec"
-    "urity.ACL.Permission\022\023\n\013TlsRequired\030\004 \001("
-    "\010\"B\n\rHMACAlgorithm\022#\n\026INVALID_HMAC_ALGOR"
-    "ITHM\020\377\377\377\377\377\377\377\377\377\001\022\014\n\010HmacSHA1\020\001\"\211\001\n\nPermis"
-    "sion\022\037\n\022INVALID_PERMISSION\020\377\377\377\377\377\377\377\377\377\001\022\010\n"
-    "\004READ\020\000\022\t\n\005WRITE\020\001\022\n\n\006DELETE\020\002\022\t\n\005RANGE\020"
-    "\003\022\t\n\005SETUP\020\004\022\t\n\005P2POP\020\005\022\n\n\006GETLOG\020\007\022\014\n\010S"
-    "ECURITY\020\010\032\327\001\n\014PinOperation\022S\n\tpinOpType\030"
-    "\001 \001(\0162@.com.seagate.kinetic.client.proto"
-    ".Command.PinOperation.PinOpType\"r\n\tPinOp"
-    "Type\022\032\n\rINVALID_PINOP\020\377\377\377\377\377\377\377\377\377\001\022\020\n\014UNLO"
-    "CK_PINOP\020\001\022\016\n\nLOCK_PINOP\020\002\022\017\n\013ERASE_PINO"
-    "P\020\003\022\026\n\022SECURE_ERASE_PINOP\020\004\"c\n\017Synchroni"
-    "zation\022$\n\027INVALID_SYNCHRONIZATION\020\377\377\377\377\377\377"
-    "\377\377\377\001\022\020\n\014WRITETHROUGH\020\001\022\r\n\tWRITEBACK\020\002\022\t\n"
-    "\005FLUSH\020\003\"F\n\010Priority\022\n\n\006NORMAL\020\005\022\n\n\006LOWE"
-    "ST\020\001\022\t\n\005LOWER\020\003\022\n\n\006HIGHER\020\007\022\013\n\007HIGHEST\020\t"
-    "\"_\n\tAlgorithm\022\036\n\021INVALID_ALGORITHM\020\377\377\377\377\377"
-    "\377\377\377\377\001\022\010\n\004SHA1\020\001\022\010\n\004SHA2\020\002\022\010\n\004SHA3\020\003\022\t\n\005C"
-    "RC32\020\004\022\t\n\005CRC64\020\005\"\371\005\n\013MessageType\022!\n\024INV"
-    "ALID_MESSAGE_TYPE\020\377\377\377\377\377\377\377\377\377\001\022\007\n\003GET\020\002\022\020\n"
-    "\014GET_RESPONSE\020\001\022\007\n\003PUT\020\004\022\020\n\014PUT_RESPONSE"
-    "\020\003\022\n\n\006DELETE\020\006\022\023\n\017DELETE_RESPONSE\020\005\022\013\n\007G"
-    "ETNEXT\020\010\022\024\n\020GETNEXT_RESPONSE\020\007\022\017\n\013GETPRE"
-    "VIOUS\020\n\022\030\n\024GETPREVIOUS_RESPONSE\020\t\022\017\n\013GET"
-    "KEYRANGE\020\014\022\030\n\024GETKEYRANGE_RESPONSE\020\013\022\016\n\n"
-    "GETVERSION\020\020\022\027\n\023GETVERSION_RESPONSE\020\017\022\t\n"
-    "\005SETUP\020\026\022\022\n\016SETUP_RESPONSE\020\025\022\n\n\006GETLOG\020\030"
-    "\022\023\n\017GETLOG_RESPONSE\020\027\022\014\n\010SECURITY\020\032\022\025\n\021S"
-    "ECURITY_RESPONSE\020\031\022\021\n\rPEER2PEERPUSH\020\034\022\032\n"
-    "\026PEER2PEERPUSH_RESPONSE\020\033\022\010\n\004NOOP\020\036\022\021\n\rN"
-    "OOP_RESPONSE\020\035\022\020\n\014FLUSHALLDATA\020 \022\031\n\025FLUS"
-    "HALLDATA_RESPONSE\020\037\022\t\n\005PINOP\020$\022\022\n\016PINOP_"
-    "RESPONSE\020#\022\r\n\tMEDIASCAN\020&\022\026\n\022MEDIASCAN_R"
-    "ESPONSE\020%\022\021\n\rMEDIAOPTIMIZE\020(\022\032\n\026MEDIAOPT"
-    "IMIZE_RESPONSE\020\'\022\017\n\013START_BATCH\020*\022\030\n\024STA"
-    "RT_BATCH_RESPONSE\020)\022\r\n\tEND_BATCH\020,\022\026\n\022EN"
-    "D_BATCH_RESPONSE\020+\022\017\n\013ABORT_BATCH\020.\022\030\n\024A"
-    "BORT_BATCH_RESPONSE\020-B\tB\007Kinetic", 7152);
+    ".Temperature\022K\n\010capacity\030\004 \001(\01329.com.sea"
+    "gate.kinetic.client.proto.Command.GetLog"
+    ".Capacity\022U\n\rconfiguration\030\005 \001(\0132>.com.s"
+    "eagate.kinetic.client.proto.Command.GetL"
+    "og.Configuration\022O\n\nstatistics\030\006 \003(\0132;.c"
+    "om.seagate.kinetic.client.proto.Command."
+    "GetLog.Statistics\022\020\n\010messages\030\007 \001(\014\022G\n\006l"
+    "imits\030\010 \001(\01327.com.seagate.kinetic.client"
+    ".proto.Command.GetLog.Limits\022G\n\006device\030\t"
+    " \001(\01327.com.seagate.kinetic.client.proto."
+    "Command.GetLog.Device\032*\n\013Utilization\022\014\n\004"
+    "name\030\001 \001(\t\022\r\n\005value\030\002 \001(\002\032^\n\013Temperature"
+    "\022\014\n\004name\030\001 \001(\t\022\017\n\007current\030\002 \001(\002\022\017\n\007minim"
+    "um\030\003 \001(\002\022\017\n\007maximum\030\004 \001(\002\022\016\n\006target\030\005 \001("
+    "\002\032\?\n\010Capacity\022\036\n\026nominalCapacityInBytes\030"
+    "\004 \001(\004\022\023\n\013portionFull\030\005 \001(\002\032\275\003\n\rConfigura"
+    "tion\022\016\n\006vendor\030\005 \001(\t\022\r\n\005model\030\006 \001(\t\022\024\n\014s"
+    "erialNumber\030\007 \001(\014\022\025\n\rworldWideName\030\016 \001(\014"
+    "\022\017\n\007version\030\010 \001(\t\022\027\n\017compilationDate\030\014 \001"
+    "(\t\022\022\n\nsourceHash\030\r \001(\t\022\027\n\017protocolVersio"
+    "n\030\017 \001(\t\022\037\n\027protocolCompilationDate\030\020 \001(\t"
+    "\022\032\n\022protocolSourceHash\030\021 \001(\t\022[\n\tinterfac"
+    "e\030\t \003(\0132H.com.seagate.kinetic.client.pro"
+    "to.Command.GetLog.Configuration.Interfac"
+    "e\022\014\n\004port\030\n \001(\005\022\017\n\007tlsPort\030\013 \001(\005\032P\n\tInte"
+    "rface\022\014\n\004name\030\001 \001(\t\022\013\n\003MAC\030\002 \001(\014\022\023\n\013ipv4"
+    "Address\030\003 \001(\014\022\023\n\013ipv6Address\030\004 \001(\014\032v\n\nSt"
+    "atistics\022J\n\013messageType\030\001 \001(\01625.com.seag"
+    "ate.kinetic.client.proto.Command.Message"
+    "Type\022\r\n\005count\030\004 \001(\004\022\r\n\005bytes\030\005 \001(\004\032\342\002\n\006L"
+    "imits\022\022\n\nmaxKeySize\030\001 \001(\r\022\024\n\014maxValueSiz"
+    "e\030\002 \001(\r\022\026\n\016maxVersionSize\030\003 \001(\r\022\022\n\nmaxTa"
+    "gSize\030\004 \001(\r\022\026\n\016maxConnections\030\005 \001(\r\022\"\n\032m"
+    "axOutstandingReadRequests\030\006 \001(\r\022#\n\033maxOu"
+    "tstandingWriteRequests\030\007 \001(\r\022\026\n\016maxMessa"
+    "geSize\030\010 \001(\r\022\030\n\020maxKeyRangeCount\030\t \001(\r\022\030"
+    "\n\020maxIdentityCount\030\n \001(\r\022\022\n\nmaxPinSize\030\013"
+    " \001(\r\022!\n\031maxOperationCountPerBatch\030\014 \001(\r\022"
+    "\036\n\026maxBatchCountPerDevice\030\r \001(\r\032\026\n\006Devic"
+    "e\022\014\n\004name\030\001 \001(\014\"\236\001\n\004Type\022\031\n\014INVALID_TYPE"
+    "\020\377\377\377\377\377\377\377\377\377\001\022\020\n\014UTILIZATIONS\020\000\022\020\n\014TEMPERA"
+    "TURES\020\001\022\016\n\nCAPACITIES\020\002\022\021\n\rCONFIGURATION"
+    "\020\003\022\016\n\nSTATISTICS\020\004\022\014\n\010MESSAGES\020\005\022\n\n\006LIMI"
+    "TS\020\006\022\n\n\006DEVICE\020\007\032\240\006\n\010Security\022C\n\003acl\030\002 \003"
+    "(\01326.com.seagate.kinetic.client.proto.Co"
+    "mmand.Security.ACL\022\022\n\noldLockPIN\030\003 \001(\014\022\022"
+    "\n\nnewLockPIN\030\004 \001(\014\022\023\n\013oldErasePIN\030\005 \001(\014\022"
+    "\023\n\013newErasePIN\030\006 \001(\014\032\374\004\n\003ACL\022\020\n\010identity"
+    "\030\001 \001(\003\022\013\n\003key\030\002 \001(\014\022[\n\rhmacAlgorithm\030\003 \001"
+    "(\0162D.com.seagate.kinetic.client.proto.Co"
+    "mmand.Security.ACL.HMACAlgorithm\022K\n\005scop"
+    "e\030\004 \003(\0132<.com.seagate.kinetic.client.pro"
+    "to.Command.Security.ACL.Scope\022G\n\013maxPrio"
+    "rity\030\005 \001(\01622.com.seagate.kinetic.client."
+    "proto.Command.Priority\032\222\001\n\005Scope\022\016\n\006offs"
+    "et\030\001 \001(\003\022\r\n\005value\030\002 \001(\014\022U\n\npermission\030\003 "
+    "\003(\0162A.com.seagate.kinetic.client.proto.C"
+    "ommand.Security.ACL.Permission\022\023\n\013TlsReq"
+    "uired\030\004 \001(\010\"B\n\rHMACAlgorithm\022#\n\026INVALID_"
+    "HMAC_ALGORITHM\020\377\377\377\377\377\377\377\377\377\001\022\014\n\010HmacSHA1\020\001\""
+    "\211\001\n\nPermission\022\037\n\022INVALID_PERMISSION\020\377\377\377"
+    "\377\377\377\377\377\377\001\022\010\n\004READ\020\000\022\t\n\005WRITE\020\001\022\n\n\006DELETE\020\002"
+    "\022\t\n\005RANGE\020\003\022\t\n\005SETUP\020\004\022\t\n\005P2POP\020\005\022\n\n\006GET"
+    "LOG\020\007\022\014\n\010SECURITY\020\010\032\327\001\n\014PinOperation\022S\n\t"
+    "pinOpType\030\001 \001(\0162@.com.seagate.kinetic.cl"
+    "ient.proto.Command.PinOperation.PinOpTyp"
+    "e\"r\n\tPinOpType\022\032\n\rINVALID_PINOP\020\377\377\377\377\377\377\377\377"
+    "\377\001\022\020\n\014UNLOCK_PINOP\020\001\022\016\n\nLOCK_PINOP\020\002\022\017\n\013"
+    "ERASE_PINOP\020\003\022\026\n\022SECURE_ERASE_PINOP\020\004\"c\n"
+    "\017Synchronization\022$\n\027INVALID_SYNCHRONIZAT"
+    "ION\020\377\377\377\377\377\377\377\377\377\001\022\020\n\014WRITETHROUGH\020\001\022\r\n\tWRIT"
+    "EBACK\020\002\022\t\n\005FLUSH\020\003\"F\n\010Priority\022\n\n\006NORMAL"
+    "\020\005\022\n\n\006LOWEST\020\001\022\t\n\005LOWER\020\003\022\n\n\006HIGHER\020\007\022\013\n"
+    "\007HIGHEST\020\t\"_\n\tAlgorithm\022\036\n\021INVALID_ALGOR"
+    "ITHM\020\377\377\377\377\377\377\377\377\377\001\022\010\n\004SHA1\020\001\022\010\n\004SHA2\020\002\022\010\n\004S"
+    "HA3\020\003\022\t\n\005CRC32\020\004\022\t\n\005CRC64\020\005\"\371\005\n\013MessageT"
+    "ype\022!\n\024INVALID_MESSAGE_TYPE\020\377\377\377\377\377\377\377\377\377\001\022\007"
+    "\n\003GET\020\002\022\020\n\014GET_RESPONSE\020\001\022\007\n\003PUT\020\004\022\020\n\014PU"
+    "T_RESPONSE\020\003\022\n\n\006DELETE\020\006\022\023\n\017DELETE_RESPO"
+    "NSE\020\005\022\013\n\007GETNEXT\020\010\022\024\n\020GETNEXT_RESPONSE\020\007"
+    "\022\017\n\013GETPREVIOUS\020\n\022\030\n\024GETPREVIOUS_RESPONS"
+    "E\020\t\022\017\n\013GETKEYRANGE\020\014\022\030\n\024GETKEYRANGE_RESP"
+    "ONSE\020\013\022\016\n\nGETVERSION\020\020\022\027\n\023GETVERSION_RES"
+    "PONSE\020\017\022\t\n\005SETUP\020\026\022\022\n\016SETUP_RESPONSE\020\025\022\n"
+    "\n\006GETLOG\020\030\022\023\n\017GETLOG_RESPONSE\020\027\022\014\n\010SECUR"
+    "ITY\020\032\022\025\n\021SECURITY_RESPONSE\020\031\022\021\n\rPEER2PEE"
+    "RPUSH\020\034\022\032\n\026PEER2PEERPUSH_RESPONSE\020\033\022\010\n\004N"
+    "OOP\020\036\022\021\n\rNOOP_RESPONSE\020\035\022\020\n\014FLUSHALLDATA"
+    "\020 \022\031\n\025FLUSHALLDATA_RESPONSE\020\037\022\t\n\005PINOP\020$"
+    "\022\022\n\016PINOP_RESPONSE\020#\022\r\n\tMEDIASCAN\020&\022\026\n\022M"
+    "EDIASCAN_RESPONSE\020%\022\021\n\rMEDIAOPTIMIZE\020(\022\032"
+    "\n\026MEDIAOPTIMIZE_RESPONSE\020\'\022\017\n\013START_BATC"
+    "H\020*\022\030\n\024START_BATCH_RESPONSE\020)\022\r\n\tEND_BAT"
+    "CH\020,\022\026\n\022END_BATCH_RESPONSE\020+\022\017\n\013ABORT_BA"
+    "TCH\020.\022\030\n\024ABORT_BATCH_RESPONSE\020-B\tB\007Kinet"
+    "ic", 7282);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "kinetic_client.proto", &protobuf_RegisterTypes);
   Local::_default_protocolversion_ =
@@ -965,6 +994,7 @@ void protobuf_AddDesc_kinetic_5fclient_2eproto() {
   Command::default_instance_ = new Command();
   Command_Header::default_instance_ = new Command_Header();
   Command_Body::default_instance_ = new Command_Body();
+  Command_Batch::default_instance_ = new Command_Batch();
   Command_Status::default_instance_ = new Command_Status();
   Command_KeyValue::default_instance_ = new Command_KeyValue();
   Command_Range::default_instance_ = new Command_Range();
@@ -992,6 +1022,7 @@ void protobuf_AddDesc_kinetic_5fclient_2eproto() {
   Command::default_instance_->InitAsDefaultInstance();
   Command_Header::default_instance_->InitAsDefaultInstance();
   Command_Body::default_instance_->InitAsDefaultInstance();
+  Command_Batch::default_instance_->InitAsDefaultInstance();
   Command_Status::default_instance_->InitAsDefaultInstance();
   Command_KeyValue::default_instance_->InitAsDefaultInstance();
   Command_Range::default_instance_->InitAsDefaultInstance();
@@ -2867,6 +2898,7 @@ const int Command_Body::kP2POperationFieldNumber;
 const int Command_Body::kGetLogFieldNumber;
 const int Command_Body::kSecurityFieldNumber;
 const int Command_Body::kPinOpFieldNumber;
+const int Command_Body::kBatchFieldNumber;
 #endif  // !_MSC_VER
 
 Command_Body::Command_Body()
@@ -2882,6 +2914,7 @@ void Command_Body::InitAsDefaultInstance() {
   getlog_ = const_cast< ::com::seagate::kinetic::client::proto::Command_GetLog*>(&::com::seagate::kinetic::client::proto::Command_GetLog::default_instance());
   security_ = const_cast< ::com::seagate::kinetic::client::proto::Command_Security*>(&::com::seagate::kinetic::client::proto::Command_Security::default_instance());
   pinop_ = const_cast< ::com::seagate::kinetic::client::proto::Command_PinOperation*>(&::com::seagate::kinetic::client::proto::Command_PinOperation::default_instance());
+  batch_ = const_cast< ::com::seagate::kinetic::client::proto::Command_Batch*>(&::com::seagate::kinetic::client::proto::Command_Batch::default_instance());
 }
 
 Command_Body::Command_Body(const Command_Body& from)
@@ -2899,6 +2932,7 @@ void Command_Body::SharedCtor() {
   getlog_ = NULL;
   security_ = NULL;
   pinop_ = NULL;
+  batch_ = NULL;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2915,6 +2949,7 @@ void Command_Body::SharedDtor() {
     delete getlog_;
     delete security_;
     delete pinop_;
+    delete batch_;
   }
 }
 
@@ -2961,6 +2996,9 @@ void Command_Body::Clear() {
     }
     if (has_pinop()) {
       if (pinop_ != NULL) pinop_->::com::seagate::kinetic::client::proto::Command_PinOperation::Clear();
+    }
+    if (has_batch()) {
+      if (batch_ != NULL) batch_->::com::seagate::kinetic::client::proto::Command_Batch::Clear();
     }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -3066,6 +3104,20 @@ bool Command_Body::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(74)) goto parse_batch;
+        break;
+      }
+
+      // optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+      case 9: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_batch:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_batch()));
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -3130,6 +3182,12 @@ void Command_Body::SerializeWithCachedSizes(
       8, this->pinop(), output);
   }
 
+  // optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+  if (has_batch()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      9, this->batch(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -3185,6 +3243,13 @@ void Command_Body::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         8, this->pinop(), target);
+  }
+
+  // optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+  if (has_batch()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        9, this->batch(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -3247,6 +3312,13 @@ int Command_Body::ByteSize() const {
           this->pinop());
     }
 
+    // optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+    if (has_batch()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->batch());
+    }
+
   }
   if (!unknown_fields().empty()) {
     total_size +=
@@ -3295,6 +3367,9 @@ void Command_Body::MergeFrom(const Command_Body& from) {
     if (from.has_pinop()) {
       mutable_pinop()->::com::seagate::kinetic::client::proto::Command_PinOperation::MergeFrom(from.pinop());
     }
+    if (from.has_batch()) {
+      mutable_batch()->::com::seagate::kinetic::client::proto::Command_Batch::MergeFrom(from.batch());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -3325,6 +3400,7 @@ void Command_Body::Swap(Command_Body* other) {
     std::swap(getlog_, other->getlog_);
     std::swap(security_, other->security_);
     std::swap(pinop_, other->pinop_);
+    std::swap(batch_, other->batch_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -3336,6 +3412,320 @@ void Command_Body::Swap(Command_Body* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = Command_Body_descriptor_;
   metadata.reflection = Command_Body_reflection_;
+  return metadata;
+}
+
+
+// -------------------------------------------------------------------
+
+#ifndef _MSC_VER
+const int Command_Batch::kCountFieldNumber;
+const int Command_Batch::kSequenceFieldNumber;
+const int Command_Batch::kFailedSequenceFieldNumber;
+#endif  // !_MSC_VER
+
+Command_Batch::Command_Batch()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void Command_Batch::InitAsDefaultInstance() {
+}
+
+Command_Batch::Command_Batch(const Command_Batch& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void Command_Batch::SharedCtor() {
+  _cached_size_ = 0;
+  count_ = 0;
+  failedsequence_ = GOOGLE_LONGLONG(0);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+Command_Batch::~Command_Batch() {
+  SharedDtor();
+}
+
+void Command_Batch::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void Command_Batch::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* Command_Batch::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return Command_Batch_descriptor_;
+}
+
+const Command_Batch& Command_Batch::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_kinetic_5fclient_2eproto();
+  return *default_instance_;
+}
+
+Command_Batch* Command_Batch::default_instance_ = NULL;
+
+Command_Batch* Command_Batch::New() const {
+  return new Command_Batch;
+}
+
+void Command_Batch::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    count_ = 0;
+    failedsequence_ = GOOGLE_LONGLONG(0);
+  }
+  sequence_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool Command_Batch::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional int32 count = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &count_)));
+          set_has_count();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_sequence;
+        break;
+      }
+
+      // repeated int64 sequence = 2 [packed = true];
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_sequence:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, this->mutable_sequence())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_VARINT) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 1, 18, input, this->mutable_sequence())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_failedSequence;
+        break;
+      }
+
+      // optional int64 failedSequence = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_failedSequence:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &failedsequence_)));
+          set_has_failedsequence();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void Command_Batch::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional int32 count = 1;
+  if (has_count()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->count(), output);
+  }
+
+  // repeated int64 sequence = 2 [packed = true];
+  if (this->sequence_size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteTag(2, ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_sequence_cached_byte_size_);
+  }
+  for (int i = 0; i < this->sequence_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64NoTag(
+      this->sequence(i), output);
+  }
+
+  // optional int64 failedSequence = 3;
+  if (has_failedsequence()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->failedsequence(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* Command_Batch::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional int32 count = 1;
+  if (has_count()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->count(), target);
+  }
+
+  // repeated int64 sequence = 2 [packed = true];
+  if (this->sequence_size() > 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
+      2,
+      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
+      target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
+      _sequence_cached_byte_size_, target);
+  }
+  for (int i = 0; i < this->sequence_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteInt64NoTagToArray(this->sequence(i), target);
+  }
+
+  // optional int64 failedSequence = 3;
+  if (has_failedsequence()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->failedsequence(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int Command_Batch::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional int32 count = 1;
+    if (has_count()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->count());
+    }
+
+    // optional int64 failedSequence = 3;
+    if (has_failedsequence()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int64Size(
+          this->failedsequence());
+    }
+
+  }
+  // repeated int64 sequence = 2 [packed = true];
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->sequence_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormatLite::
+        Int64Size(this->sequence(i));
+    }
+    if (data_size > 0) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(data_size);
+    }
+    GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+    _sequence_cached_byte_size_ = data_size;
+    GOOGLE_SAFE_CONCURRENT_WRITES_END();
+    total_size += data_size;
+  }
+
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void Command_Batch::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const Command_Batch* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const Command_Batch*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void Command_Batch::MergeFrom(const Command_Batch& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  sequence_.MergeFrom(from.sequence_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_count()) {
+      set_count(from.count());
+    }
+    if (from.has_failedsequence()) {
+      set_failedsequence(from.failedsequence());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void Command_Batch::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void Command_Batch::CopyFrom(const Command_Batch& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool Command_Batch::IsInitialized() const {
+
+  return true;
+}
+
+void Command_Batch::Swap(Command_Batch* other) {
+  if (other != this) {
+    std::swap(count_, other->count_);
+    sequence_.Swap(&other->sequence_);
+    std::swap(failedsequence_, other->failedsequence_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata Command_Batch::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = Command_Batch_descriptor_;
+  metadata.reflection = Command_Batch_reflection_;
   return metadata;
 }
 
@@ -8431,7 +8821,7 @@ const int Command_GetLog_Limits::kMaxKeyRangeCountFieldNumber;
 const int Command_GetLog_Limits::kMaxIdentityCountFieldNumber;
 const int Command_GetLog_Limits::kMaxPinSizeFieldNumber;
 const int Command_GetLog_Limits::kMaxOperationCountPerBatchFieldNumber;
-const int Command_GetLog_Limits::kMaxBatchCountPerConnectionFieldNumber;
+const int Command_GetLog_Limits::kMaxBatchCountPerDeviceFieldNumber;
 #endif  // !_MSC_VER
 
 Command_GetLog_Limits::Command_GetLog_Limits()
@@ -8462,7 +8852,7 @@ void Command_GetLog_Limits::SharedCtor() {
   maxidentitycount_ = 0u;
   maxpinsize_ = 0u;
   maxoperationcountperbatch_ = 0u;
-  maxbatchcountperconnection_ = 0u;
+  maxbatchcountperdevice_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -8512,7 +8902,7 @@ void Command_GetLog_Limits::Clear() {
     maxidentitycount_ = 0u;
     maxpinsize_ = 0u;
     maxoperationcountperbatch_ = 0u;
-    maxbatchcountperconnection_ = 0u;
+    maxbatchcountperdevice_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -8711,19 +9101,19 @@ bool Command_GetLog_Limits::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(104)) goto parse_maxBatchCountPerConnection;
+        if (input->ExpectTag(104)) goto parse_maxBatchCountPerDevice;
         break;
       }
 
-      // optional uint32 maxBatchCountPerConnection = 13;
+      // optional uint32 maxBatchCountPerDevice = 13;
       case 13: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_maxBatchCountPerConnection:
+         parse_maxBatchCountPerDevice:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &maxbatchcountperconnection_)));
-          set_has_maxbatchcountperconnection();
+                 input, &maxbatchcountperdevice_)));
+          set_has_maxbatchcountperdevice();
         } else {
           goto handle_uninterpreted;
         }
@@ -8809,9 +9199,9 @@ void Command_GetLog_Limits::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(12, this->maxoperationcountperbatch(), output);
   }
 
-  // optional uint32 maxBatchCountPerConnection = 13;
-  if (has_maxbatchcountperconnection()) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(13, this->maxbatchcountperconnection(), output);
+  // optional uint32 maxBatchCountPerDevice = 13;
+  if (has_maxbatchcountperdevice()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(13, this->maxbatchcountperdevice(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -8882,9 +9272,9 @@ void Command_GetLog_Limits::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(12, this->maxoperationcountperbatch(), target);
   }
 
-  // optional uint32 maxBatchCountPerConnection = 13;
-  if (has_maxbatchcountperconnection()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(13, this->maxbatchcountperconnection(), target);
+  // optional uint32 maxBatchCountPerDevice = 13;
+  if (has_maxbatchcountperdevice()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(13, this->maxbatchcountperdevice(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -8984,11 +9374,11 @@ int Command_GetLog_Limits::ByteSize() const {
           this->maxoperationcountperbatch());
     }
 
-    // optional uint32 maxBatchCountPerConnection = 13;
-    if (has_maxbatchcountperconnection()) {
+    // optional uint32 maxBatchCountPerDevice = 13;
+    if (has_maxbatchcountperdevice()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
-          this->maxbatchcountperconnection());
+          this->maxbatchcountperdevice());
     }
 
   }
@@ -9056,8 +9446,8 @@ void Command_GetLog_Limits::MergeFrom(const Command_GetLog_Limits& from) {
     if (from.has_maxoperationcountperbatch()) {
       set_maxoperationcountperbatch(from.maxoperationcountperbatch());
     }
-    if (from.has_maxbatchcountperconnection()) {
-      set_maxbatchcountperconnection(from.maxbatchcountperconnection());
+    if (from.has_maxbatchcountperdevice()) {
+      set_maxbatchcountperdevice(from.maxbatchcountperdevice());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -9094,7 +9484,7 @@ void Command_GetLog_Limits::Swap(Command_GetLog_Limits* other) {
     std::swap(maxidentitycount_, other->maxidentitycount_);
     std::swap(maxpinsize_, other->maxpinsize_);
     std::swap(maxoperationcountperbatch_, other->maxoperationcountperbatch_);
-    std::swap(maxbatchcountperconnection_, other->maxbatchcountperconnection_);
+    std::swap(maxbatchcountperdevice_, other->maxbatchcountperdevice_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -310,4 +310,45 @@ KineticStatus ThreadsafeBlockingKineticConnection::P2PPush(const P2PPushRequest&
     return connection_->P2PPush(push_request, operation_statuses);
 }
 
+KineticStatus ThreadsafeBlockingKineticConnection::BatchStart(int * batch_id) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchStart(batch_id);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
+    const shared_ptr<const string> current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchPutKey(batch_id, key, current_version, mode, record);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchPutKey(int batch_id, const string key,
+    const string current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchPutKey(batch_id, key, current_version, mode, record);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+    const shared_ptr<const string> version, WriteMode mode) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchDeleteKey(batch_id, key, version,mode);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
+     const string version, WriteMode mode) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchDeleteKey(batch_id, key, version, mode);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchCommit(int batch_id) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchCommit(batch_id);
+}
+
+KineticStatus ThreadsafeBlockingKineticConnection::BatchAbort(int batch_id) {
+	std::lock_guard<std::recursive_mutex> guard(mutex_);
+	return connection_->BatchAbort(batch_id);
+}
+
 } // namespace kinetic

@@ -293,32 +293,28 @@ HandlerKey ThreadsafeNonblockingKineticConnection::BatchStart(const shared_ptr<S
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
   const shared_ptr<const string> current_version, WriteMode mode,
-  const shared_ptr<const KineticRecord> record,
-  const shared_ptr<PutCallbackInterface> callback) {
+  const shared_ptr<const KineticRecord> record) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->BatchPutKey(batch_id, key, current_version, mode, record, callback);
+    return connection_->BatchPutKey(batch_id, key, current_version, mode, record);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchPutKey(int batch_id, const string key,
         const string current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) {
+        const shared_ptr<const KineticRecord> record) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->BatchPutKey(batch_id, key, current_version, mode, record, callback);
+    return connection_->BatchPutKey(batch_id, key, current_version, mode, record);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-        const shared_ptr<const string> version, WriteMode mode,
-        const shared_ptr<SimpleCallbackInterface> callback) {
+        const shared_ptr<const string> version, WriteMode mode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->BatchDeleteKey(batch_id, key, version, mode, callback);
+    return connection_->BatchDeleteKey(batch_id, key, version, mode);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
-        const string version, WriteMode mode,
-        const shared_ptr<SimpleCallbackInterface> callback) {
+        const string version, WriteMode mode) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->BatchDeleteKey(batch_id, key, version, mode, callback);
+    return connection_->BatchDeleteKey(batch_id, key, version, mode);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::BatchCommit(int batch_id,
@@ -332,6 +328,4 @@ HandlerKey ThreadsafeNonblockingKineticConnection::BatchAbort(int batch_id,
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->BatchAbort(batch_id, callback);
 }
-
-
 } // namespace kinetic

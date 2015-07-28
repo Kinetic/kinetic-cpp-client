@@ -466,6 +466,19 @@ KineticStatus BlockingKineticConnection::P2PPush(
 }
 
 KineticStatus BlockingKineticConnection::RunOperation(
+        HandlerKey handler_key) {
+    fd_set read_fds, write_fds;
+    int nfds;
+
+    if (!nonblocking_connection_->Run(&read_fds, &write_fds, &nfds)) {
+        nonblocking_connection_->RemoveHandler(handler_key);
+        return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Connection failed");
+    }
+
+    return KineticStatus(StatusCode::OK, "");
+}
+
+KineticStatus BlockingKineticConnection::RunOperation(
         shared_ptr<BlockingCallbackState> callback,
         HandlerKey handler_key) {
     fd_set read_fds, write_fds;
@@ -501,12 +514,52 @@ KineticStatus BlockingKineticConnection::RunOperation(
     }
 
     // done was set, meaning handler was invoked and therefore removed internally
-
     if (callback->success_) {
         return KineticStatus(StatusCode::OK, "");
     } else {
         return callback->error_;
     }
+
+    return KineticStatus(StatusCode::OK, "");
+}
+
+KineticStatus BlockingKineticConnection::BatchStart(int * batch_id) {
+    auto callback = make_shared<SimpleCallback>();
+	return RunOperation(callback, nonblocking_connection_->BatchStart(callback, batch_id));
+}
+
+KineticStatus BlockingKineticConnection::BatchPutKey(int batch_id, const shared_ptr<const string> key,
+    const shared_ptr<const string> current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record) {
+	return RunOperation(nonblocking_connection_->BatchPutKey(batch_id, key, current_version, mode, record));
+}
+
+KineticStatus BlockingKineticConnection::BatchPutKey(int batch_id, const string key,
+    const string current_version, WriteMode mode,
+    const shared_ptr<const KineticRecord> record) {
+	return BatchPutKey(batch_id, make_shared<string>(key), make_shared<string>(current_version),
+	           mode, record);
+}
+
+KineticStatus BlockingKineticConnection::BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+    const shared_ptr<const string> version, WriteMode mode) {
+	return RunOperation(nonblocking_connection_->BatchDeleteKey(batch_id, key, version, mode));
+}
+
+KineticStatus BlockingKineticConnection::BatchDeleteKey(int batch_id, const string key,
+     const string version, WriteMode mode) {
+	return BatchDeleteKey(batch_id, make_shared<string>(key), make_shared<string>(version),
+	            mode);
+}
+
+KineticStatus BlockingKineticConnection::BatchCommit(int batch_id) {
+	auto callback = make_shared<SimpleCallback>();
+	return RunOperation(callback, nonblocking_connection_->BatchCommit(batch_id, callback));
+}
+
+KineticStatus BlockingKineticConnection::BatchAbort(int batch_id) {
+	auto callback = make_shared<SimpleCallback>();
+	return RunOperation(callback, nonblocking_connection_->BatchAbort(batch_id, callback));
 }
 
 } // namespace kinetic

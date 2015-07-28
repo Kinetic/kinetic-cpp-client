@@ -103,18 +103,14 @@ class ThreadsafeNonblockingKineticConnection : public NonblockingKineticConnecti
     HandlerKey BatchStart(const shared_ptr<SimpleCallbackInterface> callback, int * batch_id);
     HandlerKey BatchPutKey(int batch_id, const shared_ptr<const string> key,
       const shared_ptr<const string> current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record,
-      const shared_ptr<PutCallbackInterface> callback);
+      const shared_ptr<const KineticRecord> record);
     HandlerKey BatchPutKey(int batch_id, const string key,
       const string current_version, WriteMode mode,
-      const shared_ptr<const KineticRecord> record,
-      const shared_ptr<PutCallbackInterface> callback);
+      const shared_ptr<const KineticRecord> record);
     HandlerKey BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-      const shared_ptr<const string> version, WriteMode mode,
-      const shared_ptr<SimpleCallbackInterface> callback);
+      const shared_ptr<const string> version, WriteMode mode);
     HandlerKey BatchDeleteKey(int batch_id, const string key,
-       const string version, WriteMode mode,
-       const shared_ptr<SimpleCallbackInterface> callback);
+       const string version, WriteMode mode);
     HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback);
 

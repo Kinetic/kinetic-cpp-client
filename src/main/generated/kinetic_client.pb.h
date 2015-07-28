@@ -45,6 +45,7 @@ class Message_PINauth;
 class Command;
 class Command_Header;
 class Command_Body;
+class Command_Batch;
 class Command_Status;
 class Command_KeyValue;
 class Command_Range;
@@ -1055,6 +1056,15 @@ class Command_Body : public ::google::protobuf::Message {
   inline ::com::seagate::kinetic::client::proto::Command_PinOperation* release_pinop();
   inline void set_allocated_pinop(::com::seagate::kinetic::client::proto::Command_PinOperation* pinop);
 
+  // optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+  inline bool has_batch() const;
+  inline void clear_batch();
+  static const int kBatchFieldNumber = 9;
+  inline const ::com::seagate::kinetic::client::proto::Command_Batch& batch() const;
+  inline ::com::seagate::kinetic::client::proto::Command_Batch* mutable_batch();
+  inline ::com::seagate::kinetic::client::proto::Command_Batch* release_batch();
+  inline void set_allocated_batch(::com::seagate::kinetic::client::proto::Command_Batch* batch);
+
   // @@protoc_insertion_point(class_scope:com.seagate.kinetic.client.proto.Command.Body)
  private:
   inline void set_has_keyvalue();
@@ -1071,6 +1081,8 @@ class Command_Body : public ::google::protobuf::Message {
   inline void clear_has_security();
   inline void set_has_pinop();
   inline void clear_has_pinop();
+  inline void set_has_batch();
+  inline void clear_has_batch();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -1081,9 +1093,10 @@ class Command_Body : public ::google::protobuf::Message {
   ::com::seagate::kinetic::client::proto::Command_GetLog* getlog_;
   ::com::seagate::kinetic::client::proto::Command_Security* security_;
   ::com::seagate::kinetic::client::proto::Command_PinOperation* pinop_;
+  ::com::seagate::kinetic::client::proto::Command_Batch* batch_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
 
   friend void  protobuf_AddDesc_kinetic_5fclient_2eproto();
   friend void protobuf_AssignDesc_kinetic_5fclient_2eproto();
@@ -1091,6 +1104,112 @@ class Command_Body : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static Command_Body* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Command_Batch : public ::google::protobuf::Message {
+ public:
+  Command_Batch();
+  virtual ~Command_Batch();
+
+  Command_Batch(const Command_Batch& from);
+
+  inline Command_Batch& operator=(const Command_Batch& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Command_Batch& default_instance();
+
+  void Swap(Command_Batch* other);
+
+  // implements Message ----------------------------------------------
+
+  Command_Batch* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Command_Batch& from);
+  void MergeFrom(const Command_Batch& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional int32 count = 1;
+  inline bool has_count() const;
+  inline void clear_count();
+  static const int kCountFieldNumber = 1;
+  inline ::google::protobuf::int32 count() const;
+  inline void set_count(::google::protobuf::int32 value);
+
+  // repeated int64 sequence = 2 [packed = true];
+  inline int sequence_size() const;
+  inline void clear_sequence();
+  static const int kSequenceFieldNumber = 2;
+  inline ::google::protobuf::int64 sequence(int index) const;
+  inline void set_sequence(int index, ::google::protobuf::int64 value);
+  inline void add_sequence(::google::protobuf::int64 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
+      sequence() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
+      mutable_sequence();
+
+  // optional int64 failedSequence = 3;
+  inline bool has_failedsequence() const;
+  inline void clear_failedsequence();
+  static const int kFailedSequenceFieldNumber = 3;
+  inline ::google::protobuf::int64 failedsequence() const;
+  inline void set_failedsequence(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:com.seagate.kinetic.client.proto.Command.Batch)
+ private:
+  inline void set_has_count();
+  inline void clear_has_count();
+  inline void set_has_failedsequence();
+  inline void clear_has_failedsequence();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::RepeatedField< ::google::protobuf::int64 > sequence_;
+  mutable int _sequence_cached_byte_size_;
+  ::google::protobuf::int64 failedsequence_;
+  ::google::protobuf::int32 count_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+
+  friend void  protobuf_AddDesc_kinetic_5fclient_2eproto();
+  friend void protobuf_AssignDesc_kinetic_5fclient_2eproto();
+  friend void protobuf_ShutdownFile_kinetic_5fclient_2eproto();
+
+  void InitAsDefaultInstance();
+  static Command_Batch* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2987,12 +3106,12 @@ class Command_GetLog_Limits : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 maxoperationcountperbatch() const;
   inline void set_maxoperationcountperbatch(::google::protobuf::uint32 value);
 
-  // optional uint32 maxBatchCountPerConnection = 13;
-  inline bool has_maxbatchcountperconnection() const;
-  inline void clear_maxbatchcountperconnection();
-  static const int kMaxBatchCountPerConnectionFieldNumber = 13;
-  inline ::google::protobuf::uint32 maxbatchcountperconnection() const;
-  inline void set_maxbatchcountperconnection(::google::protobuf::uint32 value);
+  // optional uint32 maxBatchCountPerDevice = 13;
+  inline bool has_maxbatchcountperdevice() const;
+  inline void clear_maxbatchcountperdevice();
+  static const int kMaxBatchCountPerDeviceFieldNumber = 13;
+  inline ::google::protobuf::uint32 maxbatchcountperdevice() const;
+  inline void set_maxbatchcountperdevice(::google::protobuf::uint32 value);
 
   // @@protoc_insertion_point(class_scope:com.seagate.kinetic.client.proto.Command.GetLog.Limits)
  private:
@@ -3020,8 +3139,8 @@ class Command_GetLog_Limits : public ::google::protobuf::Message {
   inline void clear_has_maxpinsize();
   inline void set_has_maxoperationcountperbatch();
   inline void clear_has_maxoperationcountperbatch();
-  inline void set_has_maxbatchcountperconnection();
-  inline void clear_has_maxbatchcountperconnection();
+  inline void set_has_maxbatchcountperdevice();
+  inline void clear_has_maxbatchcountperdevice();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3037,7 +3156,7 @@ class Command_GetLog_Limits : public ::google::protobuf::Message {
   ::google::protobuf::uint32 maxidentitycount_;
   ::google::protobuf::uint32 maxpinsize_;
   ::google::protobuf::uint32 maxoperationcountperbatch_;
-  ::google::protobuf::uint32 maxbatchcountperconnection_;
+  ::google::protobuf::uint32 maxbatchcountperdevice_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(13 + 31) / 32];
@@ -3977,6 +4096,7 @@ class Command : public ::google::protobuf::Message {
 
   typedef Command_Header Header;
   typedef Command_Body Body;
+  typedef Command_Batch Batch;
   typedef Command_Status Status;
   typedef Command_KeyValue KeyValue;
   typedef Command_Range Range;
@@ -5096,6 +5216,117 @@ inline void Command_Body::set_allocated_pinop(::com::seagate::kinetic::client::p
   } else {
     clear_has_pinop();
   }
+}
+
+// optional .com.seagate.kinetic.client.proto.Command.Batch batch = 9;
+inline bool Command_Body::has_batch() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void Command_Body::set_has_batch() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void Command_Body::clear_has_batch() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void Command_Body::clear_batch() {
+  if (batch_ != NULL) batch_->::com::seagate::kinetic::client::proto::Command_Batch::Clear();
+  clear_has_batch();
+}
+inline const ::com::seagate::kinetic::client::proto::Command_Batch& Command_Body::batch() const {
+  return batch_ != NULL ? *batch_ : *default_instance_->batch_;
+}
+inline ::com::seagate::kinetic::client::proto::Command_Batch* Command_Body::mutable_batch() {
+  set_has_batch();
+  if (batch_ == NULL) batch_ = new ::com::seagate::kinetic::client::proto::Command_Batch;
+  return batch_;
+}
+inline ::com::seagate::kinetic::client::proto::Command_Batch* Command_Body::release_batch() {
+  clear_has_batch();
+  ::com::seagate::kinetic::client::proto::Command_Batch* temp = batch_;
+  batch_ = NULL;
+  return temp;
+}
+inline void Command_Body::set_allocated_batch(::com::seagate::kinetic::client::proto::Command_Batch* batch) {
+  delete batch_;
+  batch_ = batch;
+  if (batch) {
+    set_has_batch();
+  } else {
+    clear_has_batch();
+  }
+}
+
+// -------------------------------------------------------------------
+
+// Command_Batch
+
+// optional int32 count = 1;
+inline bool Command_Batch::has_count() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Command_Batch::set_has_count() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Command_Batch::clear_has_count() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Command_Batch::clear_count() {
+  count_ = 0;
+  clear_has_count();
+}
+inline ::google::protobuf::int32 Command_Batch::count() const {
+  return count_;
+}
+inline void Command_Batch::set_count(::google::protobuf::int32 value) {
+  set_has_count();
+  count_ = value;
+}
+
+// repeated int64 sequence = 2 [packed = true];
+inline int Command_Batch::sequence_size() const {
+  return sequence_.size();
+}
+inline void Command_Batch::clear_sequence() {
+  sequence_.Clear();
+}
+inline ::google::protobuf::int64 Command_Batch::sequence(int index) const {
+  return sequence_.Get(index);
+}
+inline void Command_Batch::set_sequence(int index, ::google::protobuf::int64 value) {
+  sequence_.Set(index, value);
+}
+inline void Command_Batch::add_sequence(::google::protobuf::int64 value) {
+  sequence_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int64 >&
+Command_Batch::sequence() const {
+  return sequence_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int64 >*
+Command_Batch::mutable_sequence() {
+  return &sequence_;
+}
+
+// optional int64 failedSequence = 3;
+inline bool Command_Batch::has_failedsequence() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Command_Batch::set_has_failedsequence() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Command_Batch::clear_has_failedsequence() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Command_Batch::clear_failedsequence() {
+  failedsequence_ = GOOGLE_LONGLONG(0);
+  clear_has_failedsequence();
+}
+inline ::google::protobuf::int64 Command_Batch::failedsequence() const {
+  return failedsequence_;
+}
+inline void Command_Batch::set_failedsequence(::google::protobuf::int64 value) {
+  set_has_failedsequence();
+  failedsequence_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -8184,26 +8415,26 @@ inline void Command_GetLog_Limits::set_maxoperationcountperbatch(::google::proto
   maxoperationcountperbatch_ = value;
 }
 
-// optional uint32 maxBatchCountPerConnection = 13;
-inline bool Command_GetLog_Limits::has_maxbatchcountperconnection() const {
+// optional uint32 maxBatchCountPerDevice = 13;
+inline bool Command_GetLog_Limits::has_maxbatchcountperdevice() const {
   return (_has_bits_[0] & 0x00001000u) != 0;
 }
-inline void Command_GetLog_Limits::set_has_maxbatchcountperconnection() {
+inline void Command_GetLog_Limits::set_has_maxbatchcountperdevice() {
   _has_bits_[0] |= 0x00001000u;
 }
-inline void Command_GetLog_Limits::clear_has_maxbatchcountperconnection() {
+inline void Command_GetLog_Limits::clear_has_maxbatchcountperdevice() {
   _has_bits_[0] &= ~0x00001000u;
 }
-inline void Command_GetLog_Limits::clear_maxbatchcountperconnection() {
-  maxbatchcountperconnection_ = 0u;
-  clear_has_maxbatchcountperconnection();
+inline void Command_GetLog_Limits::clear_maxbatchcountperdevice() {
+  maxbatchcountperdevice_ = 0u;
+  clear_has_maxbatchcountperdevice();
 }
-inline ::google::protobuf::uint32 Command_GetLog_Limits::maxbatchcountperconnection() const {
-  return maxbatchcountperconnection_;
+inline ::google::protobuf::uint32 Command_GetLog_Limits::maxbatchcountperdevice() const {
+  return maxbatchcountperdevice_;
 }
-inline void Command_GetLog_Limits::set_maxbatchcountperconnection(::google::protobuf::uint32 value) {
-  set_has_maxbatchcountperconnection();
-  maxbatchcountperconnection_ = value;
+inline void Command_GetLog_Limits::set_maxbatchcountperdevice(::google::protobuf::uint32 value) {
+  set_has_maxbatchcountperdevice();
+  maxbatchcountperdevice_ = value;
 }
 
 // -------------------------------------------------------------------

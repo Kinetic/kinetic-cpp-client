@@ -52,8 +52,8 @@ set(EXTERNAL_PREFIX "${kinetic_cpp_client_BINARY_DIR}/vendor")
 
 include(ExternalProject)
 
-set(KINETIC_PROTO_VERSION "3.0.0")
-set(KINETIC_PROTO_MD5 "85ca027b870811a297c1f6d792498934")
+set(KINETIC_PROTO_VERSION "3.0.6")
+set(KINETIC_PROTO_MD5 "c675d3e92fe73727b5eec1b5aa695e7d")
 
 ExternalProject_add(
     kinetic-proto

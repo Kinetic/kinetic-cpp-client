@@ -334,18 +334,14 @@ class NonblockingKineticConnectionInterface {
     virtual HandlerKey BatchStart(const shared_ptr<SimpleCallbackInterface> callback, int * batch_id) = 0;
     virtual HandlerKey BatchPutKey(int batch_id, const shared_ptr<const string> key,
         const shared_ptr<const string> current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) = 0;
+        const shared_ptr<const KineticRecord> record) = 0;
     virtual HandlerKey BatchPutKey(int batch_id, const string key,
         const string current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) = 0;
+        const shared_ptr<const KineticRecord> record) = 0;
     virtual HandlerKey BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
-        const shared_ptr<const string> version, WriteMode mode,
-        const shared_ptr<SimpleCallbackInterface> callback) = 0;
+        const shared_ptr<const string> version, WriteMode mode) = 0;
     virtual HandlerKey BatchDeleteKey(int batch_id, const string key,
-         const string version, WriteMode mode,
-         const shared_ptr<SimpleCallbackInterface> callback) = 0;
+         const string version, WriteMode mode) = 0;
     virtual HandlerKey BatchCommit(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) = 0;
     virtual HandlerKey BatchAbort(int batch_id, const shared_ptr<SimpleCallbackInterface> callback) = 0;
 };

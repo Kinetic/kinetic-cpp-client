@@ -139,6 +139,25 @@ class BlockingKineticConnectionInterface {
     virtual KineticStatus LockDevice(const string& pin) = 0;
     virtual KineticStatus UnlockDevice(const shared_ptr<string> pin) = 0;
     virtual KineticStatus UnlockDevice(const string& pin) = 0;
+
+    /* Batch Operation Support. BatchStart sets the batch id to be used for all further
+     * requests added to the same batch operation. Every started batch should be either
+     * committed or aborted.
+     * Use the BatchOperation class defined in kinetic/batch_operation.h to minimize code
+     * complexity. */
+    virtual KineticStatus BatchStart(int * batch_id) = 0;
+    virtual KineticStatus BatchPutKey(int batch_id, const shared_ptr<const string> key,
+        const shared_ptr<const string> current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record) = 0;
+    virtual KineticStatus BatchPutKey(int batch_id, const string key,
+        const string current_version, WriteMode mode,
+        const shared_ptr<const KineticRecord> record) = 0;
+    virtual KineticStatus BatchDeleteKey(int batch_id, const shared_ptr<const string> key,
+        const shared_ptr<const string> version, WriteMode mode) = 0;
+    virtual KineticStatus BatchDeleteKey(int batch_id, const string key,
+         const string version, WriteMode mode) = 0;
+    virtual KineticStatus BatchCommit(int batch_id) = 0;
+    virtual KineticStatus BatchAbort(int batch_id) = 0;
 };
 
 } // namespace kinetic
