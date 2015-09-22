@@ -47,3 +47,14 @@ suite or `make integration_test_valgrind` for the integration test suite.
 **Generating documentation**: `make doc`. HTML documentation will be generated in `docs/`
 
 **Apply licenses**: Run something like `./apply_license.sh my_new_file.cc` or `./apply_license.sh src/*.h`
+
+How to cross-compile
+====================
+
+Please note that cross-compile support is only to build static or shared library, not for tests.
+1. Build and install all the dependencies outside, such as `openssl, protobuf, glog, gmock`
+2. Run `cmake . -DBUILD_NATIVE=no" -DCMAKE_LIBRARY_PATH="path/to/lib/directory" -DCMAKE_INCLUDE_PATH="path/to/include/directory"` to build static library
+or run `cmake . -DBUILD_NATIVE=no -DBUILD_SHARED_LIBS=true -DCMAKE_LIBRARY_PATH="path/to/lib/directory" -DCMAKE_INCLUDE_PATH="path/to/include/directory"` to build shared library.
+3. Run `make`
+
+"LIB_INSTALL_DIR" and "INC_INSTALL_DIR" cmake variables can also be provided to provide install path for "libkinetic_client.a" or "libkinetic_client.so"

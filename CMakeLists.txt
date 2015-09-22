@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(kinetic_cpp_client CXX C)
 
+option(BUILD_NATIVE "Build for native platform" on)
+
+if(BUILD_NATIVE)
+
 find_package (Threads)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -176,6 +180,30 @@ set(LIBRARY_DEPENDENCIES
     dl
 )
 
+else(BUILD_NATIVE)
+
+add_library(kinetic-protocol SHARED IMPORTED)
+set_property(TARGET kinetic-protocol PROPERTY IMPORTED_LOCATION "${CMAKE_LIBRARY_PATH}/libkinetic.pb.so")
+add_library(openssl SHARED IMPORTED)
+set_property(TARGET openssl PROPERTY IMPORTED_LOCATION "${CMAKE_LIBRARY_PATH}/libssl.so")
+
+include_directories(
+    include
+    src/main
+
+    ${CMAKE_INCLUDE_PATH}/kinetic
+    ${CMAKE_INCLUDE_PATH}/openssl
+    ${CMAKE_INCLUDE_PATH}/google/protobuf
+    ${CMAKE_INCLUDE_PATH}/glog
+)
+
+set(LIBRARY_DEPENDENCIES
+    kinetic_client
+    ${CMAKE_THREAD_LIBS_INIT}
+    dl
+)
+
+endif(BUILD_NATIVE)
 # If libunwind is installed it is used by glog and thus has to linked. 
 # Otherwise glog uses the standard glibc unwinder and there is no dependency.
 find_library(LIBUNWIND "unwind")
@@ -186,6 +214,7 @@ if(LIBUNWIND)
     )
 endif()
 
+if(BUILD_NATIVE)
 add_library(kinetic_client
     src/main/generated/kinetic_client.pb.cc
     src/main/hmac_provider.cc
@@ -273,3 +302,35 @@ add_custom_target(lint
     WORKING_DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}
     COMMENT "Running style checker" VERBATIM
 )
+else(BUILD_NATIVE)
+
+add_library(kinetic_client
+    src/main/hmac_provider.cc
+    src/main/kinetic_connection_factory.cc
+    src/main/nonblocking_kinetic_connection.cc
+    src/main/threadsafe_nonblocking_kinetic_connection.cc
+    src/main/nonblocking_packet.cc
+    src/main/nonblocking_packet_writer_factory.cc
+    src/main/nonblocking_packet_service.cc
+    src/main/nonblocking_packet_sender.cc
+    src/main/nonblocking_packet_receiver.cc
+    src/main/nonblocking_string.cc
+    src/main/socket_wrapper.cc
+    src/main/blocking_kinetic_connection.cc
+    src/main/threadsafe_blocking_kinetic_connection.cc
+    src/main/status_code.cc
+    src/main/byte_stream.cc
+    src/main/incoming_string_value.cc
+    src/main/message_stream.cc
+    src/main/outgoing_string_value.cc
+    src/main/reader_writer.cc
+    src/main/key_range_iterator.cc
+    src/main/batch_operation.cc
+)
+add_dependencies(kinetic_client kinetic_protocol openssl)
+
+# installation rules
+install(DIRECTORY include/kinetic/ DESTINATION ${INC_INSTALL_DIR}/kinetic_client FILES_MATCHING PATTERN "*.h")
+install(TARGETS kinetic_client LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+
+endif(BUILD_NATIVE)
