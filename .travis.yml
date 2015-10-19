@@ -9,7 +9,7 @@ install:
   - cmake .
   - make
 before_script:
-  - git clone https://github.com/Seagate/kinetic-java
+  - git clone https://github.com/Kinetic/kinetic-java
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
   - echo $JAVA_HOME
   - mvn -f ./kinetic-java/pom.xml -DskipTests clean package 
