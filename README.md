@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Seagate/kinetic-cpp-client.svg?branch=master)](https://travis-ci.org/Seagate/kinetic-cpp-client)
+[![Build Status](https://travis-ci.org/Kinetic/kinetic-cpp-client.svg?branch=master)](https://travis-ci.org/Kinetic/kinetic-cpp-client)
 Introduction
 ============
 This repo contains code for producing C and C++ kinetic clients. The C++ library currently does not support Windows at this time because of existing library requirements.
@@ -6,7 +6,7 @@ This repo contains code for producing C and C++ kinetic clients. The C++ library
 
 Protocol Version
 =================
-The client is using version `3.0.0` of the [Kinetic-Protocol](https://github.com/Seagate/kinetic-protocol).
+The client is using version `3.0.0` of the [Kinetic-Protocol](https://github.com/Kinetic/kinetic-protocol).
 
 
 Dependencies
