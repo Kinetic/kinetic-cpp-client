@@ -32,17 +32,25 @@ namespace kinetic {
 
 using std::string;
 
+class OpenSSLInitializer{
+public:
+    OpenSSLInitializer() {
+      SSL_library_init();
+      OpenSSL_add_all_algorithms();
+    }
+};
+static OpenSSLInitializer init;
+
 SocketWrapper::SocketWrapper(const std::string& host, int port, bool use_ssl, bool nonblocking)
         : ctx_(NULL), ssl_(NULL), host_(host), port_(port), nonblocking_(nonblocking), fd_(-1) {
-    if(!use_ssl) return;
-
-    SSL_library_init();
-    OpenSSL_add_all_algorithms();
-    ctx_ = SSL_CTX_new(SSLv23_client_method());
-    ssl_ = SSL_new(ctx_);
-    if(!ssl_ || !ctx_)
-        throw std::runtime_error("Failed Setting up SSL environment.");
-    SSL_set_mode(ssl_, SSL_MODE_AUTO_RETRY);
+    if(use_ssl) {
+        ctx_ = SSL_CTX_new(SSLv23_client_method());
+        ssl_ = SSL_new(ctx_);
+        if(!ssl_ || !ctx_) {
+            throw std::runtime_error("Failed Setting up SSL environment.");
+        }
+        SSL_set_mode(ssl_, SSL_MODE_AUTO_RETRY);
+    }
 }
 
 SocketWrapper::~SocketWrapper() {
