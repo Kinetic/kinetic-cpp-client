@@ -61,7 +61,6 @@ HandlerKey ThreadsafeNonblockingKineticConnection::Get(const string key, const s
     return connection_->Get(key, callback);
 }
 
-
 HandlerKey ThreadsafeNonblockingKineticConnection::GetNext(const string key, const shared_ptr<GetCallbackInterface> callback){
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetNext(key, callback);
@@ -195,6 +194,11 @@ HandlerKey ThreadsafeNonblockingKineticConnection::GetLog(const vector<Command_G
         const shared_ptr<GetLogCallbackInterface> callback) {
     std::lock_guard<std::recursive_mutex> guard(mutex_);
     return connection_->GetLog(types, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::Flush(const shared_ptr<SimpleCallbackInterface> callback) {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->Flush(callback);
 }
 
 HandlerKey ThreadsafeNonblockingKineticConnection::UpdateFirmware(

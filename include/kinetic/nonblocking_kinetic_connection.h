@@ -68,6 +68,7 @@ class NonblockingKineticConnection : public NonblockingKineticConnectionInterfac
             const shared_ptr<P2PPushCallbackInterface> callback);
     HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback);
     HandlerKey GetLog(const vector<Command_GetLog_Type>& types, const shared_ptr<GetLogCallbackInterface> callback);
+    HandlerKey Flush(const shared_ptr<SimpleCallbackInterface> callback);
 
     HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware, const shared_ptr<SimpleCallbackInterface> callback);
     HandlerKey SetClusterVersion(int64_t new_cluster_version, const shared_ptr<SimpleCallbackInterface> callback);
