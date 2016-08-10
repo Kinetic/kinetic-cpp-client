@@ -294,6 +294,11 @@ KineticStatus BlockingKineticConnection::GetLog(const vector<Command_GetLog_Type
     return RunOperation(callback, nonblocking_connection_->GetLog(types, callback));
 }
 
+KineticStatus BlockingKineticConnection::Flush() {
+    auto callback = make_shared<SimpleCallback>();
+    return RunOperation(callback, nonblocking_connection_->Flush(callback));
+}
+
 KineticStatus BlockingKineticConnection::UpdateFirmware(const shared_ptr<const string>
         new_firmware) {
     auto callback = make_shared<SimpleCallback>();

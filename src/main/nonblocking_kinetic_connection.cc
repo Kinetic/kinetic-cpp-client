@@ -22,46 +22,7 @@
 
 namespace kinetic {
 
-using com::seagate::kinetic::client::proto::Command_MessageType_DELETE;
-using com::seagate::kinetic::client::proto::Command_MessageType_GET;
-using com::seagate::kinetic::client::proto::Command_MessageType_GETNEXT;
-using com::seagate::kinetic::client::proto::Command_MessageType_GETPREVIOUS;
-using com::seagate::kinetic::client::proto::Command_MessageType_GETKEYRANGE;
-using com::seagate::kinetic::client::proto::Command_MessageType_GETVERSION;
-using com::seagate::kinetic::client::proto::Command_MessageType_NOOP;
-using com::seagate::kinetic::client::proto::Command_MessageType_PUT;
-using com::seagate::kinetic::client::proto::Command_MessageType_SETUP;
-using com::seagate::kinetic::client::proto::Command_MessageType_GETLOG;
-using com::seagate::kinetic::client::proto::Command_MessageType_SECURITY;
-using com::seagate::kinetic::client::proto::Command_MessageType_PEER2PEERPUSH;
-using com::seagate::kinetic::client::proto::Command_MessageType_PINOP;
-using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NOT_AUTHORIZED;
-using com::seagate::kinetic::client::proto::Command_Status_StatusCode_NOT_FOUND;
-using com::seagate::kinetic::client::proto::Command_Status_StatusCode_SUCCESS;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_UTILIZATIONS;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_TEMPERATURES;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_CAPACITIES;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_CONFIGURATION;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_STATISTICS;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_MESSAGES;
-using com::seagate::kinetic::client::proto::Command_GetLog_Type_LIMITS;
-using com::seagate::kinetic::client::proto::Command_Security_ACL;
-using com::seagate::kinetic::client::proto::Command_Security_ACL_Permission;
-using com::seagate::kinetic::client::proto::Command_Security_ACL_Scope;
-using com::seagate::kinetic::client::proto::Command_Security_ACL_HMACAlgorithm_HmacSHA1;
-using com::seagate::kinetic::client::proto::Command_Status;
-using com::seagate::kinetic::client::proto::Command_P2POperation;
-using com::seagate::kinetic::client::proto::Command_Synchronization;
-using com::seagate::kinetic::client::proto::Command_Synchronization_FLUSH;
-using com::seagate::kinetic::client::proto::Command_Synchronization_WRITEBACK;
-using com::seagate::kinetic::client::proto::Command_Synchronization_WRITETHROUGH;
-using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_UNLOCK_PINOP;
-using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_LOCK_PINOP;
-using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_ERASE_PINOP;
-using com::seagate::kinetic::client::proto::Command_PinOperation_PinOpType_SECURE_ERASE_PINOP;
-using com::seagate::kinetic::client::proto::Message_AuthType_PINAUTH;
-using com::seagate::kinetic::client::proto::Message_AuthType_HMACAUTH;
-
+using namespace com::seagate::kinetic::client::proto;
 using std::shared_ptr;
 using std::string;
 using std::make_shared;
@@ -532,6 +493,17 @@ HandlerKey NonblockingKineticConnection::GenericGet(const shared_ptr<const strin
     unique_ptr<Command> request = NewCommand(message_type);
 
     request->mutable_body()->mutable_keyvalue()->set_key(*key);
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::Flush(
+    const shared_ptr<SimpleCallbackInterface> callback) {
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_HMACAUTH);
+    unique_ptr<Command> request = NewCommand(Command_MessageType_FLUSHALLDATA);
+
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 

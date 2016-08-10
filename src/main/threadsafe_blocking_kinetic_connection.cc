@@ -142,6 +142,10 @@ KineticStatus ThreadsafeBlockingKineticConnection::GetLog(const vector<Command_G
     return connection_->GetLog(types, drive_log);
 }
 
+KineticStatus ThreadsafeBlockingKineticConnection::Flush() {
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->Flush();
+}
 
 KineticStatus ThreadsafeBlockingKineticConnection::UpdateFirmware(const shared_ptr<const string>
         new_firmware) {

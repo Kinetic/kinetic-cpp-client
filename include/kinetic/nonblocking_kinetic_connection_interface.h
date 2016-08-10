@@ -285,6 +285,7 @@ public:
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;
     virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
             const shared_ptr<GetLogCallbackInterface> callback) = 0;
+    virtual HandlerKey Flush(const shared_ptr<SimpleCallbackInterface> callback) = 0;
 
     virtual HandlerKey UpdateFirmware(const shared_ptr<const string> new_firmware,
         const shared_ptr<SimpleCallbackInterface> callback) = 0;

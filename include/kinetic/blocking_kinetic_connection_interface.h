@@ -117,6 +117,7 @@ class BlockingKineticConnectionInterface {
             unique_ptr<vector<KineticStatus>>& operation_statuses) = 0;
     virtual KineticStatus P2PPush(const shared_ptr<const P2PPushRequest> push_request,
             unique_ptr<vector<KineticStatus>>& operation_statuses) = 0;
+    virtual KineticStatus Flush() = 0;
 
     virtual KineticStatus SetClusterVersion(int64_t cluster_version) = 0;
     virtual KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware) = 0;

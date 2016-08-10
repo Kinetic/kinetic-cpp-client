@@ -47,6 +47,8 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     ASSERT_TRUE(blocking_connection_->Put(make_shared<string>("key3"), make_shared<string>(""),
        WriteMode::IGNORE_VERSION, record3).ok());
 
+    ASSERT_TRUE(blocking_connection_->Flush().ok());
+
     KeyRangeIterator it = blocking_connection_->IterateKeyRange("key1", true, "key3", false, 1);
     ASSERT_EQ("key1", *it);
     ++it;
