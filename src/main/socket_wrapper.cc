@@ -28,17 +28,85 @@
 #include "glog/logging.h"
 #include "socket_wrapper.h"
 
+#ifdef USE_PTHREAD_LOCKS
+#include <pthread.h>
+namespace {
+    pthread_mutex_t* mutex_buffer = NULL;
+
+    void pthread_mutex_funs(int mode, int index, const char* file, int line)
+    {
+        if (mode & CRYPTO_LOCK) {
+            pthread_mutex_lock(&mutex_buffer[index]);
+        } else {
+            pthread_mutex_unlock(&mutex_buffer[index]);
+        }
+    }
+
+    unsigned long pthread_id_fun()
+    {
+        return (unsigned long) pthread_self();
+    }
+
+    void SSL_register_locks()
+    {
+        const int num_locks = CRYPTO_num_locks();
+        mutex_buffer = (pthread_mutex_t*) malloc(num_locks * sizeof(pthread_mutex_t));
+        if (!mutex_buffer) {
+            LOG(ERROR) << "Failed allocating memory for OpenSSL pthread locks.";
+            return;
+        }
+        for (int i = 0; i < num_locks; i++) {
+            pthread_mutex_init(&mutex_buffer[i], NULL);
+        }
+        CRYPTO_set_id_callback(pthread_id_fun);
+        CRYPTO_set_locking_callback(pthread_mutex_funs);
+    }
+
+    void SSL_free_locks()
+    {
+        if (mutex_buffer) {
+            CRYPTO_set_id_callback(NULL);
+            CRYPTO_set_locking_callback(NULL);
+            for(int i=0; i<CRYPTO_num_locks(); i++){
+                pthread_mutex_destroy(&mutex_buffer[i]);
+            }
+            free(mutex_buffer);
+            mutex_buffer = NULL;
+        }
+    }
+}
+#else
+namespace {
+    void SSL_register_locks()
+    {
+        LOG(INFO) << "No locks configured for OpenSSL. Do so yourself if you require thread-safety.";
+    }
+    void SSL_free_locks() {}
+}
+#endif
+
+
 namespace kinetic {
 
 using std::string;
 
-class OpenSSLInitializer{
+class OpenSSLInitializer
+{
 public:
-    OpenSSLInitializer() {
-      SSL_library_init();
-      OpenSSL_add_all_algorithms();
-    }
+  OpenSSLInitializer()
+  {
+    SSL_library_init();
+    SSL_register_locks();
+    SSL_load_error_strings();
+    OpenSSL_add_all_algorithms();
+  }
+
+  ~OpenSSLInitializer()
+  {
+    SSL_free_locks();
+  }
 };
+
 static OpenSSLInitializer init;
 
 SocketWrapper::SocketWrapper(const std::string& host, int port, bool use_ssl, bool nonblocking)

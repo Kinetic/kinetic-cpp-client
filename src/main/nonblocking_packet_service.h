@@ -25,8 +25,6 @@
 #include <unordered_map>
 #include <glog/logging.h>
 
-#include "gmock/gmock.h"
-
 #include "kinetic/nonblocking_packet_service_interface.h"
 #include "kinetic/connection_options.h"
 #include "kinetic/hmac_provider.h"
