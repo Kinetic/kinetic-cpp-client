@@ -482,7 +482,7 @@ KineticStatus BlockingKineticConnection::RunOperation(
         tv.tv_usec = 0;
 
         int number_ready_fds = select(nfds, &read_fds, &write_fds, NULL, &tv);
-        if (number_ready_fds < 0) {
+        if (number_ready_fds < 0 && errno != EINTR) {
             // select() returned an error
             nonblocking_connection_->RemoveHandler(handler_key);
             return KineticStatus(StatusCode::CLIENT_IO_ERROR, strerror(errno));
@@ -490,13 +490,14 @@ KineticStatus BlockingKineticConnection::RunOperation(
             // select() returned before any sockets were ready meaning the connection timed out
             nonblocking_connection_->RemoveHandler(handler_key);
             return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Network timeout");
-        }
+        } else {
 
-        // At least one FD was ready meaning that the connection is ready
-        // to make some progress
-        if (!nonblocking_connection_->Run(&read_fds, &write_fds, &nfds)) {
-            nonblocking_connection_->RemoveHandler(handler_key);
-            return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Connection failed");
+            // At least one FD was ready meaning that the connection is ready
+            // to make some progress
+            if (!nonblocking_connection_->Run(&read_fds, &write_fds, &nfds)) {
+                nonblocking_connection_->RemoveHandler(handler_key);
+                return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Connection failed");
+            }
         }
     }
 
