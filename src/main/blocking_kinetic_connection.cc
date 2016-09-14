@@ -19,6 +19,7 @@
 #include <sys/select.h>
 #include <errno.h>
 #include <stdexcept>
+#include <chrono>
 #include "kinetic/blocking_kinetic_connection.h"
 
 
@@ -29,6 +30,9 @@ using std::unique_ptr;
 using std::string;
 using std::make_shared;
 using std::move;
+using std::chrono::duration_cast;
+using std::chrono::microseconds;
+using std::chrono::seconds;
 
 BlockingKineticConnection::BlockingKineticConnection( unique_ptr<NonblockingKineticConnection> nonblocking_connection,
         unsigned int network_timeout_seconds)
@@ -475,11 +479,19 @@ KineticStatus BlockingKineticConnection::RunOperation(
         nonblocking_connection_->RemoveHandler(handler_key);
         return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Connection failed");
     }
+    auto timeout_time = std::chrono::system_clock::now() + seconds(network_timeout_seconds_);
 
     while (!(callback->done_)) {
-        struct timeval tv;
-        tv.tv_sec = network_timeout_seconds_;
-        tv.tv_usec = 0;
+        struct timeval tv{0, 0};
+
+        auto current_time = std::chrono::system_clock::now();
+        if (timeout_time > current_time) {
+            auto remaining_sec = duration_cast<seconds>(timeout_time - current_time);
+            auto remaining_usec = duration_cast<microseconds>(timeout_time - current_time) -
+                                  duration_cast<microseconds>(remaining_sec);
+            tv.tv_sec = remaining_sec.count();
+            tv.tv_usec = remaining_usec.count();
+        }
 
         int number_ready_fds = select(nfds, &read_fds, &write_fds, NULL, &tv);
         if (number_ready_fds < 0 && errno != EINTR) {
@@ -502,7 +514,6 @@ KineticStatus BlockingKineticConnection::RunOperation(
     }
 
     // done was set, meaning handler was invoked and therefore removed internally
-
     if (callback->success_) {
         return KineticStatus(StatusCode::OK, "");
     } else {
