@@ -11,17 +11,21 @@ The client is using version `3.0.0` of the [Kinetic-Protocol](https://github.com
 
 Dependencies
 ============
-
-### Running 
-* openssl and protobuf libraries
-* optional (see [build options](#build-options)): glog and gflags libraries 
-
-### Building 
 * cmake 
-* gcc 4.4 or higher. Or other c++ compiler supporting at least the c++0x feature set provided by gcc 4.4.
-* openssl and protobuf headers
-* protobuf-compiler
-* optional (see [build options](#build-options)): glog and gflags headers 
+* gcc 4.4 or higher. Or another c++ compiler supporting at least the c++0x feature set provided by gcc 4.4.
+
+### Optional Dependencies 
+
+* glog, gflags, openssl, protobuf, protobuf-compiler
+
+If a library is not found installed on the system, it will be build and linked statically into the kinetic-cpp-client library. Static linkage may be convenient, but will drastically increase build time for the kinetic-cpp-client and may land you in linker-hell should you attempt to use the same libraries in your application.
+
+It is **strongly recommended** to at least install the openssl and protobuf libraries. On most platforms, package managers will install the corresponding packages with their development files for you. E.g. 
+ * yum install openssl openssl-devel protobuf-devel 
+ * apt-get install openssl libssl-dev libprotobuf-dev protobuf-compiler  
+ * brew install openssl protobuf
+
+You may force static linkage by setting the corresponding `LIBNAME_STATIC` variable. This may be desirable if you plan deploying the compiled library on other machines. As an example, `cmake -DPROTOBUF_STATIC=ON /path/to/git` will link protobuf statically into the kinetic-cpp-client even if it is installed on the system that is compiling the library. 
 
 ### Other
 * doxygen/graphviz for generating documentation
@@ -36,11 +40,10 @@ Compilation
 5. Run `make`
 
 #### BUILD OPTIONS:
-The following cmake options modify build behavior. All options are enabled by default, they may be disabled using the `cmake -DOPTION=OFF /path/to/git` syntax. 
+The following cmake options modify build behavior. You may change an option using the `cmake -DOPTION=ON/OFF /path/to/git` syntax. 
 
-+ GOOGLE_STATIC: Builds static glog and gflags libraries and links them into the generated kinetic-cpp-client library. This makes life a little easier as the google libraries do not have to be installed separately. To prevent linker errors, unset if you are using either library in the application linking the kinetic-cpp-client library.   
-+ PTHREAD_LOCKS: If set, pthread locks are registered with the OpenSSL library to ensure thread safety. Unset if you are compiling in a non-pthread environment or otherwise wish to register locks yourself from your application. 
-+ BUILD_TEST: Builds unit and integration tests.
++ PTHREAD_LOCKS (default: on): If set, pthread locks are registered with the OpenSSL library to ensure thread safety. Unset if you are compiling in a non-pthread environment or otherwise wish to register locks yourself from your application. 
++ BUILD_TEST (default: off): Builds unit and integration tests.
 
 Versioning
 ============
@@ -64,7 +67,9 @@ RPM PACKAGE GENERATION:
 Common Developer Tasks
 ======================
 
-**Running tests**: To run the unit test suite, run `make check`. This make target will only be generated if BUILD_TEST cmake option is set. Tests results
+**Running tests**: Ensure you built the test binaries (BUILD_TEST cmake option has to be set).
+
+To run the unit test suite, run `make check`. Tests results
 will appear on stdout and a JUnit report be written to `gtestresults.xml`
 
 There is also an integration test suite. This suite reads the environment

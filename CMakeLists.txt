@@ -1,7 +1,18 @@
 cmake_minimum_required(VERSION 2.8.6)
 project(kinetic_cpp_client CXX C)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(ExternalProject)
 
+################################################################################
+# Compiler flags.
+set(CMAKE_CXX_FLAGS "--std=c++0x -Wall -Wextra -Werror -Wno-unknown-warning-option -Wno-unused-parameter -Wno-null-dereference -Wno-unused-local-typedefs -fPIC")
+if (APPLE)
+    # Ignore deprecated warnings due to OpenSSL
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+endif ()
+
+################################################################################
+# Library Versioning. Patch version equals commit number.
 execute_process(
         COMMAND git log --oneline
         COMMAND wc -l
@@ -15,59 +26,143 @@ set(PROJECT_VERSION_PATCH ${GIT_COMMITS})
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 message(STATUS "Project version set to ${PROJECT_VERSION}")
 
-find_package(OpenSSL REQUIRED)
-find_package(Protobuf REQUIRED)
-find_library(LIBUNWIND "unwind")
-
-option(BUILD_TEST "Build test executables." on)
-option(GOOGLE_STATIC "Build & link google libraries statically. If not set, glog and gflags have to be installed." on)
+################################################################################
+# Configuration.
+option(BUILD_TEST "Build test executables." off)
 option(PTHREAD_LOCKS "Register pthread locks with OpenSSL for thread-safety." on)
-message(STATUS "Set Options: BUILD_TEST=${BUILD_TEST} GOOGLE_STATIC=${GOOGLE_STATIC} PTHREAD_LOCKS=${PTHREAD_LOCKS}")
-
-set(CMAKE_CXX_FLAGS "--std=c++0x -Wall -Wextra -Werror -Wno-unknown-warning-option -Wno-unused-parameter -Wno-null-dereference -Wno-unused-local-typedefs -DGTEST_USE_OWN_TR1_TUPLE=1")
-if(APPLE)
-    # Ignore deprecated warnings due to OpenSSL
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
-endif()
-
-if (GOOGLE_STATIC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-
-    ExternalProject_add(
-            gflags
-            PREFIX ${kinetic_cpp_client_BINARY_DIR}/vendor
-            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/gflags-2.0-no-svn-files.tar.gz"
-            URL_MD5 "9084829124e02a7e6be0f0f824523423"
-            CONFIGURE_COMMAND ../gflags/configure --prefix=${kinetic_cpp_client_BINARY_DIR}/vendor --enable-static --with-pic
-    )
-    set(GFLAGS_LIBRARIES ${CMAKE_BINARY_DIR}/vendor/lib/libgflags.a)
-    set(GFLAGS_INCLUDE_DIR ${CMAKE_BINARY_DIR}/vendor/include)
-    ExternalProject_add(
-            glog
-            PREFIX ${kinetic_cpp_client_BINARY_DIR}/vendor
-            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/glog-0.3.3.tar.gz"
-            URL_MD5 "a6fd2c22f8996846e34c763422717c18"
-            PATCH_COMMAND sh ${kinetic_cpp_client_SOURCE_DIR}/patches/apply-glog-patches.sh ${kinetic_cpp_client_SOURCE_DIR}
-            CONFIGURE_COMMAND ../glog/configure --prefix=${kinetic_cpp_client_BINARY_DIR}/vendor --with-gflags=${kinetic_cpp_client_BINARY_DIR}/vendor --enable-static --with-pic
-            DEPENDS gflags
-    )
-    set(GLOG_LIBRARIES ${CMAKE_BINARY_DIR}/vendor/lib/libglog.a)
-    set(GLOG_INCLUDE_DIR ${CMAKE_BINARY_DIR}/vendor/include)
-else ()
-    find_library(GLOG_LIBRARIES glog)
-    find_library(GFLAGS_LIBRARIES gflags)
-    find_path(GFLAGS_INCLUDE_DIR google/gflags.h)
-    find_path(GLOG_INCLUDE_DIR glog/logging.h)
-endif ()
+message(STATUS "Build Options:
+    BUILD_TEST=${BUILD_TEST} PTHREAD_LOCKS=${PTHREAD_LOCKS}")
 
 if (PTHREAD_LOCKS)
     add_definitions("-DUSE_PTHREAD_LOCKS")
 endif ()
 
-add_definitions(-DGOOGLE_STRIP_LOG=2)
+################################################################################
+# Dependencies can either be pre-installed (recommended, especially for OpenSSL) or can be build automatically at
+# compile time and statically linked into the kinetic c++ library. Standard behavior is to link everything that can be
+# found dynamically. You may manually set LIB_STATIC to force static linkage of a library.
+option(GLOG_STATIC OFF)
+option(GFLAGS_STATIC OFF)
+option(PROTOBUF_STATIC OFF)
+option(OPENSSL_STATIC OFF)
 
+find_package(OpenSSL)
+find_package(Protobuf)
+find_package(Gflags)
+find_package(Glog)
+
+if (NOT GLOG_FOUND)
+    set(GLOG_STATIC ON)
+endif()
+if (NOT GFLAGS_FOUND)
+    set(GFLAGS_STATIC ON)
+endif()
+if (NOT PROTOBUF_FOUND)
+    set(PROTOBUF_STATIC ON)
+endif()
+if (NOT OPENSSL_FOUND)
+    set(OPENSSL_STATIC ON)
+endif()
+
+message(STATUS "Dependency Configuration:
+    GLOG_STATIC=${GLOG_STATIC} GFLAGS_STATIC=${GFLAGS_STATIC} PROTOBUF_STATIC=${PROTOBUF_STATIC} OPENSSL_STATIC=${OPENSSL_STATIC}")
+
+set(STATIC_PREFIX ${kinetic_cpp_client_BINARY_DIR}/vendor)
+set(STATIC_LIBDIR ${STATIC_PREFIX}/lib)
+
+if (GFLAGS_STATIC)
+    ExternalProject_add(
+            gflags
+            PREFIX ${STATIC_PREFIX}
+            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/gflags-2.0-no-svn-files.tar.gz"
+            URL_MD5 "9084829124e02a7e6be0f0f824523423"
+            CONFIGURE_COMMAND ../gflags/configure --prefix=${STATIC_PREFIX} --libdir=${STATIC_LIBDIR} --enable-static --with-pic
+    )
+    set(GFLAGS_LIBRARIES ${STATIC_LIBDIR}/libgflags.a)
+    set(GFLAGS_INCLUDE_DIR ${STATIC_PREFIX}/include)
+endif()
+
+if (GLOG_STATIC)
+    if(GFLAGS_STATIC)
+        ExternalProject_add(
+                glog
+                PREFIX ${STATIC_PREFIX}
+                URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/glog-0.3.3.tar.gz"
+                URL_MD5 "a6fd2c22f8996846e34c763422717c18"
+                PATCH_COMMAND sh ${kinetic_cpp_client_SOURCE_DIR}/patches/apply-glog-patches.sh ${kinetic_cpp_client_SOURCE_DIR}
+                CONFIGURE_COMMAND ../glog/configure --prefix=${STATIC_PREFIX} --with-gflags=${STATIC_PREFIX} --libdir=${STATIC_LIBDIR} --enable-static --with-pic
+                DEPENDS gflags
+        )
+    else()
+        ExternalProject_add(
+                glog
+                PREFIX ${STATIC_PREFIX}
+                URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/glog-0.3.3.tar.gz"
+                URL_MD5 "a6fd2c22f8996846e34c763422717c18"
+                PATCH_COMMAND sh ${kinetic_cpp_client_SOURCE_DIR}/patches/apply-glog-patches.sh ${kinetic_cpp_client_SOURCE_DIR}
+                CONFIGURE_COMMAND ../glog/configure --prefix=${STATIC_PREFIX} --libdir=${STATIC_LIBDIR} --enable-static --with-pic
+        )
+    endif()
+    add_definitions(-DGOOGLE_STRIP_LOG=2)
+    set(GLOG_LIBRARIES ${STATIC_LIBDIR}/libglog.a)
+    set(GLOG_INCLUDE_DIR ${STATIC_PREFIX}/include)
+endif ()
+
+if (OPENSSL_STATIC)
+    if(APPLE)
+        # On OSX we must explicitly specify that we want to build for x86-64
+        set(OPENSSL_CONFIGURE_COMMAND ./Configure darwin64-x86_64-cc)
+    else()
+        set(OPENSSL_CONFIGURE_COMMAND ../openssl/config -DPURIFY)
+    endif()
+    ExternalProject_add(
+            openssl
+            PREFIX ${STATIC_PREFIX}
+            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/openssl-1.0.1g.tar.gz"
+            URL_MD5 "de62b43dfcd858e66a74bee1c834e959"
+            BUILD_IN_SOURCE 1
+            CONFIGURE_COMMAND ${OPENSSL_CONFIGURE_COMMAND} --prefix=${STATIC_PREFIX} -fPIC
+            BUILD_COMMAND touch apps/openssl && touch openssl.pc && make build_libs libssl.pc libcrypto.pc
+            INSTALL_COMMAND make install_sw
+    )
+    set(OPENSSL_LIBRARIES  ${STATIC_LIBDIR}/libssl.a ${STATIC_LIBDIR}/libcrypto.a)
+    set(OPENSSL_INCLUDE_DIR ${STATIC_PREFIX}/include)
+endif ()
+
+if (PROTOBUF_STATIC)
+    # The protobuf build requires the existence of a protoc binary.
+    ExternalProject_add(
+            protoc
+            PREFIX ${STATIC_PREFIX}/host
+            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/protobuf-2.5.0.tar.bz2"
+            URL_MD5 "a72001a9067a4c2c4e0e836d0f92ece4"
+            CONFIGURE_COMMAND ../protoc/configure --prefix=${STATIC_PREFIX}/host --enable-static
+    )
+    ExternalProject_add(
+            protobuf
+            PREFIX ${STATIC_PREFIX}
+            URL "${kinetic_cpp_client_SOURCE_DIR}/tarballs/protobuf-2.5.0.tar.bz2"
+            URL_MD5 "a72001a9067a4c2c4e0e836d0f92ece4"
+            CONFIGURE_COMMAND ../protobuf/configure --with-protoc=${PROTOC_PATH} --prefix=${STATIC_PREFIX} --libdir=${STATIC_LIBDIR} --enable-static --with-pic
+            DEPENDS protoc
+    )
+    set(PROTOBUF_LIBRARIES ${STATIC_LIBDIR}/libprotobuf.a)
+    set(PROTOBUF_INCLUDE_DIR ${STATIC_PREFIX}/include)
+    set(PROTOC_PATH "${STATIC_PREFIX}/host/bin/protoc")
+else()
+    set(PROTOC_PATH "protoc")
+endif ()
+
+# If libunwind is installed it is used by glog and thus has to linked.
+# Otherwise glog uses the standard glibc unwinder and there is no dependency.
+find_library(LIBUNWIND "unwind")
+if (LIBUNWIND)
+    set(GLOG_LIBRARIES ${GLOG_LIBRARIES} ${LIBUNWIND})
+endif ()
+
+################################################################################
+# Download and compile google protobuf kinetic protocol definition
 set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
-
 ExternalProject_add(kinetic-proto
         PREFIX proto
         GIT_REPOSITORY https://github.com/Seagate/kinetic-protocol
@@ -78,30 +173,23 @@ ExternalProject_add(kinetic-proto
         BUILD_COMMAND sed s/com\\.seagate\\.kinetic\\.proto/com.seagate.kinetic.client.proto/ kinetic.proto > kinetic_client.proto
         INSTALL_COMMAND cp kinetic_client.proto ${GENERATED_SOURCES_PATH}/kinetic_client.proto
         )
-
 add_custom_command(
         COMMENT "Compiling protobuf"
         OUTPUT ${GENERATED_SOURCES_PATH}/kinetic_client.pb.cc ${GENERATED_SOURCES_PATH}/kinetic_client.pb.h
-        COMMAND protoc --proto_path=${GENERATED_SOURCES_PATH} --cpp_out=${GENERATED_SOURCES_PATH} ${GENERATED_SOURCES_PATH}/kinetic_client.proto
+        COMMAND ${PROTOC_PATH} --proto_path=${GENERATED_SOURCES_PATH} --cpp_out=${GENERATED_SOURCES_PATH} ${GENERATED_SOURCES_PATH}/kinetic_client.proto
         COMMAND cp ${GENERATED_SOURCES_PATH}/kinetic_client.pb.h ${kinetic_cpp_client_SOURCE_DIR}/include/kinetic
         DEPENDS kinetic-proto
 )
 add_custom_target(proto-compile
         DEPENDS ${GENERATED_SOURCES_PATH}/kinetic_client.pb.cc ${GENERATED_SOURCES_PATH}/kinetic_client.pb.h
         )
-set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${GENERATED_SOURCES_PATH})
+if (PROTOBUF_STATIC)
+    add_dependencies(proto-compile protobuf)
+endif()
 set_source_files_properties(${GENERATED_SOURCES_PATH}/kinetic_client.pb.cc PROPERTIES GENERATED TRUE)
 
-# If libunwind is installed it is used by glog and thus has to linked.
-# Otherwise glog uses the standard glibc unwinder and there is no dependency.
-find_library(LIBUNWIND "unwind")
-if (LIBUNWIND)
-    set(GLOG_LIBRARIES
-            ${GLOG_LIBRARIES}
-            ${LIBUNWIND}
-            )
-endif (LIBUNWIND)
-
+################################################################################
+# Main library compilation
 include_directories(
         include
         src/main
@@ -141,10 +229,18 @@ add_library(kinetic_client SHARED ${KINETIC_SRC})
 
 add_dependencies(kinetic_client_static proto-compile)
 add_dependencies(kinetic_client proto-compile)
-if (GOOGLE_STATIC)
-    add_dependencies(kinetic_client_static gflags glog)
-    add_dependencies(kinetic_client gflags glog)
+if (GLOG_STATIC)
+    add_dependencies(kinetic_client_static glog)
+    add_dependencies(kinetic_client glog)
 endif ()
+if (GFLAGS_STATIC)
+    add_dependencies(kinetic_client_static gflags)
+    add_dependencies(kinetic_client gflags)
+endif()
+if (OPENSSL_STATIC)
+    add_dependencies(kinetic_client_static openssl)
+    add_dependencies(kinetic_client openssl)
+endif()
 
 target_link_libraries(kinetic_client_static
         ${OPENSSL_LIBRARIES}
@@ -161,7 +257,6 @@ target_link_libraries(kinetic_client
 
 set_target_properties(kinetic_client PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
 
-# Set lib or lib64 depending on architecture
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 set(LIBSUFFIX "")
 if ("${LIB64}" STREQUAL "TRUE" AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -175,6 +270,7 @@ install(TARGETS kinetic_client
 install(DIRECTORY ${kinetic_cpp_client_SOURCE_DIR}/include/
         DESTINATION include)
 
+################################################################################
 # Rule for generating docs
 configure_file(${kinetic_cpp_client_SOURCE_DIR}/Doxyfile ${kinetic_cpp_client_BINARY_DIR}/Doxyfile)
 add_custom_target(doc
@@ -184,8 +280,11 @@ add_custom_target(doc
         )
 set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES docs)
 
+################################################################################
+# Test-suite compilation and custom make targets
 if (BUILD_TEST)
     find_package(Threads REQUIRED)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
 
     ExternalProject_add(
             gtest
@@ -233,13 +332,10 @@ if (BUILD_TEST)
 
     target_link_libraries(kinetic_client_test
             kinetic_client
-            ${OPENSSL_LIBRARIES}
-            ${PROTOBUF_LIBRARIES}
-            ${GLOG_LIBRARIES}
-            ${GFLAGS_LIBRARIES}
             ${CMAKE_BINARY_DIR}/vendor/src/gtest/libgtest.a
             ${CMAKE_BINARY_DIR}/vendor/src/gmock/libgmock.a
             ${CMAKE_THREAD_LIBS_INIT}
+            ${CMAKE_DL_LIBS}
             )
 
     add_executable(kinetic_integration_test
@@ -254,13 +350,10 @@ if (BUILD_TEST)
 
     target_link_libraries(kinetic_integration_test
             kinetic_client
-            ${OPENSSL_LIBRARIES}
-            ${PROTOBUF_LIBRARIES}
-            ${GLOG_LIBRARIES}
-            ${GFLAGS_LIBRARIES}
             ${CMAKE_BINARY_DIR}/vendor/src/gtest/libgtest.a
             ${CMAKE_BINARY_DIR}/vendor/src/gmock/libgmock.a
             ${CMAKE_THREAD_LIBS_INIT}
+            ${CMAKE_DL_LIBS}
             )
 
     # Rules for running unit and integration tests
@@ -297,11 +390,17 @@ set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 set(CPACK_RPM_PACKAGE_LICENSE "Mozilla Public License, v. 2.0")
 set(CPACK_RPM_PACKAGE_DESCRIPTION "A c++ client for the kinetic protocol. See https://www.openkinetic.org/ for information on the Kinetic Open Storage Project. Source code available at https://github.com/Kinetic/kinetic-cpp-client")
 set(CPACK_RPM_PACKAGE_GROUP "Development/Libraries")
-if (GOOGLE_STATIC)
-    set(CPACK_RPM_PACKAGE_REQUIRES "openssl, protobuf")
-else ()
-    set(CPACK_RPM_PACKAGE_REQUIRES "google-glog, gflags, openssl, protobuf")
+if (NOT GLOG_STATIC)
+    set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES} google-glog")
 endif ()
-
+if (NOT GFLAGS_STATIC)
+    set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES} gflags")
+endif ()
+if (NOT PROTOBUF_STATIC)
+    set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES} protobuf")
+endif ()
+if (NOT OPENSSL_STATIC)
+    set(CPACK_RPM_PACKAGE_REQUIRES "${CPACK_RPM_PACKAGE_REQUIRES} openssl")
+endif ()
 set(CPACK_GENERATOR "RPM")
 include(CPack)
