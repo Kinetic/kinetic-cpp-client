@@ -9,11 +9,10 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y protobuf-compiler libprotobuf-dev; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update ; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install protobuf; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew link openssl --force; fi
 install:
-  - cmake -DBUILD_TEST=on .
-  - make -j 8
+  - cmake -DBUILD_TEST=ON .
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then cmake -DOPENSSL_STATIC=ON .; fi
+  - make
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export JAVA_HOME=$(/usr/libexec/java_home); fi
   - echo $JAVA_HOME
