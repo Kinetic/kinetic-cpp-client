@@ -7,3 +7,20 @@
    fun:_GLOBAL__sub_I__ZN3fLB17FLAGS_logtostderrE
    ...
 }
+{
+   Ignore OpenSSL malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:CRYPTO_malloc
+   ...
+   obj:*libcrypto*
+}
+
+{
+   Ignore OpenSSL realloc
+   Memcheck:Leak
+   fun:realloc
+   fun:CRYPTO_realloc
+   ...
+   obj:*libcrypto*
+}
