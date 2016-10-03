@@ -136,15 +136,17 @@ class BlockingKineticConnection : public BlockingKineticConnectionInterface {
 
     KineticStatus Flush();
 
-    KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
-    		RequestPriority request_priority);
-    KineticStatus MediaScan(const MediaScanRequest& media_scan_request,
-    		RequestPriority request_priority);
+    KineticStatus MediaScan(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key, unique_ptr<vector<string>>& keys);
 
-    KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
-    		RequestPriority request_priority);
-    KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
-    		RequestPriority request_priority);
+    KineticStatus MediaScan(const string& start_key, const string& end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key, unique_ptr<vector<string>>& keys);
+
+    KineticStatus MediaOptimize(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key);
+
+    KineticStatus MediaOptimize(const string& start_key, const string& end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key);
 
     KineticStatus SetClusterVersion(int64_t cluster_version);
     KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware);

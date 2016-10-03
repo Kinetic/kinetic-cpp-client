@@ -122,6 +122,42 @@ class GetKeyRangeHandler : public HandlerInterface {
     DISALLOW_COPY_AND_ASSIGN(GetKeyRangeHandler);
 };
 
+class MediaScanCallbackInterface {
+public:
+  virtual ~MediaScanCallbackInterface() {}
+  virtual void Success(unique_ptr<vector<string>> keys, const std::string& last_key) = 0;
+  virtual void Failure(KineticStatus error) = 0;
+};
+
+class MediaScanHandler : public HandlerInterface {
+public:
+  explicit MediaScanHandler(const shared_ptr<MediaScanCallbackInterface> callback);
+  void Handle(const Command &response, unique_ptr<const string> value);
+  void Error(KineticStatus error, Command const * const response);
+
+private:
+  const shared_ptr<MediaScanCallbackInterface>  callback_;
+  DISALLOW_COPY_AND_ASSIGN(MediaScanHandler);
+};
+
+class MediaOptimizeCallbackInterface {
+public:
+  virtual ~MediaOptimizeCallbackInterface() {}
+  virtual void Success(const std::string& last_key) = 0;
+  virtual void Failure(KineticStatus error) = 0;
+};
+
+class MediaOptimizeHandler : public HandlerInterface {
+public:
+  explicit MediaOptimizeHandler(const shared_ptr<MediaOptimizeCallbackInterface> callback);
+  void Handle(const Command &response, unique_ptr<const string> value);
+  void Error(KineticStatus error, Command const * const response);
+
+private:
+  const shared_ptr<MediaOptimizeCallbackInterface>  callback_;
+  DISALLOW_COPY_AND_ASSIGN(MediaOptimizeHandler);
+};
+
 class PutCallbackInterface {
     public:
     virtual ~PutCallbackInterface() {}
@@ -221,14 +257,6 @@ enum RequestPriority {
     Priority_HIGHEST
 };
 
-typedef struct MediaRequest {
-	string start_key;
-	bool start_key_inclusive;
-	string end_key;
-	bool end_key_inclusive;
-	RequestPriority priority;
-} MediaScanRequest, MediaOptimizeRequest;
-
 class NonblockingKineticConnectionInterface {
 
 public:
@@ -299,19 +327,14 @@ public:
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
     virtual HandlerKey P2PPush(const shared_ptr<const P2PPushRequest> push_request,
         const shared_ptr<P2PPushCallbackInterface> callback) = 0;
-    virtual HandlerKey MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
-    		RequestPriority request_priority,
-    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey MediaScan(const MediaScanRequest& media_scan_reques,
-    		RequestPriority request_priority,
-    		const shared_ptr<SimpleCallbackInterface> callbackt) = 0;
-    virtual HandlerKey MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
-    		RequestPriority request_priority,
-    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
-    virtual HandlerKey MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
-    		RequestPriority request_priority,
-    		const shared_ptr<SimpleCallbackInterface> callback) = 0;
-
+    virtual HandlerKey MediaScan(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+        RequestPriority request_priority, const shared_ptr<MediaScanCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaScan(const string start_key, const string end_key,
+        RequestPriority request_priority, const shared_ptr<MediaScanCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaOptimize(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+        RequestPriority request_priority, const shared_ptr<MediaOptimizeCallbackInterface> callback) = 0;
+    virtual HandlerKey MediaOptimize(const string start_key, const string end_key,
+        RequestPriority request_priority, const shared_ptr<MediaOptimizeCallbackInterface> callback) = 0;
     virtual HandlerKey GetLog(const shared_ptr<GetLogCallbackInterface> callback) = 0;
     virtual HandlerKey GetLog(const vector<Command_GetLog_Type>& types,
             const shared_ptr<GetLogCallbackInterface> callback) = 0;

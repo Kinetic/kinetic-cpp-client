@@ -271,32 +271,40 @@ HandlerKey ThreadsafeNonblockingKineticConnection::P2PPush(const P2PPushRequest&
     return connection_->P2PPush(push_request, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
-		RequestPriority request_priority,
-		const shared_ptr<SimpleCallbackInterface> callback) {
-	std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->MediaScan(media_scan_request, request_priority, callback);
-}
-
-HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request,
-		RequestPriority request_priority,
-		const shared_ptr<SimpleCallbackInterface> callback) {
-	std::lock_guard<std::recursive_mutex> guard(mutex_);
-    return connection_->MediaScan(media_scan_request, request_priority, callback);
-}
-
-HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
-		RequestPriority request_priority,
-		const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const shared_ptr<const string> start_key,
+                                                             const shared_ptr<const string> end_key,
+                                                             RequestPriority request_priority,
+                                                             const shared_ptr<MediaScanCallbackInterface> callback)
+{
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-	return connection_->MediaOptimize(media_optimize_request, request_priority, callback);
+    return connection_->MediaScan(start_key, end_key, request_priority, callback);
 }
 
-HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
-		RequestPriority request_priority,
-		const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaScan(const string start_key,
+                                                             const string end_key,
+                                                             RequestPriority request_priority,
+                                                             const shared_ptr<MediaScanCallbackInterface> callback)
+{
     std::lock_guard<std::recursive_mutex> guard(mutex_);
-	return connection_->MediaOptimize(media_optimize_request, request_priority, callback);
+    return connection_->MediaScan(start_key, end_key, request_priority, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const shared_ptr<const string> start_key,
+                                                                 const shared_ptr<const string> end_key,
+                                                                 RequestPriority request_priority,
+                                                                 const shared_ptr<MediaOptimizeCallbackInterface> callback)
+{
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaOptimize(start_key, end_key, request_priority, callback);
+}
+
+HandlerKey ThreadsafeNonblockingKineticConnection::MediaOptimize(const string start_key,
+                                                                 const string end_key,
+                                                                 RequestPriority request_priority,
+                                                                 const shared_ptr<MediaOptimizeCallbackInterface> callback)
+{
+    std::lock_guard<std::recursive_mutex> guard(mutex_);
+    return connection_->MediaOptimize(start_key, end_key, request_priority, callback);
 }
 
 } // namespace kinetic

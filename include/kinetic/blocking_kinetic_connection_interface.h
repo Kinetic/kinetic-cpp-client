@@ -118,14 +118,14 @@ class BlockingKineticConnectionInterface {
     virtual KineticStatus P2PPush(const shared_ptr<const P2PPushRequest> push_request,
             unique_ptr<vector<KineticStatus>>& operation_statuses) = 0;
     virtual KineticStatus Flush() = 0;
-    virtual KineticStatus MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
-    		RequestPriority request_priority) = 0;
-    virtual KineticStatus MediaScan(const MediaScanRequest& media_scan_request,
-    		RequestPriority request_priority) = 0;
-    virtual KineticStatus MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
-    		RequestPriority request_priority) = 0;
-    virtual KineticStatus MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
-    		RequestPriority request_priority) = 0;
+    virtual KineticStatus MediaScan(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key, unique_ptr<vector<string>>& keys) = 0;
+    virtual KineticStatus MediaScan(const string& start_key, const string& end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key, unique_ptr<vector<string>>& keys) = 0;
+    virtual KineticStatus MediaOptimize(const shared_ptr<const string> start_key, const shared_ptr<const string> end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key) = 0;
+    virtual KineticStatus MediaOptimize(const string& start_key, const string& end_key,
+         RequestPriority request_priority, unique_ptr<string>& last_handled_key) = 0;
     virtual KineticStatus SetClusterVersion(int64_t cluster_version) = 0;
     virtual KineticStatus UpdateFirmware(const shared_ptr<const string> new_firmware) = 0;
     virtual KineticStatus SetACLs(const shared_ptr<const list<ACL>> acls) = 0;

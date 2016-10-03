@@ -162,6 +162,57 @@ class BlockingGetKeyRangeCallback : public GetKeyRangeCallbackInterface,
     unique_ptr<vector<string>>& keys_;
 };
 
+class BlockingMediaScanCallback : public MediaScanCallbackInterface, public BlockingCallbackState
+{
+public:
+  explicit BlockingMediaScanCallback(unique_ptr<vector<string>>& keys, unique_ptr<string>& end_key)
+  :  keys_(keys), end_key_(end_key) {}
+
+  virtual void Success(unique_ptr<vector<string>> keys, const std::string& end_key) {
+    OnSuccess();
+
+    if (end_key_) {
+      *end_key_ = end_key;
+    } else {
+      end_key_.reset(new string(end_key));
+    }
+    keys_ = move(keys);
+  }
+
+  virtual void Failure(KineticStatus error) {
+    OnError(error);
+  }
+
+private:
+  unique_ptr<vector<string>>& keys_;
+  unique_ptr<string>& end_key_;
+};
+
+
+class BlockingMediaOptimizeCallback : public MediaOptimizeCallbackInterface, public BlockingCallbackState
+{
+public:
+  explicit BlockingMediaOptimizeCallback(unique_ptr<string>& end_key)
+      :  end_key_(end_key) {}
+
+  virtual void Success(const std::string& end_key) {
+    OnSuccess();
+
+    if (end_key_) {
+      *end_key_ = end_key;
+    } else {
+      end_key_.reset(new string(end_key));
+    }
+  }
+
+  virtual void Failure(KineticStatus error) {
+    OnError(error);
+  }
+
+private:
+  unique_ptr<string>& end_key_;
+};
+
 void BlockingKineticConnection::SetClientClusterVersion(int64_t cluster_version) {
     nonblocking_connection_->SetClientClusterVersion(cluster_version);
 }
@@ -469,26 +520,43 @@ KineticStatus BlockingKineticConnection::P2PPush(
             nonblocking_connection_->P2PPush(push_request, callback));
 }
 
-KineticStatus BlockingKineticConnection::MediaScan(const shared_ptr<const MediaScanRequest> media_scan_request,
-		RequestPriority request_priority){
-	auto callback = make_shared<SimpleCallback>();
-	return RunOperation(callback, nonblocking_connection_->MediaScan(media_scan_request, request_priority, callback));
+KineticStatus BlockingKineticConnection::MediaOptimize(
+    const shared_ptr<const string> start_key,
+    const shared_ptr<const string> end_key,
+    RequestPriority request_priority, unique_ptr<string>& last_handled_key)
+{
+  auto callback = make_shared<BlockingMediaOptimizeCallback>(last_handled_key);
+  return RunOperation(callback, nonblocking_connection_->MediaOptimize(
+      start_key, end_key, request_priority, callback
+  ));
 }
 
-KineticStatus BlockingKineticConnection::MediaScan(const MediaScanRequest& media_scan_request,
-		RequestPriority request_priority){
-	return this->MediaScan(make_shared<MediaScanRequest>(media_scan_request), request_priority);
+KineticStatus BlockingKineticConnection::MediaOptimize(const string& start_key,
+    const string& end_key, RequestPriority request_priority, unique_ptr<string>& last_handled_key)
+{
+  return this->MediaOptimize(make_shared<string>(start_key),
+                             make_shared<string>(end_key),
+                             request_priority, last_handled_key);
 }
 
-KineticStatus BlockingKineticConnection::MediaOptimize(const shared_ptr<const MediaOptimizeRequest> media_optimize_request,
-		RequestPriority request_priority){
-	auto callback = make_shared<SimpleCallback>();
-    return RunOperation(callback, nonblocking_connection_->MediaOptimize(media_optimize_request, request_priority, callback));
+KineticStatus BlockingKineticConnection::MediaScan(const shared_ptr<const string> start_key,
+                                                   const shared_ptr<const string> end_key,
+                                                   RequestPriority request_priority,
+                                                   unique_ptr<string>& last_handled_key,
+                                                   unique_ptr<vector<string>>& keys)
+{
+  auto callback = make_shared<BlockingMediaScanCallback>(keys, last_handled_key);
+  return RunOperation(callback, nonblocking_connection_->MediaScan(start_key, end_key, request_priority, callback));
 }
 
-KineticStatus BlockingKineticConnection::MediaOptimize(const MediaOptimizeRequest& media_optimize_request,
-		RequestPriority request_priority){
-	return this->MediaOptimize(make_shared<MediaScanRequest>(media_optimize_request), request_priority);
+KineticStatus BlockingKineticConnection::MediaScan(const string& start_key,
+                                                   const string& end_key,
+                                                   RequestPriority request_priority,
+                                                   unique_ptr<string>& last_handled_key,
+                                                   unique_ptr<vector<string>>& keys)
+{
+  return this->MediaScan(make_shared<string>(start_key), make_shared<string>(end_key),
+                         request_priority, last_handled_key, keys);
 }
 
 KineticStatus BlockingKineticConnection::RunOperation(
