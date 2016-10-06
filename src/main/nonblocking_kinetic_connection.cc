@@ -30,36 +30,38 @@ using std::unique_ptr;
 using std::iterator;
 using std::move;
 
-GetHandler::GetHandler(const shared_ptr<GetCallbackInterface> callback)
-    : callback_(callback) {}
+GetHandler::GetHandler(const shared_ptr<GetCallbackInterface> callback) : callback_(callback) {}
 
-void GetHandler::Handle(const Command &response, unique_ptr<const string> value) {
+void GetHandler::Handle(const Command &response,
+                        unique_ptr<const string> value) {
     unique_ptr<KineticRecord> record(new KineticRecord(shared_ptr<const string>(value.release()),
-         make_shared<string>(response.body().keyvalue().dbversion()),
-         make_shared<string>(response.body().keyvalue().tag()),
-         response.body().keyvalue().algorithm()));
+                                                       make_shared<string>(response.body().keyvalue().dbversion()),
+                                                       make_shared<string>(response.body().keyvalue().tag()),
+                                                       response.body().keyvalue().algorithm()));
     callback_->Success(response.body().keyvalue().key(), move(record));
 }
 
-void GetHandler::Error(KineticStatus error, Command const * const response) {
+void GetHandler::Error(KineticStatus error,
+                       Command const *const response) {
     callback_->Failure(error);
 }
 
-GetVersionHandler::GetVersionHandler(const shared_ptr<GetVersionCallbackInterface> callback)
-    : callback_(callback) {}
+GetVersionHandler::GetVersionHandler(const shared_ptr<GetVersionCallbackInterface> callback) : callback_(callback) {}
 
-void GetVersionHandler::Handle(const Command &response, unique_ptr<const string> value) {
+void GetVersionHandler::Handle(const Command &response,
+                               unique_ptr<const string> value) {
     callback_->Success(response.body().keyvalue().dbversion());
 }
 
-void GetVersionHandler::Error(KineticStatus error, Command const * const response) {
+void GetVersionHandler::Error(KineticStatus error,
+                              Command const *const response) {
     callback_->Failure(error);
 }
 
-GetKeyRangeHandler::GetKeyRangeHandler(const shared_ptr<GetKeyRangeCallbackInterface> callback)
-    : callback_(callback) {}
+GetKeyRangeHandler::GetKeyRangeHandler(const shared_ptr<GetKeyRangeCallbackInterface> callback) : callback_(callback) {}
 
-void GetKeyRangeHandler::Handle(const Command &response, unique_ptr<const string> value) {
+void GetKeyRangeHandler::Handle(const Command &response,
+                                unique_ptr<const string> value) {
     int raw_size = response.body().range().keys_size();
     CHECK_GE(raw_size, 0);
     size_t key_size = (size_t) raw_size;
@@ -74,14 +76,15 @@ void GetKeyRangeHandler::Handle(const Command &response, unique_ptr<const string
     callback_->Success(move(keys));
 }
 
-void GetKeyRangeHandler::Error(KineticStatus error, Command const * const response) {
+void GetKeyRangeHandler::Error(KineticStatus error,
+                               Command const *const response) {
     callback_->Failure(error);
 }
 
-MediaScanHandler::MediaScanHandler(const shared_ptr<MediaScanCallbackInterface> callback)
-    : callback_(callback) {}
+MediaScanHandler::MediaScanHandler(const shared_ptr<MediaScanCallbackInterface> callback) : callback_(callback) {}
 
-void MediaScanHandler::Handle(const Command& response, unique_ptr<const string> value) {
+void MediaScanHandler::Handle(const Command &response,
+                              unique_ptr<const string> value) {
     int raw_size = response.body().range().keys_size();
     CHECK_GE(raw_size, 0);
     size_t key_size = (size_t) raw_size;
@@ -95,47 +98,52 @@ void MediaScanHandler::Handle(const Command& response, unique_ptr<const string> 
     callback_->Success(move(keys), response.body().range().endkey());
 }
 
-void MediaScanHandler::Error(KineticStatus error, Command const* const response){
+void MediaScanHandler::Error(KineticStatus error,
+                             Command const *const response) {
     callback_->Failure(error);
 }
 
-MediaOptimizeHandler::MediaOptimizeHandler(const shared_ptr<MediaOptimizeCallbackInterface> callback)
-    : callback_(callback) {}
+MediaOptimizeHandler::MediaOptimizeHandler(const shared_ptr<MediaOptimizeCallbackInterface> callback) : callback_(
+    callback) {}
 
-void MediaOptimizeHandler::Handle(const Command& response, unique_ptr<const string> value) {
+void MediaOptimizeHandler::Handle(const Command &response,
+                                  unique_ptr<const string> value) {
     callback_->Success(response.body().range().endkey());
 }
 
-void MediaOptimizeHandler::Error(KineticStatus error, Command const* const response) {
+void MediaOptimizeHandler::Error(KineticStatus error,
+                                 Command const *const response) {
     callback_->Failure(error);
 }
 
-PutHandler::PutHandler(const shared_ptr<PutCallbackInterface> callback)
-    : callback_(callback) {}
+PutHandler::PutHandler(const shared_ptr<PutCallbackInterface> callback) : callback_(callback) {}
 
-void PutHandler::Handle(const Command &response, unique_ptr<const string> value) {
+void PutHandler::Handle(const Command &response,
+                        unique_ptr<const string> value) {
     callback_->Success();
 }
 
-void PutHandler::Error(KineticStatus error, Command const * const response) {
+void PutHandler::Error(KineticStatus error,
+                       Command const *const response) {
     callback_->Failure(error);
 }
 
-SimpleHandler::SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback)
-    : callback_(callback) {}
+SimpleHandler::SimpleHandler(const shared_ptr<SimpleCallbackInterface> callback) : callback_(callback) {}
 
-void SimpleHandler::Handle(const Command &response, unique_ptr<const string> value) {
+void SimpleHandler::Handle(const Command &response,
+                           unique_ptr<const string> value) {
     callback_->Success();
 }
 
-void SimpleHandler::Error(KineticStatus error, Command const * const response) {
+void SimpleHandler::Error(KineticStatus error,
+                          Command const *const response) {
     callback_->Failure(error);
 }
 
-GetLogHandler::GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback)
-    : callback_(callback) {}
+GetLogHandler::GetLogHandler(const shared_ptr<GetLogCallbackInterface> callback) : callback_(callback) {}
 
-void GetLogHandler::Handle(const Command& response, unique_ptr<const string> value) {
+void GetLogHandler::Handle(const Command &response,
+                           unique_ptr<const string> value) {
     auto getlog = response.body().getlog();
     auto configuration = getlog.configuration();
     unique_ptr<DriveLog> drive_log(new DriveLog);
@@ -194,14 +202,15 @@ void GetLogHandler::Handle(const Command& response, unique_ptr<const string> val
     callback_->Success(move(drive_log));
 }
 
-void GetLogHandler::Error(KineticStatus error, Command const * const response) {
+void GetLogHandler::Error(KineticStatus error,
+                          Command const *const response) {
     callback_->Failure(error);
 }
 
-P2PPushHandler::P2PPushHandler(const shared_ptr<P2PPushCallbackInterface> callback)
-    : callback_(callback) {}
+P2PPushHandler::P2PPushHandler(const shared_ptr<P2PPushCallbackInterface> callback) : callback_(callback) {}
 
-void P2PPushHandler::Handle(const Command& response, unique_ptr<const string> value) {
+void P2PPushHandler::Handle(const Command &response,
+                            unique_ptr<const string> value) {
     unique_ptr<vector<KineticStatus>> statuses(new vector<KineticStatus>());
 
     Command_P2POperation const &p2pop = response.body().p2poperation();
@@ -210,26 +219,27 @@ void P2PPushHandler::Handle(const Command& response, unique_ptr<const string> va
     for (int i = 0; i < p2pop.operation_size(); i++) {
         Command_Status const &status = p2pop.operation(i).status();
 
-        statuses->push_back(
-                KineticStatus(ConvertFromProtoStatus(status.code()), status.statusmessage()));
+        statuses->push_back(KineticStatus(ConvertFromProtoStatus(status.code()), status.statusmessage()));
     }
 
     callback_->Success(move(statuses), response);
 }
 
-void P2PPushHandler::Error(KineticStatus error, Command const * const response) {
+void P2PPushHandler::Error(KineticStatus error,
+                           Command const *const response) {
     callback_->Failure(error, response);
 }
 
-NonblockingKineticConnection::NonblockingKineticConnection(
-        NonblockingPacketServiceInterface *service)
-    : service_(service), empty_str_(make_shared<string>("")), cluster_version_(0) {}
+NonblockingKineticConnection::NonblockingKineticConnection(NonblockingPacketServiceInterface *service) : service_(
+    service), empty_str_(make_shared<string>("")), cluster_version_(0) {}
 
 NonblockingKineticConnection::~NonblockingKineticConnection() {
     delete service_;
 }
 
-bool NonblockingKineticConnection::Run(fd_set *read_fds, fd_set *write_fds, int *nfds) {
+bool NonblockingKineticConnection::Run(fd_set *read_fds,
+                                       fd_set *write_fds,
+                                       int *nfds) {
     return service_->Run(read_fds, write_fds, nfds);
 }
 
@@ -255,37 +265,37 @@ HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInt
 }
 
 HandlerKey NonblockingKineticConnection::Get(const shared_ptr<const string> key,
-    const shared_ptr<GetCallbackInterface> callback) {
+                                             const shared_ptr<GetCallbackInterface> callback) {
     return GenericGet(key, callback, Command_MessageType_GET);
 }
 
 HandlerKey NonblockingKineticConnection::Get(const string key,
-        const shared_ptr<GetCallbackInterface> callback) {
+                                             const shared_ptr<GetCallbackInterface> callback) {
     return this->Get(make_shared<string>(key), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GetNext(const shared_ptr<const string> key,
-    const shared_ptr<GetCallbackInterface> callback) {
+                                                 const shared_ptr<GetCallbackInterface> callback) {
     return GenericGet(key, callback, Command_MessageType_GETNEXT);
 }
 
 HandlerKey NonblockingKineticConnection::GetNext(const string key,
-    const shared_ptr<GetCallbackInterface> callback) {
+                                                 const shared_ptr<GetCallbackInterface> callback) {
     return this->GetNext(make_shared<string>(key), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GetPrevious(const shared_ptr<const string> key,
-    const shared_ptr<GetCallbackInterface> callback) {
+                                                     const shared_ptr<GetCallbackInterface> callback) {
     return GenericGet(key, callback, Command_MessageType_GETPREVIOUS);
 }
 
 HandlerKey NonblockingKineticConnection::GetPrevious(const string key,
-    const shared_ptr<GetCallbackInterface> callback) {
+                                                     const shared_ptr<GetCallbackInterface> callback) {
     return this->GetPrevious(make_shared<string>(key), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GetVersion(const shared_ptr<const string> key,
-    const shared_ptr<GetVersionCallbackInterface> callback) {
+                                                    const shared_ptr<GetVersionCallbackInterface> callback) {
     unique_ptr<GetVersionHandler> handler(new GetVersionHandler(callback));
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
@@ -297,17 +307,17 @@ HandlerKey NonblockingKineticConnection::GetVersion(const shared_ptr<const strin
 }
 
 HandlerKey NonblockingKineticConnection::GetVersion(const string key,
-    const shared_ptr<GetVersionCallbackInterface> callback) {
+                                                    const shared_ptr<GetVersionCallbackInterface> callback) {
     return this->GetVersion(make_shared<string>(key), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GetKeyRange(const shared_ptr<const string> start_key,
-        bool start_key_inclusive,
-        const shared_ptr<const string> end_key,
-        bool end_key_inclusive,
-        bool reverse_results,
-        int32_t max_results,
-        const shared_ptr<GetKeyRangeCallbackInterface> callback) {
+                                                     bool start_key_inclusive,
+                                                     const shared_ptr<const string> end_key,
+                                                     bool end_key_inclusive,
+                                                     bool reverse_results,
+                                                     int32_t max_results,
+                                                     const shared_ptr<GetKeyRangeCallbackInterface> callback) {
     unique_ptr<GetKeyRangeHandler> handler(new GetKeyRangeHandler(callback));
 
     unique_ptr<Message> msg(new Message());
@@ -325,21 +335,27 @@ HandlerKey NonblockingKineticConnection::GetKeyRange(const shared_ptr<const stri
 }
 
 HandlerKey NonblockingKineticConnection::GetKeyRange(const string start_key,
-    bool start_key_inclusive,
-    const string end_key,
-    bool end_key_inclusive,
-    bool reverse_results,
-    int32_t max_results,
-    const shared_ptr<GetKeyRangeCallbackInterface> callback) {
-    return this->GetKeyRange(make_shared<string>(start_key), start_key_inclusive,
-        make_shared<string>(end_key), end_key_inclusive, reverse_results, max_results, callback);
+                                                     bool start_key_inclusive,
+                                                     const string end_key,
+                                                     bool end_key_inclusive,
+                                                     bool reverse_results,
+                                                     int32_t max_results,
+                                                     const shared_ptr<GetKeyRangeCallbackInterface> callback) {
+    return this->GetKeyRange(make_shared<string>(start_key),
+                             start_key_inclusive,
+                             make_shared<string>(end_key),
+                             end_key_inclusive,
+                             reverse_results,
+                             max_results,
+                             callback);
 }
 
 HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
-    const shared_ptr<const string> current_version, WriteMode mode,
-    const shared_ptr<const KineticRecord> record,
-    const shared_ptr<PutCallbackInterface> callback,
-    PersistMode persistMode) {
+                                             const shared_ptr<const string> current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record,
+                                             const shared_ptr<PutCallbackInterface> callback,
+                                             PersistMode persistMode) {
     unique_ptr<PutHandler> handler(new PutHandler(callback));
 
     unique_ptr<Message> msg(new Message());
@@ -349,56 +365,58 @@ HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
 
     bool force = mode == WriteMode::IGNORE_VERSION;
     request->mutable_body()->mutable_keyvalue()->set_key(*key);
-    request->mutable_body()->mutable_keyvalue()->set_dbversion(
-            *current_version);
+    request->mutable_body()->mutable_keyvalue()->set_dbversion(*current_version);
     request->mutable_body()->mutable_keyvalue()->set_force(force);
 
     if (record->version().get() != NULL) {
-        request->mutable_body()->mutable_keyvalue()->set_newversion(
-            *(record->version()));
+        request->mutable_body()->mutable_keyvalue()->set_newversion(*(record->version()));
     }
 
     request->mutable_body()->mutable_keyvalue()->set_tag(*(record->tag()));
-    request->mutable_body()->mutable_keyvalue()->set_algorithm(
-            record->algorithm());
+    request->mutable_body()->mutable_keyvalue()->set_algorithm(record->algorithm());
 
-    request->mutable_body()->mutable_keyvalue()->set_synchronization(
-            this->GetSynchronizationForPersistMode(persistMode));
+    request->mutable_body()->mutable_keyvalue()->set_synchronization(GetSynchronizationForPersistMode(persistMode));
 
     return service_->Submit(move(msg), move(request), record->value(), move(handler));
 }
 
 HandlerKey NonblockingKineticConnection::Put(const string key,
-    const string current_version, WriteMode mode,
-    const shared_ptr<const KineticRecord> record,
-    const shared_ptr<PutCallbackInterface> callback,
-    PersistMode persistMode) {
-    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record,
-        callback, persistMode);
+                                             const string current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record,
+                                             const shared_ptr<PutCallbackInterface> callback,
+                                             PersistMode persistMode) {
+    return this->Put(make_shared<string>(key),
+                     make_shared<string>(current_version),
+                     mode,
+                     record,
+                     callback,
+                     persistMode);
 }
 
-
 HandlerKey NonblockingKineticConnection::Put(const shared_ptr<const string> key,
-        const shared_ptr<const string> current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record,
-        const shared_ptr<PutCallbackInterface> callback) {
+                                             const shared_ptr<const string> current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record,
+                                             const shared_ptr<PutCallbackInterface> callback) {
     // Default to the WRITE_BACK case, which performs better but does
     // not guarantee immediate persistence
     return this->Put(key, current_version, mode, record, callback, PersistMode::WRITE_BACK);
 }
 
 HandlerKey NonblockingKineticConnection::Put(const string key,
-    const string current_version, WriteMode mode,
-    const shared_ptr<const KineticRecord> record,
-    const shared_ptr<PutCallbackInterface> callback) {
-    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record,
-        callback);
+                                             const string current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record,
+                                             const shared_ptr<PutCallbackInterface> callback) {
+    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode, record, callback);
 }
 
 HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
-    const shared_ptr<const string> version, WriteMode mode,
-    const shared_ptr<SimpleCallbackInterface> callback,
-    PersistMode persistMode) {
+                                                const shared_ptr<const string> version,
+                                                WriteMode mode,
+                                                const shared_ptr<SimpleCallbackInterface> callback,
+                                                PersistMode persistMode) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
@@ -411,39 +429,42 @@ HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> k
     // TODO(marshall) handle null version
     request->mutable_body()->mutable_keyvalue()->set_dbversion(*version);
     request->mutable_body()->mutable_keyvalue()->set_force(force);
-    request->mutable_body()->mutable_keyvalue()->set_synchronization(
-            this->GetSynchronizationForPersistMode(persistMode));
+    request->mutable_body()->mutable_keyvalue()->set_synchronization(GetSynchronizationForPersistMode(persistMode));
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
-        WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback,
-        PersistMode persistMode) {
-    return this->Delete(make_shared<string>(key), make_shared<string>(version),
-            mode, callback, persistMode);
+HandlerKey NonblockingKineticConnection::Delete(const string key,
+                                                const string version,
+                                                WriteMode mode,
+                                                const shared_ptr<SimpleCallbackInterface> callback,
+                                                PersistMode persistMode) {
+    return this->Delete(make_shared<string>(key), make_shared<string>(version), mode, callback, persistMode);
 }
 
 HandlerKey NonblockingKineticConnection::Delete(const shared_ptr<const string> key,
-        const shared_ptr<const string> version, WriteMode mode,
-        const shared_ptr<SimpleCallbackInterface> callback) {
+                                                const shared_ptr<const string> version,
+                                                WriteMode mode,
+                                                const shared_ptr<SimpleCallbackInterface> callback) {
     // Default to the WRITE_BACK case, which performs better but does
     // not guarantee immediate persistence
     return this->Delete(key, version, mode, callback, PersistMode::WRITE_BACK);
 }
 
-HandlerKey NonblockingKineticConnection::Delete(const string key, const string version,
-        WriteMode mode, const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey NonblockingKineticConnection::Delete(const string key,
+                                                const string version,
+                                                WriteMode mode,
+                                                const shared_ptr<SimpleCallbackInterface> callback) {
     return this->Delete(make_shared<string>(key), make_shared<string>(version), mode, callback);
 }
 
 HandlerKey NonblockingKineticConnection::SecureErase(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback) {
+                                                     const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_SECURE_ERASE_PINOP);
@@ -452,17 +473,17 @@ HandlerKey NonblockingKineticConnection::SecureErase(const shared_ptr<string> pi
 }
 
 HandlerKey NonblockingKineticConnection::SecureErase(const string pin,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+                                                     const shared_ptr<SimpleCallbackInterface> callback) {
     return this->SecureErase(make_shared<string>(pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::InstantErase(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback) {
+                                                      const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_ERASE_PINOP);
@@ -471,39 +492,35 @@ HandlerKey NonblockingKineticConnection::InstantErase(const shared_ptr<string> p
 }
 
 HandlerKey NonblockingKineticConnection::InstantErase(const string pin,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+                                                      const shared_ptr<SimpleCallbackInterface> callback) {
     return this->InstantErase(make_shared<string>(pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::LockDevice(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
-   unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
-
-   unique_ptr<Message> msg(new Message());
-   msg->set_authtype(Message_AuthType_PINAUTH);
-   if(pin) msg->mutable_pinauth()->set_pin(*pin);
-
-   unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
-   request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_LOCK_PINOP);
-   return service_->Submit(move(msg), move(request), empty_str_, move(handler));
-
-
-}
-HandlerKey NonblockingKineticConnection::LockDevice(const string pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
-    return this->LockDevice(make_shared<string>(pin), callback);
-}
-
-HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+                                                    const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_PINAUTH);
-    if(pin) msg->mutable_pinauth()->set_pin(*pin);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
+
+    unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
+    request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_LOCK_PINOP);
+    return service_->Submit(move(msg), move(request), empty_str_, move(handler));
+}
+
+HandlerKey NonblockingKineticConnection::LockDevice(const string pin,
+                                                    const shared_ptr<SimpleCallbackInterface> callback) {
+    return this->LockDevice(make_shared<string>(pin), callback);
+}
+
+HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> pin,
+                                                      const shared_ptr<SimpleCallbackInterface> callback) {
+    unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
+
+    unique_ptr<Message> msg(new Message());
+    msg->set_authtype(Message_AuthType_PINAUTH);
+    if (pin) msg->mutable_pinauth()->set_pin(*pin);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_PINOP);
     request->mutable_body()->mutable_pinop()->set_pinoptype(Command_PinOperation_PinOpType_UNLOCK_PINOP);
@@ -511,13 +528,13 @@ HandlerKey NonblockingKineticConnection::UnlockDevice(const shared_ptr<string> p
 }
 
 HandlerKey NonblockingKineticConnection::UnlockDevice(const string pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+                                                      const shared_ptr<SimpleCallbackInterface> callback) {
     return this->UnlockDevice(make_shared<string>(pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::GenericGet(const shared_ptr<const string> key,
-    const shared_ptr<GetCallbackInterface> callback, Command_MessageType message_type) {
+                                                    const shared_ptr<GetCallbackInterface> callback,
+                                                    Command_MessageType message_type) {
     unique_ptr<GetHandler> handler(new GetHandler(callback));
 
     unique_ptr<Message> msg(new Message());
@@ -528,9 +545,7 @@ HandlerKey NonblockingKineticConnection::GenericGet(const shared_ptr<const strin
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::Flush(
-    const shared_ptr<SimpleCallbackInterface> callback) {
-
+HandlerKey NonblockingKineticConnection::Flush(const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_FLUSHALLDATA);
@@ -540,20 +555,18 @@ HandlerKey NonblockingKineticConnection::Flush(
 }
 
 HandlerKey NonblockingKineticConnection::SetClusterVersion(int64_t new_cluster_version,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+                                                           const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_SETUP);
 
-    request->mutable_body()->mutable_setup()->set_newclusterversion(
-            new_cluster_version);
+    request->mutable_body()->mutable_setup()->set_newclusterversion(new_cluster_version);
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::GetLog(
-        const shared_ptr<GetLogCallbackInterface> callback) {
+HandlerKey NonblockingKineticConnection::GetLog(const shared_ptr<GetLogCallbackInterface> callback) {
     vector<Command_GetLog_Type> types;
     types.push_back(Command_GetLog_Type_UTILIZATIONS);
     types.push_back(Command_GetLog_Type_TEMPERATURES);
@@ -566,14 +579,13 @@ HandlerKey NonblockingKineticConnection::GetLog(
     return GetLog(types, callback);
 }
 
-HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types,
-        const shared_ptr<GetLogCallbackInterface> callback) {
-
+HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type> &types,
+                                                const shared_ptr<GetLogCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_GETLOG);
 
-    for(auto iter = types.begin(); iter != types.end(); ++iter){
+    for (auto iter = types.begin(); iter != types.end(); ++iter) {
         auto mutable_getlog = request->mutable_body()->mutable_getlog();
         mutable_getlog->add_types(*iter);
     }
@@ -582,10 +594,8 @@ HandlerKey NonblockingKineticConnection::GetLog(const vector<Command_GetLog_Type
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::UpdateFirmware(
-        const shared_ptr<const string> new_firmware,
-        const shared_ptr<SimpleCallbackInterface> callback) {
-
+HandlerKey NonblockingKineticConnection::UpdateFirmware(const shared_ptr<const string> new_firmware,
+                                                        const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_SETUP);
@@ -597,47 +607,38 @@ HandlerKey NonblockingKineticConnection::UpdateFirmware(
 }
 
 HandlerKey NonblockingKineticConnection::SetACLs(const shared_ptr<const list<ACL>> acls,
-        const shared_ptr<SimpleCallbackInterface> callback) {
-
+                                                 const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
 
-
     for (auto it = acls->begin(); it != acls->end(); ++it) {
-        Command_Security_ACL *acl =
-                request->mutable_body()->mutable_security()->add_acl();
+        Command_Security_ACL *acl = request->mutable_body()->mutable_security()->add_acl();
         acl->set_identity(it->identity);
         acl->set_key(it->hmac_key);
         acl->set_hmacalgorithm(Command_Security_ACL_HMACAlgorithm_HmacSHA1);
 
         for (auto scope_it = it->scopes.begin(); scope_it != it->scopes.end(); ++scope_it) {
-            Command_Security_ACL_Scope * scope = acl->add_scope();
+            Command_Security_ACL_Scope *scope = acl->add_scope();
             scope->set_offset(scope_it->offset);
             scope->set_value(scope_it->value);
 
-            for (auto permission_it = scope_it->permissions.begin();
-                 permission_it != scope_it->permissions.end();
+            for (auto permission_it = scope_it->permissions.begin(); permission_it != scope_it->permissions.end();
                  ++permission_it) {
                 Command_Security_ACL_Permission permission;
                 switch (*permission_it) {
-                    case READ:
-                        permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_READ;
+                    case READ:permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_READ;
                         break;
-                    case WRITE:
-                        permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_WRITE;
+                    case WRITE:permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_WRITE;
                         break;
                     case DELETE:
                         permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_DELETE;
                         break;
-                    case RANGE:
-                        permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_RANGE;
+                    case RANGE:permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_RANGE;
                         break;
-                    case SETUP:
-                        permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_SETUP;
+                    case SETUP:permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_SETUP;
                         break;
-                    case P2POP:
-                        permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_P2POP;
+                    case P2POP:permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_P2POP;
                         break;
                     case GETLOG:
                         permission = com::seagate::kinetic::client::proto::Command_Security_ACL_Permission_GETLOG;
@@ -655,57 +656,57 @@ HandlerKey NonblockingKineticConnection::SetACLs(const shared_ptr<const list<ACL
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin, const shared_ptr<const string> current_pin,
-        const shared_ptr<SimpleCallbackInterface> callback)
-{
+HandlerKey NonblockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
+                                                    const shared_ptr<const string> current_pin,
+                                                    const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-    if(current_pin)
+    if (current_pin)
         request->mutable_body()->mutable_security()->set_oldlockpin(*current_pin);
-    if(new_pin)
+    if (new_pin)
         request->mutable_body()->mutable_security()->set_newlockpin(*new_pin);
 
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetLockPIN(const string new_pin, const string current_pin,
-    const shared_ptr<SimpleCallbackInterface> callback)
-{
+HandlerKey NonblockingKineticConnection::SetLockPIN(const string new_pin,
+                                                    const string current_pin,
+                                                    const shared_ptr<SimpleCallbackInterface> callback) {
     return this->SetLockPIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
 }
 
 HandlerKey NonblockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
-    const shared_ptr<const string> current_pin,
-    const shared_ptr<SimpleCallbackInterface> callback)
-{
+                                                     const shared_ptr<const string> current_pin,
+                                                     const shared_ptr<SimpleCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_SECURITY);
-    if(current_pin)
+    if (current_pin)
         request->mutable_body()->mutable_security()->set_olderasepin(*current_pin);
-    if(new_pin)
+    if (new_pin)
         request->mutable_body()->mutable_security()->set_newerasepin(*new_pin);
 
     unique_ptr<SimpleHandler> handler(new SimpleHandler(callback));
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-HandlerKey NonblockingKineticConnection::SetErasePIN(const string new_pin, const string current_pin,
-    const shared_ptr<SimpleCallbackInterface> callback) {
+HandlerKey NonblockingKineticConnection::SetErasePIN(const string new_pin,
+                                                     const string current_pin,
+                                                     const shared_ptr<SimpleCallbackInterface> callback) {
     return this->SetErasePIN(make_shared<string>(new_pin), make_shared<string>(current_pin), callback);
 }
 
-HandlerKey NonblockingKineticConnection::P2PPush(const P2PPushRequest& push_request,
-        const shared_ptr<P2PPushCallbackInterface> callback) {
+HandlerKey NonblockingKineticConnection::P2PPush(const P2PPushRequest &push_request,
+                                                 const shared_ptr<P2PPushCallbackInterface> callback) {
     return this->P2PPush(make_shared<P2PPushRequest>(push_request), callback);
 }
 
-void NonblockingKineticConnection::PopulateP2PMessage(
-        Command_P2POperation *mutable_p2pop, const shared_ptr<const P2PPushRequest> push_request) {
+void NonblockingKineticConnection::PopulateP2PMessage(Command_P2POperation *mutable_p2pop,
+                                                      const shared_ptr<const P2PPushRequest> push_request) {
     mutable_p2pop->mutable_peer()->set_hostname(push_request->host);
     mutable_p2pop->mutable_peer()->set_port(push_request->port);
 
@@ -726,10 +727,8 @@ void NonblockingKineticConnection::PopulateP2PMessage(
     }
 }
 
-HandlerKey NonblockingKineticConnection::P2PPush(
-        const shared_ptr<const P2PPushRequest> push_request,
-        const shared_ptr<P2PPushCallbackInterface> callback) {
-
+HandlerKey NonblockingKineticConnection::P2PPush(const shared_ptr<const P2PPushRequest> push_request,
+                                                 const shared_ptr<P2PPushCallbackInterface> callback) {
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
     unique_ptr<Command> request = NewCommand(Command_MessageType_PEER2PEERPUSH);
@@ -741,92 +740,74 @@ HandlerKey NonblockingKineticConnection::P2PPush(
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
-void setPriority(Command_Priority& command_priority, RequestPriority request_priority)
-{
-    switch (request_priority) {
-        case Priority_NORMAL:
-            command_priority = Command_Priority::Command_Priority_NORMAL;
-        break;
-        case Priority_LOWEST:
-            command_priority = Command_Priority::Command_Priority_LOWEST;
-        break;
-        case Priority_LOWER:
-            command_priority = Command_Priority::Command_Priority_LOWER;
-        break;
-        case Priority_HIGHER:
-            command_priority = Command_Priority::Command_Priority_HIGHER;
-        break;
-        case Priority_HIGHEST:
-            command_priority = Command_Priority::Command_Priority_HIGHEST;
-        break;
-        default:
-            command_priority = Command_Priority::Command_Priority_NORMAL;
-        break;
-    }
-}
-
 HandlerKey NonblockingKineticConnection::MediaScan(const shared_ptr<const string> start_key,
+                                                   bool start_key_inclusive,
                                                    const shared_ptr<const string> end_key,
-                                                   RequestPriority request_priority,
-                                                   const shared_ptr<MediaScanCallbackInterface> callback)
-{
+                                                   bool end_key_inclusive,
+                                                   int32_t max_results,
+                                                   const shared_ptr<MediaScanCallbackInterface> callback) {
     unique_ptr<MediaScanHandler> handler(new MediaScanHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIASCAN);
-
-    Command_Priority priority;
-    setPriority(priority, request_priority);
-    request->mutable_header()->set_priority(priority);
+    request->mutable_header()->set_priority(Command_Priority_LOWER);
 
     request->mutable_body()->mutable_range()->set_startkey(*start_key);
-    request->mutable_body()->mutable_range()->set_startkeyinclusive(true);
+    request->mutable_body()->mutable_range()->set_startkeyinclusive(start_key_inclusive);
     request->mutable_body()->mutable_range()->set_endkey(*end_key);
-    request->mutable_body()->mutable_range()->set_endkeyinclusive(true);
+    request->mutable_body()->mutable_range()->set_endkeyinclusive(end_key_inclusive);
+    request->mutable_body()->mutable_range()->set_maxreturned(max_results);
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
 HandlerKey NonblockingKineticConnection::MediaScan(const string start_key,
+                                                   bool start_key_inclusive,
                                                    const string end_key,
-                                                   RequestPriority request_priority,
-                                                   const shared_ptr<MediaScanCallbackInterface> callback)
-{
-    return this->MediaScan(make_shared<string>(start_key), make_shared<string>(end_key), request_priority, callback);
+                                                   bool end_key_inclusive,
+                                                   int32_t max_results,
+                                                   const shared_ptr<MediaScanCallbackInterface> callback) {
+    return this->MediaScan(make_shared<string>(start_key),
+                           start_key_inclusive,
+                           make_shared<string>(end_key),
+                           end_key_inclusive,
+                           max_results,
+                           callback);
 }
 
 HandlerKey NonblockingKineticConnection::MediaOptimize(const shared_ptr<const string> start_key,
+                                                       bool start_key_inclusive,
                                                        const shared_ptr<const string> end_key,
-                                                       RequestPriority request_priority,
-                                                       const shared_ptr<MediaOptimizeCallbackInterface> callback)
-{
+                                                       bool end_key_inclusive,
+                                                       const shared_ptr<MediaOptimizeCallbackInterface> callback) {
     unique_ptr<MediaOptimizeHandler> handler(new MediaOptimizeHandler(callback));
 
     unique_ptr<Message> msg(new Message());
     msg->set_authtype(Message_AuthType_HMACAUTH);
 
     unique_ptr<Command> request = NewCommand(Command_MessageType_MEDIAOPTIMIZE);
-
-    Command_Priority priority;
-    setPriority(priority, request_priority);
-    request->mutable_header()->set_priority(priority);
+    request->mutable_header()->set_priority(Command_Priority_LOWER);
 
     request->mutable_body()->mutable_range()->set_startkey(*start_key);
-    request->mutable_body()->mutable_range()->set_startkeyinclusive(true);
+    request->mutable_body()->mutable_range()->set_startkeyinclusive(start_key_inclusive);
     request->mutable_body()->mutable_range()->set_endkey(*end_key);
-    request->mutable_body()->mutable_range()->set_endkeyinclusive(true);
+    request->mutable_body()->mutable_range()->set_endkeyinclusive(end_key_inclusive);
 
     return service_->Submit(move(msg), move(request), empty_str_, move(handler));
 }
 
 HandlerKey NonblockingKineticConnection::MediaOptimize(const string start_key,
+                                                       bool start_key_inclusive,
                                                        const string end_key,
-                                                       RequestPriority request_priority,
-                                                       const shared_ptr<MediaOptimizeCallbackInterface> callback)
-{
-    return this->MediaOptimize(make_shared<string>(start_key),  make_shared<string>(end_key), request_priority, callback);
+                                                       bool end_key_inclusive,
+                                                       const shared_ptr<MediaOptimizeCallbackInterface> callback) {
+    return this->MediaOptimize(make_shared<string>(start_key),
+                               start_key_inclusive,
+                               make_shared<string>(end_key),
+                               end_key_inclusive,
+                               callback);
 }
 
 bool NonblockingKineticConnection::RemoveHandler(HandlerKey handler_key) {
@@ -836,14 +817,11 @@ bool NonblockingKineticConnection::RemoveHandler(HandlerKey handler_key) {
 Command_Synchronization NonblockingKineticConnection::GetSynchronizationForPersistMode(PersistMode persistMode) {
     Command_Synchronization sync_option;
     switch (persistMode) {
-        case PersistMode::WRITE_BACK:
-            sync_option = Command_Synchronization_WRITEBACK;
+        case PersistMode::WRITE_BACK:sync_option = Command_Synchronization_WRITEBACK;
             break;
-        case PersistMode::WRITE_THROUGH:
-            sync_option = Command_Synchronization_WRITETHROUGH;
+        case PersistMode::WRITE_THROUGH:sync_option = Command_Synchronization_WRITETHROUGH;
             break;
-        case PersistMode::FLUSH:
-            sync_option = Command_Synchronization_FLUSH;
+        case PersistMode::FLUSH:sync_option = Command_Synchronization_FLUSH;
             break;
     }
     return sync_option;

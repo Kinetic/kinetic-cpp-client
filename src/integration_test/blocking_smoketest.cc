@@ -55,7 +55,7 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
        WriteMode::IGNORE_VERSION, record2).ok());
 
     auto record3 = make_shared<KineticRecord>(make_shared<string>("value3"),
-        make_shared<string>("v3"), make_shared<string>("t3"), Command_Algorithm_CRC32);
+        make_shared<string>("v3"), make_shared<string>("94ca33031e37aa3f3b67e5b921c729f08a6bba75"), Command_Algorithm_SHA1);
     ASSERT_TRUE(blocking_connection_->Put(make_shared<string>("key3"), make_shared<string>(""),
        WriteMode::IGNORE_VERSION, record3).ok());
 
@@ -105,14 +105,9 @@ TEST_F(IntegrationTest, BlockingSmoketest) {
     unique_ptr<string> last_handled;
     unique_ptr<vector<string>> actual_failed_keys;
     vector<string> expected_failed_keys = {"key1", "key3"};
-    ASSERT_TRUE(blocking_connection_->MediaScan(
-        "key1", "key3", RequestPriority::Priority_LOWEST, last_handled, actual_failed_keys).ok()
-    );
+    ASSERT_TRUE(blocking_connection_->MediaScan("key1", true, "key3", true, 100, last_handled, actual_failed_keys).ok());
     EXPECT_EQ(expected_failed_keys, *actual_failed_keys);
     EXPECT_EQ("key3", *last_handled);
-
-    ASSERT_TRUE(blocking_connection_->MediaOptimize("!",  "~", RequestPriority::Priority_HIGHER, last_handled).ok());
-    EXPECT_EQ(*last_handled, "~");
 
     ASSERT_TRUE(blocking_connection_->Delete("key1", "", WriteMode::IGNORE_VERSION).ok());
 
