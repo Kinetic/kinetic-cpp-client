@@ -251,7 +251,7 @@ unique_ptr<Command> NonblockingKineticConnection::NewCommand(Command_MessageType
     unique_ptr<Command> cmd(new Command());
     cmd->mutable_header()->set_messagetype(message_type);
     cmd->mutable_header()->set_clusterversion(cluster_version_);
-    return move(cmd);
+    return cmd;
 }
 
 HandlerKey NonblockingKineticConnection::NoOp(const shared_ptr<SimpleCallbackInterface> callback) {
