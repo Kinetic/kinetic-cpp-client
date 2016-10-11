@@ -21,7 +21,7 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 2)
+set(PROJECT_VERSION_MINOR 3)
 set(PROJECT_VERSION_PATCH ${GIT_COMMITS})
 set(PROJECT_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 message(STATUS "Project version set to ${PROJECT_VERSION}")
@@ -166,7 +166,7 @@ set(GENERATED_SOURCES_PATH ${kinetic_cpp_client_SOURCE_DIR}/src/main/generated)
 ExternalProject_add(kinetic-proto
         PREFIX proto
         GIT_REPOSITORY https://github.com/Seagate/kinetic-protocol
-        GIT_TAG 3.0.0
+        GIT_TAG 3.0.5
         UPDATE_COMMAND mkdir -p ${GENERATED_SOURCES_PATH}
         CONFIGURE_COMMAND ""
         BUILD_IN_SOURCE 1

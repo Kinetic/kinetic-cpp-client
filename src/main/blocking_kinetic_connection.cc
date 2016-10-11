@@ -22,21 +22,17 @@
 #include <chrono>
 #include "kinetic/blocking_kinetic_connection.h"
 
-
 namespace kinetic {
 
-using std::shared_ptr;
-using std::unique_ptr;
-using std::string;
 using std::make_shared;
 using std::move;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::seconds;
 
-BlockingKineticConnection::BlockingKineticConnection( unique_ptr<NonblockingKineticConnection> nonblocking_connection,
-        unsigned int network_timeout_seconds)
-    : network_timeout_seconds_(network_timeout_seconds) {
+BlockingKineticConnection::BlockingKineticConnection(unique_ptr<NonblockingKineticConnection> nonblocking_connection,
+                                                     unsigned int network_timeout_seconds) : network_timeout_seconds_(
+    network_timeout_seconds) {
     nonblocking_connection_ = std::move(nonblocking_connection);
 }
 
@@ -44,14 +40,13 @@ BlockingKineticConnection::~BlockingKineticConnection() {}
 
 class BlockingCallbackState {
     friend class BlockingKineticConnection;
-
-    public:
-    BlockingCallbackState() : done_(false), success_(false),
-        error_(KineticStatus(StatusCode::OK, "default -- never seen")) { }
+  public:
+    BlockingCallbackState()
+        : done_(false), success_(false), error_(KineticStatus(StatusCode::OK, "default -- never seen")) {}
 
     virtual ~BlockingCallbackState() {}
 
-    protected:
+  protected:
     bool done_;
     bool success_;
     KineticStatus error_;
@@ -69,7 +64,7 @@ class BlockingCallbackState {
 };
 
 class SimpleCallback : public SimpleCallbackInterface, public BlockingCallbackState {
-    public:
+  public:
     virtual void Success() {
         OnSuccess();
     }
@@ -78,7 +73,7 @@ class SimpleCallback : public SimpleCallbackInterface, public BlockingCallbackSt
         OnError(error);
     }
 
-    private:
+  private:
 };
 
 KineticStatus BlockingKineticConnection::NoOp() {
@@ -87,14 +82,14 @@ KineticStatus BlockingKineticConnection::NoOp() {
 }
 
 class BlockingGetCallback : public GetCallbackInterface, public BlockingCallbackState {
-    public:
-    BlockingGetCallback(
-            unique_ptr<string>& actual_key,
-            unique_ptr<KineticRecord>& record,
-            bool want_actual_key)
-        : actual_key_(actual_key), record_(record),
-        want_actual_key_(want_actual_key) {}
-    virtual void Success(const string &key, unique_ptr<KineticRecord> record) {
+  public:
+    BlockingGetCallback(unique_ptr<string> &actual_key,
+                        unique_ptr<KineticRecord> &record,
+                        bool want_actual_key)
+        : actual_key_(actual_key), record_(record), want_actual_key_(want_actual_key) {}
+
+    virtual void Success(const string &key,
+                         unique_ptr<KineticRecord> record) {
         OnSuccess();
 
         if (want_actual_key_) {
@@ -112,19 +107,17 @@ class BlockingGetCallback : public GetCallbackInterface, public BlockingCallback
         OnError(error);
     }
 
-    private:
-    unique_ptr<string>& actual_key_;
-    unique_ptr<KineticRecord>& record_;
+  private:
+    unique_ptr<string> &actual_key_;
+    unique_ptr<KineticRecord> &record_;
     bool want_actual_key_;
 };
 
-class BlockingGetVersionCallback : public GetVersionCallbackInterface,
-        public BlockingCallbackState {
-    public:
-    explicit BlockingGetVersionCallback(unique_ptr<string>& version)
-    : version_(version) {}
+class BlockingGetVersionCallback : public GetVersionCallbackInterface, public BlockingCallbackState {
+  public:
+    explicit BlockingGetVersionCallback(unique_ptr<string> &version) : version_(version) {}
 
-    virtual void Success(const std::string& version) {
+    virtual void Success(const std::string &version) {
         OnSuccess();
 
         if (version_) {
@@ -138,15 +131,13 @@ class BlockingGetVersionCallback : public GetVersionCallbackInterface,
         OnError(error);
     }
 
-    private:
-    unique_ptr<string>& version_;
+  private:
+    unique_ptr<string> &version_;
 };
 
-class BlockingGetKeyRangeCallback : public GetKeyRangeCallbackInterface,
-        public BlockingCallbackState {
-    public:
-    explicit BlockingGetKeyRangeCallback(unique_ptr<vector<string>>& keys)
-    :  keys_(keys) {}
+class BlockingGetKeyRangeCallback : public GetKeyRangeCallbackInterface, public BlockingCallbackState {
+  public:
+    explicit BlockingGetKeyRangeCallback(unique_ptr<vector<string>> &keys) : keys_(keys) {}
 
     virtual void Success(unique_ptr<vector<string>> keys) {
         OnSuccess();
@@ -158,8 +149,56 @@ class BlockingGetKeyRangeCallback : public GetKeyRangeCallbackInterface,
         OnError(error);
     }
 
-    private:
-    unique_ptr<vector<string>>& keys_;
+  private:
+    unique_ptr<vector<string>> &keys_;
+};
+
+class BlockingMediaScanCallback : public MediaScanCallbackInterface, public BlockingCallbackState {
+  public:
+    explicit BlockingMediaScanCallback(unique_ptr<vector<string>> &keys,
+                                       unique_ptr<string> &end_key) : keys_(keys), end_key_(end_key) {}
+
+    virtual void Success(unique_ptr<vector<string>> keys,
+                         const std::string &end_key) {
+        OnSuccess();
+
+        if (end_key_) {
+            *end_key_ = end_key;
+        } else {
+            end_key_.reset(new string(end_key));
+        }
+        keys_ = move(keys);
+    }
+
+    virtual void Failure(KineticStatus error) {
+        OnError(error);
+    }
+
+  private:
+    unique_ptr<vector<string>> &keys_;
+    unique_ptr<string> &end_key_;
+};
+
+class BlockingMediaOptimizeCallback : public MediaOptimizeCallbackInterface, public BlockingCallbackState {
+  public:
+    explicit BlockingMediaOptimizeCallback(unique_ptr<string> &end_key) : end_key_(end_key) {}
+
+    virtual void Success(const std::string &end_key) {
+        OnSuccess();
+
+        if (end_key_) {
+            *end_key_ = end_key;
+        } else {
+            end_key_.reset(new string(end_key));
+        }
+    }
+
+    virtual void Failure(KineticStatus error) {
+        OnError(error);
+    }
+
+  private:
+    unique_ptr<string> &end_key_;
 };
 
 void BlockingKineticConnection::SetClientClusterVersion(int64_t cluster_version) {
@@ -167,18 +206,19 @@ void BlockingKineticConnection::SetClientClusterVersion(int64_t cluster_version)
 }
 
 KineticStatus BlockingKineticConnection::Get(const shared_ptr<const string> key,
-    unique_ptr<KineticRecord>& record) {
+                                             unique_ptr<KineticRecord> &record) {
     unique_ptr<string> actual_key;
     auto handler = make_shared<BlockingGetCallback>(actual_key, record, false);
     return RunOperation(handler, nonblocking_connection_->Get(key, handler));
 }
 
-KineticStatus BlockingKineticConnection::Get(const string& key, unique_ptr<KineticRecord>& record) {
+KineticStatus BlockingKineticConnection::Get(const string &key,
+                                             unique_ptr<KineticRecord> &record) {
     return this->Get(make_shared<string>(key), record);
 }
 
 class BlockingPutCallback : public PutCallbackInterface, public BlockingCallbackState {
-    public:
+  public:
     virtual void Success() {
         OnSuccess();
     }
@@ -187,66 +227,78 @@ class BlockingPutCallback : public PutCallbackInterface, public BlockingCallback
         OnError(error);
     }
 
-    private:
+  private:
 };
 
 KineticStatus BlockingKineticConnection::Put(const shared_ptr<const string> key,
-        const shared_ptr<const string> current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record,
-        PersistMode persistMode) {
+                                             const shared_ptr<const string> current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record,
+                                             PersistMode persistMode) {
     auto handler = make_shared<BlockingPutCallback>();
 
     return RunOperation(handler,
-            nonblocking_connection_->Put(key, current_version, mode, record, handler, persistMode));
+                        nonblocking_connection_->Put(key, current_version, mode, record, handler, persistMode));
 }
 
-KineticStatus BlockingKineticConnection::Put(const string& key,
-        const string& current_version, WriteMode mode,
-        const KineticRecord& record,
-        PersistMode persistMode) {
-    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode,
-        make_shared<KineticRecord>(record), persistMode);
+KineticStatus BlockingKineticConnection::Put(const string &key,
+                                             const string &current_version,
+                                             WriteMode mode,
+                                             const KineticRecord &record,
+                                             PersistMode persistMode) {
+    return this->Put(make_shared<string>(key),
+                     make_shared<string>(current_version),
+                     mode,
+                     make_shared<KineticRecord>(record),
+                     persistMode);
 }
 
 KineticStatus BlockingKineticConnection::Put(const shared_ptr<const string> key,
-        const shared_ptr<const string> current_version, WriteMode mode,
-        const shared_ptr<const KineticRecord> record) {
+                                             const shared_ptr<const string> current_version,
+                                             WriteMode mode,
+                                             const shared_ptr<const KineticRecord> record) {
     auto handler = make_shared<BlockingPutCallback>();
 
     // Rely on nonblocking_connection to handle the default PersistMode case
-    return RunOperation(handler,
-            nonblocking_connection_->Put(key, current_version, mode, record, handler));
+    return RunOperation(handler, nonblocking_connection_->Put(key, current_version, mode, record, handler));
 }
 
-KineticStatus BlockingKineticConnection::Put(const string& key,
-        const string& current_version, WriteMode mode,
-        const KineticRecord& record) {
-    return this->Put(make_shared<string>(key), make_shared<string>(current_version), mode,
-        make_shared<KineticRecord>(record));
+KineticStatus BlockingKineticConnection::Put(const string &key,
+                                             const string &current_version,
+                                             WriteMode mode,
+                                             const KineticRecord &record) {
+    return this->Put(make_shared<string>(key),
+                     make_shared<string>(current_version),
+                     mode,
+                     make_shared<KineticRecord>(record));
 }
 
 KineticStatus BlockingKineticConnection::Delete(const shared_ptr<const string> key,
-    const shared_ptr<const string> version, WriteMode mode, PersistMode persistMode) {
+                                                const shared_ptr<const string> version,
+                                                WriteMode mode,
+                                                PersistMode persistMode) {
     auto callback = make_shared<SimpleCallback>();
-    return RunOperation(callback, nonblocking_connection_->Delete(key, version, mode,
-            callback, persistMode));
+    return RunOperation(callback, nonblocking_connection_->Delete(key, version, mode, callback, persistMode));
 }
 
-KineticStatus BlockingKineticConnection::Delete(const string& key, const string& version,
-    WriteMode mode, PersistMode persistMode) {
-    return this->Delete(make_shared<string>(key),
-            make_shared<string>(version), mode, persistMode);
+KineticStatus BlockingKineticConnection::Delete(const string &key,
+                                                const string &version,
+                                                WriteMode mode,
+                                                PersistMode persistMode) {
+    return this->Delete(make_shared<string>(key), make_shared<string>(version), mode, persistMode);
 }
 
 KineticStatus BlockingKineticConnection::Delete(const shared_ptr<const string> key,
-    const shared_ptr<const string> version, WriteMode mode) {
+                                                const shared_ptr<const string> version,
+                                                WriteMode mode) {
     auto callback = make_shared<SimpleCallback>();
     // Let the nonblocking_connection handle the default persistOption
     return RunOperation(callback, nonblocking_connection_->Delete(key, version, mode, callback));
 }
 
-KineticStatus BlockingKineticConnection::Delete(const string& key, const string& version,
-    WriteMode mode) {
+KineticStatus BlockingKineticConnection::Delete(const string &key,
+                                                const string &version,
+                                                WriteMode mode) {
     return this->Delete(make_shared<string>(key), make_shared<string>(version), mode);
 }
 
@@ -254,46 +306,49 @@ KineticStatus BlockingKineticConnection::InstantErase(const shared_ptr<string> p
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->InstantErase(pin, callback));
 }
-KineticStatus BlockingKineticConnection::InstantErase(const string& pin) {
+
+KineticStatus BlockingKineticConnection::InstantErase(const string &pin) {
     return this->InstantErase(make_shared<string>(pin));
 }
 
-KineticStatus BlockingKineticConnection::SecureErase(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::SecureErase(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SecureErase(pin, callback));
 }
-KineticStatus BlockingKineticConnection::SecureErase(const string& pin){
+
+KineticStatus BlockingKineticConnection::SecureErase(const string &pin) {
     return this->SecureErase(make_shared<string>(pin));
 }
 
 KineticStatus BlockingKineticConnection::SetClusterVersion(int64_t new_cluster_version) {
     auto callback = make_shared<SimpleCallback>();
-    return RunOperation(callback,
-            nonblocking_connection_->SetClusterVersion(new_cluster_version, callback));
+    return RunOperation(callback, nonblocking_connection_->SetClusterVersion(new_cluster_version, callback));
 }
 
 class GetLogCallback : public GetLogCallbackInterface, public BlockingCallbackState {
-    public:
-    explicit GetLogCallback(unique_ptr<DriveLog>& drive_log) :  drive_log_(drive_log) {}
+  public:
+    explicit GetLogCallback(unique_ptr<DriveLog> &drive_log) : drive_log_(drive_log) {}
 
     virtual void Success(unique_ptr<DriveLog> drive_log) {
         OnSuccess();
         drive_log_ = std::move(drive_log);
     }
+
     virtual void Failure(KineticStatus error) {
         OnError(error);
     }
 
-    private:
-    unique_ptr<DriveLog>& drive_log_;
+  private:
+    unique_ptr<DriveLog> &drive_log_;
 };
 
-KineticStatus BlockingKineticConnection::GetLog(unique_ptr<DriveLog>& drive_log) {
+KineticStatus BlockingKineticConnection::GetLog(unique_ptr<DriveLog> &drive_log) {
     auto callback = make_shared<GetLogCallback>(drive_log);
     return RunOperation(callback, nonblocking_connection_->GetLog(callback));
 }
 
-KineticStatus BlockingKineticConnection::GetLog(const vector<Command_GetLog_Type>& types, unique_ptr<DriveLog>& drive_log) {
+KineticStatus BlockingKineticConnection::GetLog(const vector<Command_GetLog_Type> &types,
+                                                unique_ptr<DriveLog> &drive_log) {
     auto callback = make_shared<GetLogCallback>(drive_log);
     return RunOperation(callback, nonblocking_connection_->GetLog(types, callback));
 }
@@ -303,8 +358,7 @@ KineticStatus BlockingKineticConnection::Flush() {
     return RunOperation(callback, nonblocking_connection_->Flush(callback));
 }
 
-KineticStatus BlockingKineticConnection::UpdateFirmware(const shared_ptr<const string>
-        new_firmware) {
+KineticStatus BlockingKineticConnection::UpdateFirmware(const shared_ptr<const string> new_firmware) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->UpdateFirmware(new_firmware, callback));
 }
@@ -315,163 +369,232 @@ KineticStatus BlockingKineticConnection::SetACLs(const shared_ptr<const list<ACL
 }
 
 KineticStatus BlockingKineticConnection::SetErasePIN(const shared_ptr<const string> new_pin,
-        const shared_ptr<const string> current_pin){
+                                                     const shared_ptr<const string> current_pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SetErasePIN(new_pin, current_pin, callback));
 }
-KineticStatus BlockingKineticConnection::SetErasePIN(const string& new_pin, const string& current_pin){
-    return this->SetErasePIN(make_shared<string>(new_pin),make_shared<string>(current_pin));
+
+KineticStatus BlockingKineticConnection::SetErasePIN(const string &new_pin,
+                                                     const string &current_pin) {
+    return this->SetErasePIN(make_shared<string>(new_pin), make_shared<string>(current_pin));
 }
 
 KineticStatus BlockingKineticConnection::SetLockPIN(const shared_ptr<const string> new_pin,
-        const shared_ptr<const string> current_pin){
+                                                    const shared_ptr<const string> current_pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->SetLockPIN(new_pin, current_pin, callback));
 }
-KineticStatus BlockingKineticConnection::SetLockPIN(const string& new_pin, const string& current_pin){
-    return this->SetLockPIN(make_shared<string>(new_pin),make_shared<string>(current_pin));
+
+KineticStatus BlockingKineticConnection::SetLockPIN(const string &new_pin,
+                                                    const string &current_pin) {
+    return this->SetLockPIN(make_shared<string>(new_pin), make_shared<string>(current_pin));
 }
 
-KineticStatus BlockingKineticConnection::LockDevice(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::LockDevice(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->LockDevice(pin, callback));
 }
-KineticStatus BlockingKineticConnection::LockDevice(const string& pin){
+
+KineticStatus BlockingKineticConnection::LockDevice(const string &pin) {
     return this->LockDevice(make_shared<string>(pin));
 }
 
-KineticStatus BlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin){
+KineticStatus BlockingKineticConnection::UnlockDevice(const shared_ptr<string> pin) {
     auto callback = make_shared<SimpleCallback>();
     return RunOperation(callback, nonblocking_connection_->UnlockDevice(pin, callback));
 }
-KineticStatus BlockingKineticConnection::UnlockDevice(const string& pin){
+
+KineticStatus BlockingKineticConnection::UnlockDevice(const string &pin) {
     return this->UnlockDevice(make_shared<string>(pin));
 }
 
 KineticStatus BlockingKineticConnection::GetNext(const shared_ptr<const string> key,
-        unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
+                                                 unique_ptr<string> &actual_key,
+                                                 unique_ptr<KineticRecord> &record) {
     auto callback = make_shared<BlockingGetCallback>(actual_key, record, true);
     return RunOperation(callback, nonblocking_connection_->GetNext(key, callback));
 }
 
-KineticStatus BlockingKineticConnection::GetNext(const string& key,
-        unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
+KineticStatus BlockingKineticConnection::GetNext(const string &key,
+                                                 unique_ptr<string> &actual_key,
+                                                 unique_ptr<KineticRecord> &record) {
     return this->GetNext(make_shared<string>(key), actual_key, record);
 }
 
 KineticStatus BlockingKineticConnection::GetPrevious(const shared_ptr<const string> key,
-        unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
-    auto callback = make_shared<BlockingGetCallback>(actual_key, record,
-            true);
+                                                     unique_ptr<string> &actual_key,
+                                                     unique_ptr<KineticRecord> &record) {
+    auto callback = make_shared<BlockingGetCallback>(actual_key, record, true);
     return RunOperation(callback, nonblocking_connection_->GetPrevious(key, callback));
 }
 
-KineticStatus BlockingKineticConnection::GetPrevious(const string& key,
-        unique_ptr<string>& actual_key, unique_ptr<KineticRecord>& record) {
+KineticStatus BlockingKineticConnection::GetPrevious(const string &key,
+                                                     unique_ptr<string> &actual_key,
+                                                     unique_ptr<KineticRecord> &record) {
     return this->GetPrevious(make_shared<string>(key), actual_key, record);
 }
 
 KineticStatus BlockingKineticConnection::GetVersion(const shared_ptr<const string> key,
-        unique_ptr<string>& version) {
+                                                    unique_ptr<string> &version) {
     auto callback = make_shared<BlockingGetVersionCallback>(version);
     return RunOperation(callback, nonblocking_connection_->GetVersion(key, callback));
 }
 
-KineticStatus BlockingKineticConnection::GetVersion(const string& key,
-        unique_ptr<string>& version) {
+KineticStatus BlockingKineticConnection::GetVersion(const string &key,
+                                                    unique_ptr<string> &version) {
     return this->GetVersion(make_shared<string>(key), version);
 }
 
 KineticStatus BlockingKineticConnection::GetKeyRange(const shared_ptr<const string> start_key,
-        bool start_key_inclusive,
-        const shared_ptr<const string> end_key,
-        bool end_key_inclusive,
-        bool reverse_results,
-        int32_t max_results,
-        unique_ptr<vector<string>>& keys) {
+                                                     bool start_key_inclusive,
+                                                     const shared_ptr<const string> end_key,
+                                                     bool end_key_inclusive,
+                                                     bool reverse_results,
+                                                     int32_t max_results,
+                                                     unique_ptr<vector<string>> &keys) {
     auto callback = make_shared<BlockingGetKeyRangeCallback>(keys);
 
     return RunOperation(callback,
-            nonblocking_connection_->GetKeyRange(start_key,
-                    start_key_inclusive,
-                    end_key,
-                    end_key_inclusive,
-                    reverse_results,
-                    max_results,
-                    callback));
+                        nonblocking_connection_->GetKeyRange(start_key,
+                                                             start_key_inclusive,
+                                                             end_key,
+                                                             end_key_inclusive,
+                                                             reverse_results,
+                                                             max_results,
+                                                             callback));
 }
 
-KineticStatus BlockingKineticConnection::GetKeyRange(const string& start_key,
-        bool start_key_inclusive,
-        const string& end_key,
-        bool end_key_inclusive,
-        bool reverse_results,
-        int32_t max_results,
-        unique_ptr<vector<string>>& keys) {
+KineticStatus BlockingKineticConnection::GetKeyRange(const string &start_key,
+                                                     bool start_key_inclusive,
+                                                     const string &end_key,
+                                                     bool end_key_inclusive,
+                                                     bool reverse_results,
+                                                     int32_t max_results,
+                                                     unique_ptr<vector<string>> &keys) {
     return this->GetKeyRange(make_shared<string>(start_key),
-        start_key_inclusive, make_shared<string>(end_key),
-        end_key_inclusive, reverse_results, max_results,
-        keys);
+                             start_key_inclusive,
+                             make_shared<string>(end_key),
+                             end_key_inclusive,
+                             reverse_results,
+                             max_results,
+                             keys);
 }
 
-
-KeyRangeIterator BlockingKineticConnection::IterateKeyRange(
-        const shared_ptr<const string> start_key,
-        bool start_key_inclusive,
-        const shared_ptr<const string> end_key,
-        bool end_key_inclusive,
-        unsigned int frame_size) {
-    KeyRangeIterator it(this,
-            frame_size,
-            *start_key,
-            start_key_inclusive,
-            *end_key,
-            end_key_inclusive);
+KeyRangeIterator BlockingKineticConnection::IterateKeyRange(const shared_ptr<const string> start_key,
+                                                            bool start_key_inclusive,
+                                                            const shared_ptr<const string> end_key,
+                                                            bool end_key_inclusive,
+                                                            unsigned int frame_size) {
+    KeyRangeIterator it(this, frame_size, *start_key, start_key_inclusive, *end_key, end_key_inclusive);
     return it;
 }
 
-KeyRangeIterator BlockingKineticConnection::IterateKeyRange(const string& start_key,
-        bool start_key_inclusive,
-        const string& end_key,
-        bool end_key_inclusive,
-        unsigned int frame_size) {
+KeyRangeIterator BlockingKineticConnection::IterateKeyRange(const string &start_key,
+                                                            bool start_key_inclusive,
+                                                            const string &end_key,
+                                                            bool end_key_inclusive,
+                                                            unsigned int frame_size) {
     return this->IterateKeyRange(make_shared<string>(start_key),
-        start_key_inclusive, make_shared<string>(end_key),
-        end_key_inclusive, frame_size);
+                                 start_key_inclusive,
+                                 make_shared<string>(end_key),
+                                 end_key_inclusive,
+                                 frame_size);
 }
 
-KineticStatus BlockingKineticConnection::P2PPush(const P2PPushRequest& push_request,
-        unique_ptr<vector<KineticStatus>>& operation_statuses) {
+KineticStatus BlockingKineticConnection::P2PPush(const P2PPushRequest &push_request,
+                                                 unique_ptr<vector<KineticStatus>> &operation_statuses) {
     return this->P2PPush(make_shared<P2PPushRequest>(push_request), operation_statuses);
 }
 
 class BlockingP2PPushCallback : public P2PPushCallbackInterface, public BlockingCallbackState {
-    public:
-    explicit BlockingP2PPushCallback(unique_ptr<vector<KineticStatus>>& statuses)
-    : statuses_(statuses) {}
-    virtual void Success(unique_ptr<vector<KineticStatus>> statuses, const Command& response) {
+  public:
+    explicit BlockingP2PPushCallback(unique_ptr<vector<KineticStatus>> &statuses) : statuses_(statuses) {}
+
+    virtual void Success(unique_ptr<vector<KineticStatus>> statuses,
+                         const Command &response) {
         OnSuccess();
         statuses_ = std::move(statuses);
     }
-    virtual void Failure(KineticStatus error, Command const * const response) {
+
+    virtual void Failure(KineticStatus error,
+                         Command const *const response) {
         OnError(error);
     }
 
-    private:
-    unique_ptr<vector<KineticStatus>>& statuses_;
+  private:
+    unique_ptr<vector<KineticStatus>> &statuses_;
 };
 
-KineticStatus BlockingKineticConnection::P2PPush(
-        const shared_ptr<const P2PPushRequest> push_request,
-        unique_ptr<vector<KineticStatus>>& operation_statuses) {
+KineticStatus BlockingKineticConnection::P2PPush(const shared_ptr<const P2PPushRequest> push_request,
+                                                 unique_ptr<vector<KineticStatus>> &operation_statuses) {
     auto callback = make_shared<BlockingP2PPushCallback>(operation_statuses);
-    return RunOperation(callback,
-            nonblocking_connection_->P2PPush(push_request, callback));
+    return RunOperation(callback, nonblocking_connection_->P2PPush(push_request, callback));
 }
 
-KineticStatus BlockingKineticConnection::RunOperation(
-        shared_ptr<BlockingCallbackState> callback,
-        HandlerKey handler_key) {
+KineticStatus BlockingKineticConnection::MediaOptimize(const shared_ptr<const string> start_key,
+                                                       bool start_key_inclusive,
+                                                       const shared_ptr<const string> end_key,
+                                                       bool end_key_inclusive,
+                                                       unique_ptr<string> &last_handled_key) {
+    auto callback = make_shared<BlockingMediaOptimizeCallback>(last_handled_key);
+    return RunOperation(callback,
+                        nonblocking_connection_->MediaOptimize(start_key,
+                                                               start_key_inclusive,
+                                                               end_key,
+                                                               end_key_inclusive,
+                                                               callback));
+}
+
+KineticStatus BlockingKineticConnection::MediaOptimize(const string &start_key,
+                                                       bool start_key_inclusive,
+                                                       const string &end_key,
+                                                       bool end_key_inclusive,
+                                                       unique_ptr<string> &last_handled_key) {
+    auto callback = make_shared<BlockingMediaOptimizeCallback>(last_handled_key);
+    return RunOperation(callback,
+                        nonblocking_connection_->MediaOptimize(start_key,
+                                                               start_key_inclusive,
+                                                               end_key,
+                                                               end_key_inclusive,
+                                                               callback));
+}
+
+KineticStatus BlockingKineticConnection::MediaScan(const shared_ptr<const string> start_key,
+                                                   bool start_key_inclusive,
+                                                   const shared_ptr<const string> end_key,
+                                                   bool end_key_inclusive,
+                                                   int32_t max_results,
+                                                   unique_ptr<string> &last_handled_key,
+                                                   unique_ptr<vector<string>> &keys) {
+    auto callback = make_shared<BlockingMediaScanCallback>(keys, last_handled_key);
+    return RunOperation(callback,
+                        nonblocking_connection_->MediaScan(start_key,
+                                                           start_key_inclusive,
+                                                           end_key,
+                                                           end_key_inclusive,
+                                                           max_results,
+                                                           callback));
+}
+
+KineticStatus BlockingKineticConnection::MediaScan(const string &start_key,
+                                                   bool start_key_inclusive,
+                                                   const string &end_key,
+                                                   bool end_key_inclusive,
+                                                   int32_t max_results,
+                                                   unique_ptr<string> &last_handled_key,
+                                                   unique_ptr<vector<string>> &keys) {
+    auto callback = make_shared<BlockingMediaScanCallback>(keys, last_handled_key);
+    return RunOperation(callback,
+                        nonblocking_connection_->MediaScan(start_key,
+                                                           start_key_inclusive,
+                                                           end_key,
+                                                           end_key_inclusive,
+                                                           max_results,
+                                                           callback));
+}
+
+KineticStatus BlockingKineticConnection::RunOperation(shared_ptr<BlockingCallbackState> callback,
+                                                      HandlerKey handler_key) {
     fd_set read_fds, write_fds;
     int nfds;
 
@@ -482,13 +605,13 @@ KineticStatus BlockingKineticConnection::RunOperation(
     auto timeout_time = std::chrono::system_clock::now() + seconds(network_timeout_seconds_);
 
     while (!(callback->done_)) {
-        struct timeval tv{0, 0};
+        struct timeval tv {0, 0};
 
         auto current_time = std::chrono::system_clock::now();
         if (timeout_time > current_time) {
             auto remaining_sec = duration_cast<seconds>(timeout_time - current_time);
-            auto remaining_usec = duration_cast<microseconds>(timeout_time - current_time) -
-                                  duration_cast<microseconds>(remaining_sec);
+            auto remaining_usec =
+                duration_cast<microseconds>(timeout_time - current_time) - duration_cast<microseconds>(remaining_sec);
             tv.tv_sec = remaining_sec.count();
             tv.tv_usec = remaining_usec.count();
         }
@@ -503,7 +626,6 @@ KineticStatus BlockingKineticConnection::RunOperation(
             nonblocking_connection_->RemoveHandler(handler_key);
             return KineticStatus(StatusCode::CLIENT_IO_ERROR, "Network timeout");
         } else {
-
             // At least one FD was ready meaning that the connection is ready
             // to make some progress
             if (!nonblocking_connection_->Run(&read_fds, &write_fds, &nfds)) {

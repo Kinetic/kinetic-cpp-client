@@ -6,7 +6,7 @@ This repository contains a C++ kinetic client implementation.
 
 Protocol Version
 =================
-The client is using version `3.0.0` of the [Kinetic-Protocol](https://github.com/Kinetic/kinetic-protocol).
+The client is using version `3.0.5` of the [Kinetic-Protocol](https://github.com/Kinetic/kinetic-protocol).
 
 
 Dependencies

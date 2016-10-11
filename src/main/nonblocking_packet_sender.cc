@@ -86,8 +86,8 @@ NonblockingPacketServiceStatus NonblockingSender::Send() {
             request_queue_.pop_front();
             message_sequence_ = request->command->header().sequence();
             handler_key_ = request->handler_key;
-            current_writer_ = move(packet_writer_factory_->CreateWriter(socket_wrapper_,
-                move(request->message), request->value));
+            current_writer_ =
+                packet_writer_factory_->CreateWriter(socket_wrapper_, move(request->message), request->value);
             handler_ = move(request->handler);
         }
 
