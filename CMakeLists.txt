@@ -16,9 +16,9 @@ endif ()
 execute_process(
         COMMAND git log --oneline
         COMMAND wc -l
+        COMMAND tr -d [:space:]
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_COMMITS
-        OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 3)
